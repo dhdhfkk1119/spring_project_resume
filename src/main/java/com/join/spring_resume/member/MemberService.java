@@ -16,6 +16,7 @@ public class MemberService {
 
     }
 
+
     @Transactional
     public Member saveMember(MemberRequest.SaveDTO saveDTO){
         System.out.println("Service 데이터 확인" + saveDTO.toEntity()); // 엔티티 확인

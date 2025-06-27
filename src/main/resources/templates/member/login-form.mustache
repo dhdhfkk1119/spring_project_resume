@@ -2,20 +2,19 @@
 
 <div class="container p-5">
 
-    {{#boardList}}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h4 class="card-title mb-3">{{title}}</h4>
-                <p>작성자 : {{user.username}} | {{time}}</p>
-                <a href="/board/{{id}}" class="btn btn-primary">상세보기</a>
-            </div>
-        </div>
-    {{/boardList}}
+    <h3>일반 회원</h3>
+    <form action="/member/login" method="post">
+        <input type="text" name="memberId" placeholder="아이디">
+        <input type="text" name="password" placeholder="비밀번호">
+        <button type="submit">로그인</button>
+    </form>
 
-    <ul class="pagination d-flex justify-content-center">
-        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-    </ul>
+    <h3>기업 회원</h3>
+    <form action="/corp/login" method="post">
+        <input type="text" name="corpId" placeholder="아이디">
+        <input type="text" name="password" placeholder="비밀번호">
+        <button type="submit">로그인</button>
+    </form>
 
 </div>
 
