@@ -9,13 +9,15 @@ import java.util.Optional;
 
 public interface ResumeJpaRepository extends JpaRepository {
 
-    @Query("SELECT DISTINCT r FROM Resume r LEFT JOIN FETCH r.careers c " +
-            "WHERE r.member.id = :memberId ORDER BY r.resumeIdx DESC ")
-    List<Resume> findAllJoinUser(@Param("memberIdx") Long memberId);
+    //이력서 전체조회
+    @Query("SELECT DISTINCT r FROM Resume r LEFT JOIN FETCH r.careeList c " +
+            "WHERE r.member.memberIdx = :memberIdx ORDER BY r.resumeIdx DESC ")
+    List<Resume> findAll(@Param("memberIdx") Long memberId);
 
-    @Query("SELECT r FROM Resume r LEFT JOIN FETCH r.careers c " +
-            "WHERE r.resumeIdx = :resumeId ")
-    Optional<Resume> findByIdWithCareers(@Param("resumeId") Long resumeId);
+    //이력서 단건조회
+    @Query("SELECT r FROM Resume r LEFT JOIN FETCH r.careerList c " +
+            "WHERE r.resumeIdx = :resumeIdx ")
+    Optional<Resume> findById(@Param("resumeIdx") Long resumeId);
 
 }
 

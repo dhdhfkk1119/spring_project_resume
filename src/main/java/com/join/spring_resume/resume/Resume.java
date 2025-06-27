@@ -1,6 +1,7 @@
 package com.join.spring_resume.resume;
 
 import com.join.spring_resume.carrer.Career;
+import com.join.spring_resume.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,13 +25,14 @@ public class Resume {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resumeIdx;
 
-    //TODO Member 객체
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberIdx")
+    private Member member;
 
     @OneToMany(mappedBy = "resume",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-
     @JoinColumn(name = "careerIdx")
     private List<Career> careerList = new ArrayList<>();
 
@@ -40,10 +42,16 @@ public class Resume {
     private Timestamp createdAt;
 
     @Builder
-    public Resume(Long resumeIdx, String resumeContent, List<Career> careerList) {
+    public Resume(Long resumeIdx, Member member, String resumeContent, List<Career> careerList) {
         this.resumeIdx = resumeIdx;
+        this.member = member;
         this.resumeContent = resumeContent;
         this.careerList = careerList;
+    }
+
+    //Resume 소유권 확인 메서드
+    public boolean isOwner(Long memberIdx) {
+        return this.member.getMemberIdx().equals(memberIdx);
     }
 
 }
