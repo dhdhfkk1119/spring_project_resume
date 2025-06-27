@@ -37,6 +37,7 @@ public class Member {
     @Column(name = "address_detail")
     private String addressDetail; // 상세 주소
 
-    private LocalDateTime createdAt;
+    @CreationTimestamp
+    private Timestamp createdAt;
 
 }

@@ -25,8 +25,7 @@ public class MemberRequest {
         private String addressDefault; // 기본 주소
         private String addressDetail; // 상세 주소
 
-        private String repassword;
-        private LocalDateTime createdAt = LocalDateTime.now();
+        private String rePassword;
 
         public Member toEntity(){
             return Member.builder()
@@ -39,12 +38,12 @@ public class MemberRequest {
                     .address(address)
                     .addressDefault(addressDefault)
                     .addressDetail(addressDetail)
-                    .createdAt(createdAt)
                     .build();
         }
 
+
         public void isPassCheck(){
-            if(!password.equals(repassword)){
+            if(!password.equals(rePassword)){
                 throw new IllegalArgumentException("두개의 비밀번호가 다릅니다");
             }
         }
@@ -68,6 +67,5 @@ public class MemberRequest {
                 throw new IllegalArgumentException("비밀번호 입력해");
             }
         }
-
     }
 }
