@@ -1,0 +1,15 @@
+# server port setting
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+  port: 5000
+
+# ERROR > WARN > INFO > DEBUG > TRACE
+logging:
+  level:
+    root: WARN
+    com.join.blog: INFO           # 운영 시 중요한 로그만
+
+
+
