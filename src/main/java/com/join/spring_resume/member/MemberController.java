@@ -5,23 +5,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
+// @RequestMapping("/member")
 public class MemberController {
 
     private final MemberService memberService;
     private final HttpSession session; // 로그인시 세션 등록
 
-    @GetMapping("/user/login-form")
+    @GetMapping("login-form")
     public String loginForm(){
 
         return "member/login-form";
     }
 
-    @PostMapping("/user/login")
-    public String login(){
-
+    @PostMapping("/login")
+    public String login(MemberRequest.LoginDTO loginDTO){
+        Member member = memberService.login(loginDTO);
+        session.setAttribute("sessionUser",member); // 세선 저장
         return "redirect:/";
     }
 
@@ -33,15 +36,14 @@ public class MemberController {
 
     @PostMapping("/sign")
     public String sign(MemberRequest.SaveDTO saveDTO){
-        System.out.println("회원가입 비밀번호" + saveDTO.getPassword());
-        System.out.println("회원가입 주소" + saveDTO.getAddress());
-        System.out.println("회원가입 이메일" + saveDTO.getEmail());
-        System.out.println("회원가입 이름" + saveDTO.getUsername());
-        System.out.println("회원가입 나이" + saveDTO.getAge());
+        System.out.println("Controller 데이터 확인" + saveDTO.toEntity()); // 엔티티 확인
+        // saveDTO.isPassCheck(); // 회원 비밀번호 체크
 
-        saveDTO.isPassCheck(); // 회원 비밀번호 체크
 
-        memberService.saveMember(saveDTO);
+        Member saved = memberService.saveMember(saveDTO);
+        System.out.println("Controller 데이터 확인" + saved.getMemberIdx()); // 엔티티 확인
+        System.out.println("Controller 데이터 확인" + saved.getCreatedAt()); // 엔티티 확인
+
         return "redirect:/";
     }
     
