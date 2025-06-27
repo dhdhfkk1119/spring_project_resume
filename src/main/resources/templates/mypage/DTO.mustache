@@ -1,0 +1,71 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+// Spring Boot Controller 예시
+@Controller
+public class MyPageController {
+
+@GetMapping("/mypage")
+public String myPage(Model model, Principal principal) { // Principal은 로그인한 사용자 정보 제공 (Spring Security 사용 시)
+
+// 사용자 로그인 상태 확인 및 정보 설정 (예시)
+boolean isLoggedIn = (principal != null); // 실제로는 Spring Security Context에서 가져옴
+String username = isLoggedIn ? principal.getName() : ""; // 로그인한 사용자 이름
+
+Map<String, Object> myPageData = new HashMap<>();
+myPageData.put("loggedInUser", isLoggedIn);
+myPageData.put("username", username);
+
+List<Map<String, Object>> menuList = new ArrayList<>();
+
+Map<String, Object> item1 = new HashMap<>();
+item1.put("text", "이력서 등록");
+item1.put("link", "/resume/register"); // 실제 링크
+item1.put("isNew", false); // 신규 여부
+menuList.add(item1);
+
+Map<String, Object> item2 = new HashMap<>();
+item2.put("text", "이력서 열람");
+item2.put("link", "/resume/view");
+item2.put("isNew", false);
+menuList.add(item2);
+
+Map<String, Object> item3 = new HashMap<>();
+item3.put("text", "이력서 관리");
+item3.put("link", "/resume/manage");
+item3.put("isNew", true); // 이 항목은 신규 표시
+menuList.add(item3);
+
+Map<String, Object> item4 = new HashMap<>();
+item4.put("text", "나의 지원 현황");
+item4.put("link", "/my/applications");
+item4.put("isNew", false);
+menuList.add(item4);
+
+Map<String, Object> item5 = new HashMap<>();
+item5.put("text", "내가 작성한 게시판 관리");
+item5.put("link", "/my/posts");
+item5.put("isNew", false);
+menuList.add(item5);
+
+Map<String, Object> item6 = new HashMap<>();
+item6.put("text", "관심 기업 및 비슷한 기업정보");
+item6.put("link", "/my/companies");
+item6.put("isNew", true); // 이 항목도 신규 표시
+menuList.add(item6);
+
+myPageData.put("menuList", menuList);
+
+model.addAllAttributes(myPageData); // Map의 모든 속성을 모델에 추가
+
+// 또는 Map 없이 바로 모델에 추가
+// model.addAttribute("loggedInUser", isLoggedIn);
+// model.addAttribute("username", username);
+// model.addAttribute("menuList", menuList);
+
+
+return "mypage"; // src/main/resources/templates/mypage.html (또는 .mustache)를 찾음
+}
+}
