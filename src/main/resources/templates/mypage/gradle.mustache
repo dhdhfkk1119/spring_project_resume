@@ -1,0 +1,19 @@
+dependencies {
+// Spring Boot Starter Web (내장 톰캣 및 MVC 기능 포함)
+implementation 'org.springframework.boot:spring-boot-starter-web'
+
+// Mustache 템플릿 엔진 의존성 추가
+implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
+// Spring Data JPA (선택 사항, 데이터베이스 연동 시 필요)
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+// MySQL Driver
+runtimeOnly 'com.mysql:mysql-connector-j'
+
+// Lombok (선택 사항, DTO/VO 작성을 편리하게 해줌)
+compileOnly 'org.projectlombok:lombok'
+annotationProcessor 'org.projectlombok:lombok'
+
+// 테스트 관련 (기본 포함)
+testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

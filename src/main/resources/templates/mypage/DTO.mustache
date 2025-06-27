@@ -1,0 +1,30 @@
+package com.mypage.domain;
+
+public class MenuItem {
+private String text;
+private String link;
+private boolean isNew;
+
+public MenuItem(String text, String link) {
+this(text, link, false);
+}
+
+public MenuItem(String text, String link, boolean isNew) {
+this.text = text;
+this.link = link;
+this.isNew = isNew;
+}
+
+// Getter
+public String getText() {
+return text;
+}
+
+public String getLink() {
+return link;
+}
+
+public boolean isNew() {
+return isNew;
+}
+}
