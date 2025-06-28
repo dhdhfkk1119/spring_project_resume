@@ -33,8 +33,11 @@ public class Resume {
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true)
-    @JoinColumn(name = "careerIdx")
+    @Builder.Default
     private List<Career> careerList = new ArrayList<>();
+    // @JoinColumn(name = "careerIdx") 오류뜸 수정-> @Builder.Default
+
+
 
     private String resumeContent;
 
