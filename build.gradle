@@ -45,6 +45,10 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 	implementation("org.apache.commons:commons-lang3:3.10")
+
+	// 비밀번호 암호화 passwordEncoder
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 
