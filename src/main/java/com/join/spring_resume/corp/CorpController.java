@@ -5,9 +5,12 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @RequiredArgsConstructor
+// @RequestMapping("/corp")
 public class CorpController {
 
     private final CorpService corpService;
@@ -19,7 +22,7 @@ public class CorpController {
 
         Corp corp = corpService.login(loginDTO);
         SessionUser sessionUser = SessionUser.fromCorp(corp);
-        session.setAttribute("sessionUser",sessionUser);
+        session.setAttribute("session",sessionUser);
 
         return "redirect:/";
     }

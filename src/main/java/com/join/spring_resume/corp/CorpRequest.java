@@ -27,6 +27,25 @@ public class CorpRequest {
                     .build();
         }
 
+        public void validate() {
+            if(corpName == null || corpName.trim().isEmpty()){
+                throw new IllegalArgumentException("기업명 입력해");
+            }
+            if(corpId == null || corpId.trim().isEmpty()){
+                throw new IllegalArgumentException("아이디 입력해");
+            }
+            if(email == null || email.trim().isEmpty()){
+                throw new IllegalArgumentException(" 이메일 입력해");
+            }
+            if(password == null || password.trim().isEmpty()){
+                throw new IllegalArgumentException("비밀번호 입력해");
+            }
+            if(rePassword == null || rePassword.trim().isEmpty()){
+                throw new IllegalArgumentException("재 비밀번호 입력해");
+            }
+
+        }
+
         public void isPassCheck(){
             if(!password.equals(rePassword)){
                 throw new IllegalArgumentException("두개의 비밀번호가 다릅니다");

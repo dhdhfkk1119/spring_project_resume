@@ -37,6 +37,8 @@ public class Member {
     @Column(name = "address_detail")
     private String addressDetail; // 상세 주소
 
+    private String phoneNumber; // 전화번호
+
     @CreationTimestamp
     private Timestamp createdAt;
 

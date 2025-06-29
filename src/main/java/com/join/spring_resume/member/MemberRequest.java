@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 public class MemberRequest {
 
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -25,9 +26,15 @@ public class MemberRequest {
         private String addressDefault; // 기본 주소
         private String addressDetail; // 상세 주소
 
-        private String rePassword;
+        private String rePassword; // 비밀번호 재 입력
+
+        private String phone1;
+        private String phone2;
+        private String phone3;
 
         public Member toEntity(){
+            String phoneNumber = phone1 + phone2 + phone3; // --> 따로 받아서 넘겨주기
+            
             return Member.builder()
                     .username(this.username)
                     .password(this.password)
@@ -38,6 +45,7 @@ public class MemberRequest {
                     .address(address)
                     .addressDefault(addressDefault)
                     .addressDetail(addressDetail)
+                    .phoneNumber(phoneNumber)
                     .build();
         }
 

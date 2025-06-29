@@ -19,4 +19,9 @@ public class CorpService {
         return corpRepository.findByCorpIdAndPassword(loginDTO.getCorpId(), loginDTO.getPassword())
                 .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다"));
     }
+
+    public Corp findById(Long id) {
+        return corpRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("기업을 찾을 수 없습니다."));
+    }
 }

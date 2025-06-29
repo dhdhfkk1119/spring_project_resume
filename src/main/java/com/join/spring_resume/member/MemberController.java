@@ -24,11 +24,11 @@ public class MemberController {
     }
 
     // 로그인 기능
-    @PostMapping("/login")
+    @PostMapping("/member/login")
     public String login(MemberRequest.LoginDTO loginDTO){
         Member member = memberService.login(loginDTO);
-        SessionUser sessionUser = SessionUser.fromMember(member);
-        session.setAttribute("sessionUser",member); // 세선 저장
+        SessionUser sessionUser = SessionUser.fromMember(member); // 해당 유저가 있으면 세션에 정보를 담음
+        session.setAttribute("session",sessionUser); // 세선 저장
         return "redirect:/";
     }
 
