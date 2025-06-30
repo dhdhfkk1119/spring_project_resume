@@ -1,0 +1,42 @@
+{{> layout/header}}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">내 이력서 목록</h1>
+    <a href="/resume/save-form" class="btn btn-primary">새 이력서 작성</a>
+</div>
+
+<div class="row row-cols-1 g-4">
+    <!-- 이력서가 하나도 없을 경우 -->
+    {{^resume}}
+        <div class="col">
+            <div class="card text-center p-5">
+                <div class="card-body">
+                    <p class="card-text">작성된 이력서가 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    {{/resume}}
+
+    <!-- 이력서가 하나 이상 있을 경우 반복문 실행 -->
+    {{#resume}}
+        <div class="col">
+            <a href="/resume/{{resumeIdx}}" class="card-link">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">이력서 번호: {{resumeIdx}}</h5>
+                        <p class="card-text text-truncate">{{resumeContent}}</p>
+                        <p class="card-text">
+                            <small class="text-muted">작성자: {{authorName}} | 최종수정: {{createdAt}}</small>
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {{/resume}}
+</div>
+
+
+
+
+
+{{> layout/footer}}

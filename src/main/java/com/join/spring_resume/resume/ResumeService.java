@@ -16,7 +16,7 @@ public class ResumeService {
 
     //이력서 저장
     @Transactional
-    public Resume save(ResumeRequest.saveDTO saveDTO) {
+    public Resume save(ResumeRequest.saveDTO saveDTO, Member sessionMember) {
         Resume resume = saveDTO.toEntity();
         resumeJpaRepository.save(resume);
         return resume;
@@ -68,4 +68,8 @@ public class ResumeService {
         }
     }
 
+    //내 이력서만
+    public List<Resume> findMyResumes(Long memberIdx) {
+        return resumeJpaRepository.findAllByMemberIdx(memberIdx);
+    }
 }//

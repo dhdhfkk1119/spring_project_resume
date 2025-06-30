@@ -14,14 +14,13 @@ public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
     // careeList 오타 수정함 ->  careerList
     @Query("SELECT DISTINCT r FROM Resume r LEFT JOIN FETCH r.careerList c " +
             "WHERE r.member.memberIdx = :memberIdx ORDER BY r.resumeIdx DESC")
-    List<Resume> findAll(@Param("memberIdx") Long memberId);
-
+    List<Resume> findAllByMemberIdx(@Param("memberIdx") Long memberId);
 
 
     //이력서 단건조회
     @Query("SELECT r FROM Resume r LEFT JOIN FETCH r.careerList c " +
             "WHERE r.resumeIdx = :resumeIdx ")
-    Optional<Resume> findById(@Param("resumeIdx") Long resumeId);
+    Optional<Resume> findByResumeIdx(@Param("resumeIdx") Long resumeId);
 
-}
+}//
 
