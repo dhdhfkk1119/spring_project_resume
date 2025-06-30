@@ -1,0 +1,128 @@
+{{> layout/header}}
+<style>
+    .action-buttons {
+        display: none;
+        position: absolute;
+        top: 30px;
+        right: 5px;
+        background-color: white;
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        z-index: 100;
+    }
+
+    .action-buttons button {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: none;
+        border: none;
+        padding: 5px 8px;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+    }
+
+    .action-buttons button:hover {
+        background-color: #f5f5f5;
+    }
+
+    .action-buttons .delete:hover {
+        color: red;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            flex-direction: column;
+        }
+
+        .card-body .w-75,
+        .card-body .w-25 {
+            width: 100% !important;
+        }
+
+        .action-buttons {
+            right: 10px;
+        }
+    }
+    .custom-gray {
+        color: #373f57;
+        font-size:12px;
+    }
+    .custom-bold {
+        font-size : 16px;
+        font-weight:700;
+    }
+</style>
+
+<script>
+    function toggleActions(id) {
+        const box = document.getElementById('action-box-' + id);
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // 바깥 클릭 시 닫기
+    window.addEventListener('click', function(e) {
+        document.querySelectorAll('.action-buttons').forEach(box => {
+            if (!box.contains(e.target) && !e.target.closest('.gear-btn')) {
+                box.style.display = 'none';
+            }
+        });
+    });
+</script>
+<div class="container p-5">
+
+    {{#recruitList}}
+        <div class="card mb-3 position-relative">
+            <div class="card-body d-flex flex-wrap">
+                <!-- 왼쪽 공고 정보 -->
+                <div class="w-75">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold ">{{recruitTitle}}</a>
+                        <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
+                    </div>
+
+                    <div class="mb-2 custom-gray">
+                        <span>{{area}} *</span>
+                        <span>{{career}} *</span>
+                        <span>{{education}} *</span>
+                        <span>{{workType}}</span>
+                    </div>
+
+                    <div>
+                        <span class="custom-bold">{{recruitContent}}</span>
+                    </div>
+                </div>
+
+                <!-- 오른쪽 기업 정보 및 설정 버튼 -->
+                <div class="d-flex w-25 align-items-center position-relative">
+                    <span class="fw-bold">{{corp.corpName}}</span>
+
+                    <span class="position-absolute gear-btn" style="top: 5px; right: 5px; cursor: pointer;" onclick="toggleActions({{recruitIdx}})">
+                        <i class="fa-solid fa-gear"></i>
+                    </span>
+                    <!-- 토글 액션 박스 -->
+                    <div id="action-box-{{recruitIdx}}" class="action-buttons">
+                        <button class="edit" onclick="location.href='/recruit/{{recruitIdx}}/update-form'">
+                            <i class="fa-solid fa-pen-to-square"></i> 수정
+                        </button>
+                        <form action="/recruit/{{recruitIdx}}/delete" method="post">
+                            <button class="delete">
+                                <i class="fa-solid fa-trash"></i> 삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{/recruitList}}
+
+    <ul class="pagination d-flex justify-content-center">
+        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+</div>
+
+{{> layout/footer}}

@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface RecruitRepository extends JpaRepository<Recruit,Long> {
     Optional<Recruit> findByRecruitIdx(Long idx);
-    // List<Recruit> findByCorp_CorpIdx(Long corpIdx); // 모 기업이 등록한 모든 공고 보기
+    List<Recruit> findByCorp_CorpIdx(Long corpIdx); // 모 기업이 등록한 모든 공고 보기
 }

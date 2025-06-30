@@ -21,6 +21,7 @@ public class RecruitRequest {
         private String workType; // 근무형태 (계약직, 정규직)
         private String startAt; // 모집일, yyyy-MM-dd 형태로 들어옴
         private String endAt;   // 마감일
+        private String logoImages;
 
         public Recruit toEntity(Corp corp) {
             return Recruit.builder()
@@ -34,6 +35,7 @@ public class RecruitRequest {
                     .workType(workType)
                     .startAt(toStartOfDay(startAt))  // 00:00:00으로 변환 변환안하면 오류남
                     .endAt(toEndOfDay(endAt))        // 23:59:59.999999999로 변환
+                    .logoImages(logoImages)
                     .build();
         }
 
@@ -71,6 +73,7 @@ public class RecruitRequest {
         }
     }
 
+    // 업데이트용
     @Data
     public static class RecruitUpdateDTO{
         private Corp corpIdx; // 기업 번호
@@ -78,8 +81,10 @@ public class RecruitRequest {
         private String area; // 모집 지역
         private int recruitNumber;
         private String recruitContent;
-        private Timestamp startAt; // 모집일
-        private Timestamp endAt; // 끝나는 일
+        private LocalDateTime startAt; // 모집일
+        private LocalDateTime endAt; // 끝나는 일
 
     }
+
+
 }

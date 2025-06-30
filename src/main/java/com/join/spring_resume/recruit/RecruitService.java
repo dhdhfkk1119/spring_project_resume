@@ -40,8 +40,8 @@ public class RecruitService {
         recruit.setArea(recruitDTO.getArea());
         recruit.setRecruitNumber(recruitDTO.getRecruitNumber());
         recruit.setRecruitContent(recruitDTO.getRecruitContent());
-        recruit.setStartAt(recruitDTO.getStartAt().toLocalDateTime());
-        recruit.setEndAt(recruitDTO.getEndAt().toLocalDateTime());
+        recruit.setStartAt(recruitDTO.getStartAt());
+        recruit.setEndAt(recruitDTO.getEndAt());
 
     }
 
@@ -50,5 +50,18 @@ public class RecruitService {
         return recruitRepository.findAll();
     }
 
+    // 현재 로그인 기업의 모든 공고 보기
+    public List<Recruit> findByAllList(Long idx){
+        return recruitRepository.findByCorp_CorpIdx(idx);
+    }
+
+    public Recruit findById(Long idx){
+        return recruitRepository.findById(idx).orElseThrow(() -> new RuntimeException("해당 공고를찾을 수 없습니다"));
+    }
+
+
+    public void deleteById(Long id){
+        recruitRepository.deleteById(id);
+    }
 
 }
