@@ -1,0 +1,86 @@
+{{> layout/header}}
+
+<div class="container p-5">
+
+    <form action="/sign" method="post">
+        <div>
+            <input type="text" name="username" placeholder="이름">
+        </div>
+        <div>
+            <input type="text" name="password" placeholder="비밀번호">
+        </div>
+        <div>
+            <input type="text" name="repassword" placeholder="재비밀번호">
+        </div>
+        <div>
+            <input type="text" name="memberId" placeholder="아이디">
+        </div>
+        <div>
+            <input type="text" name="email" placeholder="이메일">
+        </div>
+        <div>
+            <select name="sex" id="">
+                <option value="남자">남자</option>
+                <option value="여자">여자</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="address">주소</label>
+            <div class="input-row">
+                <div class="input-row-btn">
+                    <input type="text" id="address" class="address" name="address" required>
+                    <button type="button" onclick="searchAddress()">주소 찾기</button>
+                </div>
+                <input type="text" id="addressDefault" name="addressDefault" class="addressDefault"
+                       placeholder="기본 주소를 입력하세요">
+                <input type="text" id="addressDetail" name="addressDetail" class="addressDetail"
+                       placeholder="상세 주소를 입력하세요">
+            </div>
+        </div>
+        <button type="submit">회원가입</button>
+    </form>
+
+
+</div>
+
+{{> layout/footer}}
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    // 주소 찾기 (카카오 주소 API 예제)
+function searchAddress() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            // 팝업을 통한 검색 결과 항목 클릭 시 실행
+            var addr = ''; // 주소_결과값이 없을 경우 공백
+            var extraAddr = ''; // 참고항목
+
+            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+            if (data.userSelectedType === 'R') { // 도로명 주소를 선택
+                addr = data.roadAddress;
+            } else { // 지번 주소를 선택
+                addr = data.jibunAddress;
+            }
+
+            if(data.userSelectedType === 'R'){
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraAddr += data.bname;
+                }
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                if(extraAddr !== ''){
+                    extraAddr = ' (' + extraAddr + ')';
+                }
+            } else {
+                document.getElementById("UserAdd1").value = '';
+            }
+
+            // 선택된 우편번호와 주소 정보를 input 박스에 넣는다.
+            document.getElementById('address').value = data.zonecode;
+            document.getElementById("addressDefault").value = addr;
+            document.getElementById("addressDefault").value += extraAddr;
+            document.getElementById("addressDetail").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
+        }
+    }).open();
+}
+</script>
