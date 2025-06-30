@@ -17,10 +17,17 @@ public class MemberController {
     private final HttpSession session; // 로그인시 세션 등록
 
     // 로그인 화면
-    @GetMapping("login-form")
+    @GetMapping("/login-form")
     public String loginForm(){
 
         return "member/login-form";
+    }
+
+    // 회원 가입 화면
+    @GetMapping("/sign-form")
+    public String signForm(){
+
+        return "member/sign-form";
     }
 
     // 로그인 기능
@@ -32,15 +39,9 @@ public class MemberController {
         return "redirect:/";
     }
 
-    // 회원 가입 화면
-    @GetMapping("/sign-form")
-    public String signForm(){
-
-        return "member/sign-form";
-    }
     
     // 회원 가입 기능
-    @PostMapping("/sign")
+    @PostMapping("/member/sign")
     public String sign(MemberRequest.SaveDTO saveDTO){
         System.out.println("Controller 데이터 확인" + saveDTO.toEntity()); // 엔티티 확인
         // saveDTO.isPassCheck(); // 회원 비밀번호 체크
@@ -58,6 +59,12 @@ public class MemberController {
     public String logout() {
         session.invalidate();
         return "redirect:/";
+    }
+
+    // 마이페이지
+    @GetMapping("/member/mypage")
+    public String myPage(){
+        return "mypage/member-page";
     }
     
 }

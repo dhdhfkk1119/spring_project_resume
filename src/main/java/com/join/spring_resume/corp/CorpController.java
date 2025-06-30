@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 @RequiredArgsConstructor
-// @RequestMapping("/corp")
+@RequestMapping("/corp")
 public class CorpController {
 
     private final CorpService corpService;
     private final HttpSession session;
 
 
-    @PostMapping("/corp/login")
+    @PostMapping("/login")
     public String login(CorpRequest.LoginDTO loginDTO){
 
         Corp corp = corpService.login(loginDTO);

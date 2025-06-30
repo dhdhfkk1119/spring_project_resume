@@ -41,4 +41,6 @@ public class Recruit {
 
     @CreationTimestamp
     private Timestamp createdAt;
+
+    private String logoImages;
 }
