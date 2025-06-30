@@ -1,16 +1,59 @@
 {{> layout/header}}
+<style>
+    .custom-bold{
+        padding-right: 3px;
+        max-width: calc(100% - 180px);
+        font-size: 18px;
+        font-weight: bold;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .custom-gray {
+        color: #949494;
+        font-size : 12px;
+    }
+    .recruit-link {
+      color: #000;
+      text-decoration: none;
+    }
 
+    .recruit-link:hover {
+      color: #2d67ff;
+      text-decoration: underline;
+    }
+
+    .recruit-link:visited {
+      color: #949494;
+    }
+</style>
 <div class="container p-5">
 
-    {{#boardList}}
+    {{#recruitList}}
         <div class="card mb-3">
-            <div class="card-body">
-                <h4 class="card-title mb-3">{{title}}</h4>
-                <p>작성자 : {{user.username}} | {{time}}</p>
-                <a href="/board/{{id}}" class="btn btn-primary">상세보기</a>
+            <div class="card-body d-flex">
+                <div class="w-75">
+                    <!-- 공고 타이틀 및 구인 날짜 -->
+                    <div class="d-flex align-items-center">
+                        <a href="/recruit/{recruitIdx}" class="recruit-link"><span class="fw-bold custom-bold">{{recruitTitle}}</span></a>
+                        <span class="custom-gray">~ {{endAt}} (월)</span>
+                    </div>
+                    <!-- 공고 타이틀 및 구인 날짜 -->
+                    <div class="mb-2 custom-gray">
+                        <span>{{area}} *</span>
+                        <span>{{career}} *</span>
+                        <span>{{education}} *</span>
+                        <span>{{workType}}</span>
+                    </div>
+                    <div>
+                        <span class="custom-bold">{{recruitContent}}</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center w-25 custom-bold">
+                    <span class="fw-bold">{{corp.corpName}}</span>
+                </div>
             </div>
         </div>
-    {{/boardList}}
+    {{/recruitList}}
 
     <ul class="pagination d-flex justify-content-center">
         <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>

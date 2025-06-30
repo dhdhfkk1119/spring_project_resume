@@ -7,15 +7,21 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ResumeJpaRepository extends JpaRepository {
+// <Resume,Long> 제네릭 부분 빼먹어서 수정함
+public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
 
-    @Query("SELECT DISTINCT r FROM Resume r LEFT JOIN FETCH r.careers c " +
-            "WHERE r.member.id = :memberId ORDER BY r.resumeIdx DESC ")
-    List<Resume> findAllJoinUser(@Param("memberIdx") Long memberId);
+    //이력서 전체조회
+    // careeList 오타 수정함 ->  careerList
+    @Query("SELECT DISTINCT r FROM Resume r LEFT JOIN FETCH r.careerList c " +
+            "WHERE r.member.memberIdx = :memberIdx ORDER BY r.resumeIdx DESC")
+    List<Resume> findAll(@Param("memberIdx") Long memberId);
 
-    @Query("SELECT r FROM Resume r LEFT JOIN FETCH r.careers c " +
-            "WHERE r.resumeIdx = :resumeId ")
-    Optional<Resume> findByIdWithCareers(@Param("resumeId") Long resumeId);
+
+
+    //이력서 단건조회
+    @Query("SELECT r FROM Resume r LEFT JOIN FETCH r.careerList c " +
+            "WHERE r.resumeIdx = :resumeIdx ")
+    Optional<Resume> findById(@Param("resumeIdx") Long resumeId);
 
 }
 

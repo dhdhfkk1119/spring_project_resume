@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -14,6 +15,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "member_tb")
 public class Member {
 
     @Id
@@ -28,9 +30,16 @@ public class Member {
     private int age;
     
     private String address; // 지번
+
+    @Column(name = "address_default")
     private String addressDefault; // 기본 주소
+
+    @Column(name = "address_detail")
     private String addressDetail; // 상세 주소
-    
+
+    private String phoneNumber; // 전화번호
+
     @CreationTimestamp
     private Timestamp createdAt;
+
 }
