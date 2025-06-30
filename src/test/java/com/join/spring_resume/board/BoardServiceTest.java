@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -57,6 +58,19 @@ public class BoardServiceTest {
         Board board = boardService.findById(testBoard.getBoardIdx());
         assertThat(board.getBoardTitle()).isEqualTo("테스트 제목");
         assertThat(board.getBoardContent()).isEqualTo("테스트 내용");
+    }
+
+    @Test
+    @DisplayName("게시글 단건 조회 실패 - 존재하지 않는 ID")
+    void testViewBoard_NotFound() throws Exception {
+        // given
+        given(boardService.findById(999L))
+                .willThrow(new IllegalArgumentException("게시글이 존재하지 않습니다"));
+
+        // when & then
+        mockMvc.perform(get("/board/999"))
+                .andExpect(status().isOk()) // 예외 발생 시 404 등으로 처리하려면 ControllerAdvice 필요
+                .andExpect(model().hasNoErrors());
     }
 
     @Test

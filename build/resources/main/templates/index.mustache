@@ -13,17 +13,17 @@
         font-size : 12px;
     }
     .recruit-link {
-      color: #000; /* 기본 링크 색상 */
-      text-decoration: none; /* 밑줄 제거 (원하면 유지 가능) */
+      color: #000;
+      text-decoration: none;
     }
 
     .recruit-link:hover {
-      color: #2d67ff; /* hover 시 파란색 */
-      text-decoration: underline; /* hover 시 밑줄 (선택사항) */
+      color: #2d67ff;
+      text-decoration: underline;
     }
 
     .recruit-link:visited {
-      color: #949494; /* 방문한 링크 */
+      color: #949494;
     }
 </style>
 <div class="container p-5">
@@ -33,7 +33,7 @@
             <div class="card-body d-flex">
                 <div class="w-75">
                     <!-- 공고 타이틀 및 구인 날짜 -->
-                    <div class="d-flex d-flex align-items-center">
+                    <div class="d-flex align-items-center">
                         <a href="/recruit/{recruitIdx}" class="recruit-link"><span class="fw-bold custom-bold">{{recruitTitle}}</span></a>
                         <span class="custom-gray">~ {{endAt}} (월)</span>
                     </div>
