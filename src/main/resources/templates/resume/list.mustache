@@ -7,7 +7,7 @@
 
 <div class="row row-cols-1 g-4">
     <!-- 이력서가 하나도 없을 경우 -->
-    {{^resume}}
+    {{^resumes}}
         <div class="col">
             <div class="card text-center p-5">
                 <div class="card-body">
@@ -15,10 +15,10 @@
                 </div>
             </div>
         </div>
-    {{/resume}}
+    {{/resumes}}
 
     <!-- 이력서가 하나 이상 있을 경우 반복문 실행 -->
-    {{#resume}}
+    {{#resumes}}
         <div class="col">
             <a href="/resume/{{resumeIdx}}" class="card-link">
                 <div class="card shadow-sm">
@@ -26,17 +26,13 @@
                         <h5 class="card-title">이력서 번호: {{resumeIdx}}</h5>
                         <p class="card-text text-truncate">{{resumeContent}}</p>
                         <p class="card-text">
-                            <small class="text-muted">작성자: {{authorName}} | 최종수정: {{createdAt}}</small>
+                            <small class="text-muted">작성자: {{member.username}} | 최종수정: {{createdAt}}</small>
                         </p>
                     </div>
                 </div>
             </a>
         </div>
-    {{/resume}}
+    {{/resumes}}
 </div>
-
-
-
-
 
 {{> layout/footer}}

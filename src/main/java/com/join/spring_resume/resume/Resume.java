@@ -26,7 +26,7 @@ public class Resume {
     private Long resumeIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberIdx")
+    @JoinColumn(name = "member_idx")
     private Member member;
 
     @OneToMany(mappedBy = "resume",
