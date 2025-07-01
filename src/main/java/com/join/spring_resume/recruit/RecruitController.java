@@ -1,5 +1,6 @@
 package com.join.spring_resume.recruit;
 
+import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.corp.CorpService;
 import com.join.spring_resume.session.SessionUser;
@@ -105,12 +106,28 @@ public class RecruitController {
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
-        if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
-            throw new RuntimeException("기업 로그인 상태가 아닙니다.");
+        if (sessionUser == null ) {
+            throw new RuntimeException("기업 회원만 수정할 수 있습니다");
+        }
+        if(!"CORP".equals(sessionUser.getRole())){
+            throw new Exception403("기업 회원만 수정할 수 있습니다.");
+        }
+        Recruit recruit = recruitService.findById(idx);
+        if(!recruit.isOwner(sessionUser.getId())){
+            throw new Exception403("본인의 공고만 수정할 수 있습니다");
         }
 
         recruitService.recruitUpdate(idx,recruitDTO);
 
         return "redirect:/";
+    }
+
+    // 공고 상세페이지
+    @GetMapping("/{recruitIdx}")
+    public String detail(@PathVariable(name = "recruitIdx")Long idx,Model model){
+        Recruit recruit = recruitService.findById(idx);
+        RecruitResponseDTO responseDTO = new RecruitResponseDTO(recruit); // 시간 변화
+        model.addAttribute("recruit",responseDTO);
+        return "recruit/recruit-detail";
     }
 }

@@ -12,13 +12,14 @@ import lombok.Data;
 public class SessionUser {
     private Long id;
     private String userId;
+    private String username;
     private String role;
 
     public static SessionUser fromMember(Member member) {
-        return new SessionUser(member.getMemberIdx(), member.getMemberId(), "MEMBER");
+        return new SessionUser(member.getMemberIdx(), member.getUsername() ,member.getMemberId(), "MEMBER");
     }
 
     public static SessionUser fromCorp(Corp corp) {
-        return new SessionUser(corp.getCorpIdx(), corp.getCorpId(), "CORP");
+        return new SessionUser(corp.getCorpIdx(), corp.getCorpName() ,corp.getCorpId(), "CORP");
     }
 }

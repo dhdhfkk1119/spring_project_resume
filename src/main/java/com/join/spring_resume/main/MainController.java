@@ -36,15 +36,21 @@ public class MainController {
         return "index";
     }
 
+    //팀 소개페이지
+    @GetMapping("/about")
+    public String about(){
+        return "page/about";
+    }
+    
     // 마이페이지
     @GetMapping("/member/mypage")
     public String memberMyPage(){
-        return "mypage/member-page";
+        return "page/member-page";
     }
 
     // 마이페이지
     @GetMapping("/recruit/mypage")
     public String corpMyPage(){
-        return "mypage/corp-page";
+        return "page/corp-page";
     }
 }
