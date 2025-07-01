@@ -78,9 +78,9 @@
         <div class="card mb-3 position-relative">
             <div class="card-body d-flex flex-wrap">
                 <!-- 왼쪽 공고 정보 -->
-                <div class="w-75">
+                <div class="w-75 overflow-hidden">
                     <div class="d-flex align-items-center flex-wrap gap-2">
-                        <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold ">{{recruitTitle}}</a>
+                        <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold text-truncate d-inline-block ">{{recruitTitle}}</a>
                         <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
                     </div>
 
@@ -92,7 +92,7 @@
                     </div>
 
                     <div>
-                        <span class="custom-bold">{{recruitContent}}</span>
+                        <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
                     </div>
                 </div>
 

@@ -14,6 +14,9 @@ public class RecruitService {
 
     private final RecruitRepository recruitRepository;
 
+    public Recruit findById(Long idx){
+        return recruitRepository.findById(idx).orElseThrow(() -> new RuntimeException("해당 공고를찾을 수 없습니다"));
+    }
     // 공고 등록하기
     @Transactional
     public void recruit(RecruitRequest.RecruitDTO recruitDTO, Corp corp){
@@ -27,21 +30,31 @@ public class RecruitService {
     public void recruitDelete(Long idx){
         Recruit recruit = recruitRepository.findByRecruitIdx(idx)
                 .orElseThrow(() -> new RuntimeException("해당 유저를 찾을수 없습니다"));
+
+        if(recruit.isOwner(idx)){
+            throw new RuntimeException("삭제권한이없습니다");
+        }
+
         recruitRepository.delete(recruit);
     }
 
     // 공고 수정
     @Transactional
     public void recruitUpdate(Long idx,RecruitRequest.RecruitUpdateDTO recruitDTO){
-        Recruit recruit = recruitRepository.findByRecruitIdx(idx)
-                .orElseThrow(() -> new RuntimeException("해당 유저를 찾을수 없습니다"));
+
+        Recruit recruit = recruitRepository.findById(idx)
+                .orElseThrow(() -> new RuntimeException("해당 게시물을 찾을 수 없습니다"));
+
+        if(recruit.isOwner(idx)){
+            throw new RuntimeException("수정권한이없습니다");
+        }
 
         recruit.setRecruitTitle(recruitDTO.getRecruitTitle());
         recruit.setArea(recruitDTO.getArea());
         recruit.setRecruitNumber(recruitDTO.getRecruitNumber());
         recruit.setRecruitContent(recruitDTO.getRecruitContent());
-        recruit.setStartAt(recruitDTO.getStartAt());
-        recruit.setEndAt(recruitDTO.getEndAt());
+        recruit.setStartAt(recruitDTO.getStartAt().atStartOfDay());
+        recruit.setEndAt(recruitDTO.getEndAt().atStartOfDay());
 
     }
 
@@ -53,10 +66,6 @@ public class RecruitService {
     // 현재 로그인 기업의 모든 공고 보기
     public List<Recruit> findByAllList(Long idx){
         return recruitRepository.findByCorp_CorpIdx(idx);
-    }
-
-    public Recruit findById(Long idx){
-        return recruitRepository.findById(idx).orElseThrow(() -> new RuntimeException("해당 공고를찾을 수 없습니다"));
     }
 
 

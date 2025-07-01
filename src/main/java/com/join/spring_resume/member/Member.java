@@ -42,4 +42,5 @@ public class Member {
     @CreationTimestamp
     private Timestamp createdAt;
 
+
 }

@@ -45,11 +45,6 @@ public class RecruitController {
         return "redirect:/";
     }
 
-    // 마이페이지
-    @GetMapping("/mypage")
-    public String myPage(){
-        return "mypage/corp-page";
-    }
 
     // 현재 로그인한 유저의 공고 목록 확인 하기
     @GetMapping("/list")
@@ -69,7 +64,14 @@ public class RecruitController {
 
     // 등록한 공고 삭제하기
     @PostMapping("/{recruitIdx}/delete")
-    public String delete(@PathVariable(name = "recruitIdx")Long idx){
+    public String delete(@PathVariable(name = "recruitIdx")Long idx,HttpSession httpSession){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        Recruit recruit = recruitService.findById(idx); // 해당 공고 의 정보를 가져옴
+
+        if(!recruit.isOwner(sessionUser.getId())){
+            throw new RuntimeException("삭제에대한 권한이없습니다");
+        }
+
         recruitService.deleteById(idx);
         return "redirect:/";
     }
@@ -85,20 +87,21 @@ public class RecruitController {
 
         Recruit recruit = recruitService.findById(idx); // 해당 공고 의 정보를 가져옴
 
-        if(!recruit.getCorp().getCorpIdx().equals(sessionUser.getId())){
-            throw new RuntimeException("해당 공고에 대한 수정 권한이 없습니다.");
+        if(!recruit.isOwner(sessionUser.getId())){
+            throw new RuntimeException("수정권한이없습니다");
         }
 
         RecruitResponseDTO responseDTO = new RecruitResponseDTO(recruit);
 
 
         model.addAttribute("recruit",responseDTO); // 현재 수정 공고의 업데이트
+        model.addAttribute("sessionUser",sessionUser); //
         return "recruit/recruit-update-form";
     }
     
     // 공고 업데이트
-    @PostMapping("/recruit-update")
-    public String update(RecruitRequest.RecruitDTO recruitDTO,HttpSession session){
+    @PostMapping("/{recruitIdx}/recruit-update")
+    public String update(@PathVariable(name = "recruitIdx")Long idx, RecruitRequest.RecruitUpdateDTO recruitDTO,HttpSession session){
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
@@ -106,9 +109,7 @@ public class RecruitController {
             throw new RuntimeException("기업 로그인 상태가 아닙니다.");
         }
 
-        Corp corp = corpService.findById(sessionUser.getId());
-
-        recruitService.recruit(recruitDTO,corp);
+        recruitService.recruitUpdate(idx,recruitDTO);
 
         return "redirect:/";
     }

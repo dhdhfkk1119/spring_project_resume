@@ -42,5 +42,10 @@ public class Recruit {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    // 작성자 와 세션 아이디 비교
+    public boolean isOwner(Long userId){
+        return this.corp.getCorpIdx().equals(userId);
+    }
+
     private String logoImages;
 }
