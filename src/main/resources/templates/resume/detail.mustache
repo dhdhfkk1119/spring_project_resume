@@ -1,20 +1,23 @@
 {{> layout/header}}
 
-<div class="card shadow-sm">
+<div class="container my-5">
     <!-- 카드 헤더: 이력서 제목과 수정 버튼 -->
     <div class="card-header bg-light py-3">
         <div class="d-flex justify-content-between align-items-center">
-            <h1 class="h4 mb-0">📄 이력서 상세 정보</h1>
+            <h1 class="h4 mb-0">이력서 상세 정보</h1>
             <!--
                 이력서의 주인(Owner)에게만 '수정' 버튼이 보이도록 처리합니다.
                 Controller에서 model.addAttribute("isOwner", true); 와 같이 boolean 값을 전달해줘야 합니다.
             -->
             {{#isOwner}}
                 <a href="/resume/{{resume.resumeIdx}}/update-form" class="btn btn-outline-primary">수정하기</a>
+                <form id="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post" class="d-inline">
+                    <button type="button" id="delete-btn" class="btn btn-outline-danger">삭제</button>
+                </form>
             {{/isOwner}}
         </div>
     </div>
-
+    <hr>
     <!-- 카드 바디: 개인 정보 -->
     <div class="card-body">
         <h2 class="h5 border-bottom pb-2 mb-3">👤 기본 정보</h2>
@@ -40,9 +43,28 @@
         </div>
     </div>
 
+    <h4>경력 정보</h4>
+    <!-- 경력 정보가 있을 경우 순회하며 출력합니다. -->
+    {{#resume.careers}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{company}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{role}}</h6>
+                <p class="card-text">{{startDate}} ~ {{endDate}}</p>
+            </div>
+        </div>
+    {{/resume.careers}}
+
+    <!-- 경력 정보가 없을 경우 메시지를 표시합니다. -->
+    {{^resume.careers}}
+        <div class="text-center p-3 border rounded">
+            <p class="mb-0">입력된 경력 정보가 없습니다.</p>
+        </div>
+    {{/resume.careers}}
+
     <!-- 카드 푸터: 목록으로 돌아가기 버튼 -->
-    <div class="card-footer text-end">
-        <a href="/resumes" class="btn btn-secondary">목록으로</a>
+    <div class="mt-4">
+        <a href="/resume/list" class="btn btn-secondary">목록으로</a>
     </div>
 </div>
 

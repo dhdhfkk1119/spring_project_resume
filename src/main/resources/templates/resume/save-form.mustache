@@ -10,6 +10,15 @@
                 <label for="resumeContent" class="form-label">이력서 내용</label>
                 <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15" placeholder="자유롭게 이력서 내용을 작성해주세요. (예: 자기소개, 기술 스택, 프로젝트 경험 등)"></textarea>
             </div>
+            <hr>
+
+            <h4>경력 정보</h4>
+            <div id="career-container">
+                <!-- 경력 입력 필드 -->
+            </div>
+            <button type="button" id="add-career-btn" class="btn btn-secondary mt-2">경력 추가</button>
+
+            <hr>
             <div class="d-flex justify-content-end">
                 <a href="/resumes" class="btn btn-secondary me-2">취소</a>
                 <button type="submit" class="btn btn-primary">저장하기</button>
@@ -17,5 +26,57 @@
         </form>
     </div>
 </div>
+
+<script>
+    // 경력 정보 동적 추가/삭제 스크립트
+    document.addEventListener('DOMContentLoaded', function () {
+        const careerContainer = document.getElementById('career-container');
+        const addCareerBtn = document.getElementById('add-career-btn');
+        let careerIndex = 0; // 각 경력 필드를 구분하기 위한 인덱스
+
+        addCareerBtn.addEventListener('click', function () {
+            const careerDiv = document.createElement('div');
+            careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light');
+            // name 속성의 careers[index].fieldName 형태는 Spring Boot가 List<DTO>로 데이터를 바인딩할 수 있게 해줍니다.
+            careerDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-11">
+                        <div class="mb-2">
+                            <label class="form-label">회사명</label>
+                            <input type="text" name="careers[${careerIndex}].company" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">직무</label>
+                            <input type="text" name="careers[${careerIndex}].role" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">시작일</label>
+                                <input type="date" name="careers[${careerIndex}].startDate" class="form-control" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">종료일 (재직 중일 경우 비워두세요)</label>
+                                <input type="date" name="careers[${careerIndex}].endDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                        <button type="button" class="btn btn-danger remove-career-btn">삭제</button>
+                    </div>
+                </div>
+            `;
+            careerContainer.appendChild(careerDiv);
+            careerIndex++;
+        });
+
+        // '삭제' 버튼에 대한 이벤트 리스너 (이벤트 위임 사용)
+        careerContainer.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('remove-career-btn')) {
+                // 가장 가까운 .card 요소를 찾아 삭제합니다.
+                e.target.closest('.card').remove();
+            }
+        });
+    });
+</script>
 
 {{> layout/footer}}

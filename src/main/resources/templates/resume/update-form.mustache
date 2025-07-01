@@ -1,37 +1,120 @@
 {{> layout/header}}
 
+<div class="container my-5">
+    <h2>이력서 수정</h2>
+    <h2 class="h4 mb-0">등록번호: {{resume.resumeIdx}}</h2>
+    <hr>
+    <!-- 수정 요청은 /resume/{id}/update 경로로 POST 방식으로 전송합니다. -->
+    <form action="/resume/{{resume.resumeIdx}}/update" method="post">
 
-<div class="card shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="h4 mb-0">이력서 수정 (번호: {{resume.resumeIdx}})</h2>
-        <!-- 삭제 버튼: 별도의 form으로 감싸서 처리 -->
-        <form id="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post" class="d-inline">
-            <button type="button" id="btn-delete" class="btn btn-danger btn-sm">삭제</button>
-        </form>
-    </div>
-    <div class="card-body">
-        <form action="/resume/{{resume.resumeIdx}}/update" method="post">
+        <div class="card-body">
             <div class="mb-3">
                 <label for="resumeContent" class="form-label">이력서 내용</label>
-                <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15">{{resume.resumeContent}}</textarea>
+                <textarea class="form-control" id="resumeContent" name="resumeContent"
+                          rows="10">{{resume.resumeContent}}</textarea>
             </div>
+            <hr>
+
+            <h4>경력 정보</h4>
+            <div id="career-container">
+                <!-- 기존 경력 정보들을 순회하며 출력합니다. -->
+                {{#resume.careers}}
+                    <div class="card my-3 p-3 bg-light">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <!-- 기존 경력임을 식별하기 위해 id를 hidden 필드로 전송합니다. -->
+                                <input type="hidden" name="careers[{{@index}}].id" value="{{id}}">
+                                <div class="mb-2">
+                                    <label class="form-label">회사명</label>
+                                    <input type="text" name="careers[{{@index}}].company" class="form-control" value="{{company}}" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">직무</label>
+                                    <input type="text" name="careers[{{@index}}].role" class="form-control" value="{{role}}" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <label class="form-label">시작일</label>
+                                        <input type="date" name="careers[{{@index}}].startDate" class="form-control" value="{{startDate}}" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">종료일</label>
+                                        <input type="date" name="careers[{{@index}}].endDate" class="form-control" value="{{endDate}}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                <button type="button" class="btn btn-danger remove-career-btn">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                {{/resume.careers}}
+            </div>
+            <button type="button" id="add-career-btn" class="btn btn-secondary mt-2">경력 추가</button>
+
+
+
+            <hr>
             <div class="d-flex justify-content-end">
                 <a href="/resume/{{resume.resumeIdx}}" class="btn btn-secondary me-2">취소</a>
                 <button type="submit" class="btn btn-primary">수정완료</button>
             </div>
-        </form>
-    </div>
+
+        </div>
+    </form>
 </div>
 
 <script>
-    // 삭제 버튼 클릭 시, 사용자에게 확인을 요청하는 스크립트
-    document.getElementById('btn-delete').addEventListener('click', function() {
-        if (confirm('정말로 이 이력서를 삭제하시겠습니까? 되돌릴 수 없습니다.')) {
-            document.getElementById('delete-form').submit();
-        }
+    // save-form.mustache의 스크립트와 거의 동일하지만, careerIndex 초기값이 다릅니다.
+    document.addEventListener('DOMContentLoaded', function () {
+        const careerContainer = document.getElementById('career-container');
+        const addCareerBtn = document.getElementById('add-career-btn');
+        // 현재 렌더링된 경력 카드의 개수로 인덱스를 초기화하여 중복을 피합니다.
+        let careerIndex = document.querySelectorAll('#career-container .card').length;
+
+        addCareerBtn.addEventListener('click', function () {
+            const careerDiv = document.createElement('div');
+            careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light');
+            // 새로 추가되는 경력은 id가 없으므로 hidden input을 포함하지 않습니다.
+            careerDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-11">
+                        <div class="mb-2">
+                            <label class="form-label">회사명</label>
+                            <input type="text" name="careers[${careerIndex}].company" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">직무</label>
+                            <input type="text" name="careers[${careerIndex}].role" class="form-control" required>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label">시작일</label>
+                                <input type="date" name="careers[${careerIndex}].startDate" class="form-control" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">종료일 (재직 중일 경우 비워두세요)</label>
+                                <input type="date" name="careers[${careerIndex}].endDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                        <button type="button" class="btn btn-danger remove-career-btn">삭제</button>
+                    </div>
+                </div>
+            `;
+            careerContainer.appendChild(careerDiv);
+            careerIndex++;
+        });
+
+        careerContainer.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('remove-career-btn')) {
+                if (confirm('이 경력 정보를 삭제하시겠습니까?')) {
+                    e.target.closest('.card').remove();
+                }
+            }
+        });
     });
 </script>
-
-
 
 {{> layout/footer}}
