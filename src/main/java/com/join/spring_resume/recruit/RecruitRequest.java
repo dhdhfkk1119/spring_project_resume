@@ -2,6 +2,7 @@ package com.join.spring_resume.recruit;
 
 import com.join.spring_resume.corp.Corp;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -81,8 +82,11 @@ public class RecruitRequest {
         private String area; // 모집 지역
         private int recruitNumber;
         private String recruitContent;
-        private LocalDateTime startAt; // 모집일
-        private LocalDateTime endAt; // 끝나는 일
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        private LocalDate startAt;
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        private LocalDate endAt;
 
     }
 

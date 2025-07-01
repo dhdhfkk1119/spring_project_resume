@@ -1,6 +1,7 @@
 package com.join.spring_resume.recruit;
 
 import com.join.spring_resume.corp.Corp;
+import com.join.spring_resume.session.SessionUser;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
@@ -19,6 +20,7 @@ public class RecruitResponseDTO {
     private String workType;
     private String recruitContent;
     private CorpDTO corp;
+    private boolean isOwner;
 
     public RecruitResponseDTO(Recruit recruit) {
         this.recruitIdx = recruit.getRecruitIdx();
@@ -32,6 +34,7 @@ public class RecruitResponseDTO {
         this.workType = recruit.getWorkType();
         this.recruitContent = recruit.getRecruitContent();
         this.corp = new CorpDTO(recruit.getCorp());
+        // this.isOwner = isRecruitOwner(recruit,sessionUser);
     }
 
     @Getter
@@ -41,5 +44,11 @@ public class RecruitResponseDTO {
         public CorpDTO(Corp corp) {
             this.corpName = corp.getCorpName();
         }
+    }
+
+    private boolean isRecruitOwner(Recruit recruit, SessionUser sessionUser) {
+        return sessionUser != null
+                && "CORP".equals(sessionUser.getRole())
+                && recruit.isOwner(sessionUser.getId()); // Recruit의 메서드 사용
     }
 }

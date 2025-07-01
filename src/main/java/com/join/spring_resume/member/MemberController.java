@@ -61,10 +61,6 @@ public class MemberController {
         return "redirect:/";
     }
 
-    // 마이페이지
-    @GetMapping("/member/mypage")
-    public String myPage(){
-        return "mypage/member-page";
-    }
+
     
 }

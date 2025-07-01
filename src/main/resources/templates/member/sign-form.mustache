@@ -39,11 +39,14 @@
             <div class="mb-3">
                 <label for="phone1" class="form-label">전화 번호</label>
                 <div class="d-flex align-items-center gap-2">
-                    <input type="number" class="form-control" id="phone1" name="phone1" required>
+                    <input type="text" class="form-control" id="phone1" name="phone1" maxlength="3" pattern="\d{3}"
+                           required>
                     <span>-</span>
-                    <input type="number" class="form-control" id="phone2" name="phone2" required>
+                    <input type="text" class="form-control" id="phone2" name="phone2" maxlength="4" pattern="\d{4}"
+                           required>
                     <span>-</span>
-                    <input type="number" class="form-control" id="phone3" name="phone3" required>
+                    <input type="text" class="form-control" id="phone3" name="phone3" maxlength="4" pattern="\d{4}"
+                           required>
                 </div>
             </div>
             <div class="mb-3">
@@ -76,8 +79,8 @@
 
     <!-- 기업 회원 가입 폼  -->
     <div id="formCorp" style="display:none;">
-        <h3 id="titleCorp" class="my-4 fw-bold text-center" >기업 회원가입</h3>
-        <form action="/corp/corp-sign" method="post" >
+        <h3 id="titleCorp" class="my-4 fw-bold text-center">기업 회원가입</h3>
+        <form action="/corp/corp-sign" method="post">
             <div class="mb-3">
                 <input type="text" class="form-control" name="corpName" placeholder="기업명" required>
             </div>
@@ -102,58 +105,74 @@
 {{> layout/footer}}
 
 <script>
-// 주소 찾기 (카카오 주소 API 예제)
-function searchAddress() {
-    new daum.Postcode({
-        oncomplete: function(data) {
-            // 팝업을 통한 검색 결과 항목 클릭 시 실행
-            var addr = ''; // 주소_결과값이 없을 경우 공백
-            var extraAddr = ''; // 참고항목
+    // 주소 찾기 (카카오 주소 API 예제)
+    function searchAddress() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 팝업을 통한 검색 결과 항목 클릭 시 실행
+                var addr = ''; // 주소_결과값이 없을 경우 공백
+                var extraAddr = ''; // 참고항목
 
-            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-            if (data.userSelectedType === 'R') { // 도로명 주소를 선택
-                addr = data.roadAddress;
-            } else { // 지번 주소를 선택
-                addr = data.jibunAddress;
+                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                if (data.userSelectedType === 'R') { // 도로명 주소를 선택
+                    addr = data.roadAddress;
+                } else { // 지번 주소를 선택
+                    addr = data.jibunAddress;
+                }
+
+                if(data.userSelectedType === 'R'){
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraAddr += data.bname;
+                    }
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    if(extraAddr !== ''){
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                } else {
+                    document.getElementById("UserAdd1").value = '';
+                }
+
+                // 선택된 우편번호와 주소 정보를 input 박스에 넣는다.
+                document.getElementById('address').value = data.zonecode;
+                document.getElementById("addressDefault").value = addr;
+                document.getElementById("addressDefault").value += extraAddr;
+                document.getElementById("addressDetail").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
             }
-
-            if(data.userSelectedType === 'R'){
-                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
-                    extraAddr += data.bname;
-                }
-                if(data.buildingName !== '' && data.apartment === 'Y'){
-                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                }
-                if(extraAddr !== ''){
-                    extraAddr = ' (' + extraAddr + ')';
-                }
-            } else {
-                document.getElementById("UserAdd1").value = '';
-            }
-
-            // 선택된 우편번호와 주소 정보를 input 박스에 넣는다.
-            document.getElementById('address').value = data.zonecode;
-            document.getElementById("addressDefault").value = addr;
-            document.getElementById("addressDefault").value += extraAddr;
-            document.getElementById("addressDetail").focus(); // 우편번호 + 주소 입력이 완료되었음으로 상세주소로 포커스 이동
-        }
-    }).open();
-}
+        }).open();
+    }
 
 
-  const btnUser = document.getElementById('btnUser'); // 일반 유저 버튼
-  const btnCorp = document.getElementById('btnCorp'); // 기업 유저 버튼
-  const formUser = document.getElementById('formUser'); // 일반 유저 폼
-  const formCorp = document.getElementById('formCorp'); // 기업 유저 폼
+      const btnUser = document.getElementById('btnUser'); // 일반 유저 버튼
+      const btnCorp = document.getElementById('btnCorp'); // 기업 유저 버튼
+      const formUser = document.getElementById('formUser'); // 일반 유저 폼
+      const formCorp = document.getElementById('formCorp'); // 기업 유저 폼
 
 
-  btnUser.addEventListener('click', () => {
-    formUser.style.display = 'block';
-    formCorp.style.display = 'none';
-  });
+      btnUser.addEventListener('click', () => {
+        formUser.style.display = 'block';
+        formCorp.style.display = 'none';
+      });
 
-  btnCorp.addEventListener('click', () => {
-    formUser.style.display = 'none';
-    formCorp.style.display = 'block';
-  });
+      btnCorp.addEventListener('click', () => {
+        formUser.style.display = 'none';
+        formCorp.style.display = 'block';
+      });
+
+
+        // 전화번호 숫자만 입력 가능 하게
+        document.querySelectorAll('input[name^="phone"]').forEach(input => {
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/\D/g, ''); // 숫자 이외 제거
+      });
+    });
+
+        // 전화번호 다음 입력 이후 다음 포커스로 넘어가기
+        document.getElementById('phone1').addEventListener('input', function () {
+      if (this.value.length === 3) document.getElementById('phone2').focus();
+    });
+    document.getElementById('phone2').addEventListener('input', function () {
+      if (this.value.length === 4) document.getElementById('phone3').focus();
+    });
 </script>
