@@ -46,6 +46,16 @@
                 rgba(55, 63, 87, 0.1) 100%
             );
         }
+        .sub-menu-bar {
+            background-color: #f8f9fa; /* Bootstrap 기본 연회색 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
+            position: relative;
+            z-index: 9;
+        }
+
+        .sub-menu-link:hover {
+            color: #2d67ff !important;
+        }
     </style>
 </head>
 
@@ -88,3 +98,11 @@
         </div>
     </div>
 </nav>
+<!-- 서브 메뉴바 (네비게이션 아래 메뉴) -->
+<div class="sub-menu-bar shadow-sm py-2 bg-light border-top">
+    <div class="container d-flex justify-content-center gap-5">
+        <a href="/about" class="sub-menu-link text-dark fw-semibold text-decoration-none">팀 소개</a>
+        <a href="/" class="sub-menu-link text-dark fw-semibold text-decoration-none">공고 목록</a>
+        <a href="/board/list" class="sub-menu-link text-dark fw-semibold text-decoration-none">커뮤니티</a>
+    </div>
+</div>
