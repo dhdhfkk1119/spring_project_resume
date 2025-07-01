@@ -34,6 +34,7 @@ public class BoardServiceTest {
     private Board testBoard;
     private Board savedBoard;
     private Long boardId;
+    private BoardUpdateDto BoardUpdateDto;
 
     @BeforeEach
     public void setup() {
@@ -89,7 +90,7 @@ public class BoardServiceTest {
         updatedData.setBoardContent("수정된 내용");
         updatedData.setTags("새태그");
 
-        Board updated = boardService.update(savedBoard.getBoardIdx(), updatedData);
+        Board updated = boardService.update(savedBoard.getBoardIdx(),BoardUpdateDto);
 
         assertThat(updated.getBoardTitle()).isEqualTo("수정된 제목");
         assertThat(updated.getBoardContent()).isEqualTo("수정된 내용");
@@ -107,7 +108,7 @@ public class BoardServiceTest {
     @Test
     @DisplayName("조회수 증가 테스트")
     void testIncreaseHits() {
-        boardService.increaseHits(savedBoard.getBoardIdx());
+        boardService.findByIdAndIncreaseHits(savedBoard.getBoardIdx());
 
         Board updated = boardRepository.findById(savedBoard.getBoardIdx()).get();
         assertThat(updated.getBoardHits()).isEqualTo(1);

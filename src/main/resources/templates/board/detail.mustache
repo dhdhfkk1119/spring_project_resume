@@ -1,0 +1,50 @@
+{{> layout/header}}
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">{{board.boardTitle}}</h2>
+        </div>
+        <div class="card-body">
+            <div class="mb-2">
+                <strong>작성자:</strong>
+                {{#board.member}}
+                    {{username}} (ID: {{memberId}})
+                {{/board.member}}
+            </div>
+            <div class="mb-2"><strong>작성일:</strong> {{board.createdAt}}</div>
+            <div class="mb-2"><strong>수정일:</strong> {{board.updatedAt}}</div>
+            <div class="mb-3"><strong>조회수:</strong> {{board.boardHits}}</div>
+
+            <hr>
+
+            <div class="mb-3">
+                <strong>내용</strong>
+                <p class="mt-2">{{board.boardContent}}</p>
+            </div>
+
+            {{#board.tags}}
+                <div class="mb-3">
+                    <strong>태그:</strong> <span class="badge bg-secondary">{{board.tags}}</span>
+                </div>
+            {{/board.tags}}
+
+        </div>
+        <div class="card-footer text-end">
+            <!-- 목록으로 -->
+            <a href="/board/list" class="btn btn-outline-secondary">← 목록으로</a>
+
+            <!-- 수정 -->
+            <a href="/board/{{board.boardIdx}}/edit" class="btn btn-warning">✏️ 수정</a>
+
+            <!-- 삭제 -->
+            <form action="/board/{{board.boardIdx}}/delete" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?')">🗑 삭제</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net

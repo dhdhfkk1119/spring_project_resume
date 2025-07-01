@@ -7,8 +7,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
+
     @Modifying
-    @Query("UPDATE Board b SET b.boardHits = b.boardHits + 1 WHERE b.boardIdx = :boardIdx")
-    void increaseHits(@Param("boardIdx") Long boardIdx);
+    @Query("UPDATE Board b SET b.boardHits = b.boardHits + 1 WHERE b.boardIdx = :id")
+    void increaseHits(@Param("id") Long id);
 
 }

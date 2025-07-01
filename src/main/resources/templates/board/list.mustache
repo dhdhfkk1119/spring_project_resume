@@ -1,0 +1,91 @@
+{{> layout/header}}
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <h2 class="mb-4 text-primary">📋 게시판 목록</h2>
+
+    <!-- 메시지 출력 -->
+    {{#message}}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {{/message}}
+
+    {{#updateMessage}}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            ✏️ {{updateMessage}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {{/updateMessage}}
+
+    {{#deleteMessage}}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            🗑️ {{deleteMessage}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {{/deleteMessage}}
+
+    <!-- 게시글 테이블 -->
+    <table class="table table-striped table-hover mt-4">
+        <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+            <th>조회수</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#boardList}}
+            <tr>
+                <td>{{boardIdx}}</td>
+                <td><a href="/board/{{boardIdx}}" class="text-decoration-none">{{boardTitle}}</a></td>
+                <td>{{#member}}{{username}}{{/member}}</td>
+                <td>{{createdAt}}</td>
+                <td>{{boardHits}}</td>
+                <td>
+                    {{#isAuthor}}
+                        <form method="post" action="/board/{{boardIdx}}/edit" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">수정</button>
+                        </form>
+                        <form method="post" action="/board/{{boardIdx}}/delete" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                        </form>
+                    {{/isAuthor}}
+                </td>
+            </tr>
+        {{/boardList}}
+
+        {{^boardList}}
+            <tr>
+                <td colspan="6" class="text-center text-muted">등록된 게시글이 없습니다.</td>
+            </tr>
+        {{/boardList}}
+        </tbody>
+    </table>
+
+    <!-- 새 글 쓰기 버튼 -->
+    <div class="text-end mt-4">
+        {{#sessionUser}}
+            <a href="/board/new" class="btn btn-primary">✏️ 새 글 쓰기</a>
+        {{/sessionUser}}
+        {{^sessionUser}}
+            <button class="btn btn-outline-secondary" onclick="alertLogin()">글 작성하기</button>
+        {{/sessionUser}}
+    </div>
+</div>
+
+<script>
+    function alertLogin() {
+        alert("로그인이 필요한 서비스입니다.");
+        window.location.href = "/login-form";
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+{{> layout/footer}}
