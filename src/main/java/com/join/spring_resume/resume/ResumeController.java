@@ -1,5 +1,7 @@
     package com.join.spring_resume.resume;
 
+    import com.join.spring_resume.carrer.Career;
+    import com.join.spring_resume.carrer.CareerJpaRepository;
     import com.join.spring_resume.member.Member;
     import com.join.spring_resume.member.MemberRepository;
     import com.join.spring_resume.session.SessionUser;
@@ -20,6 +22,8 @@
         private final ResumeService resumeService;
         private final HttpSession session;
         private final MemberRepository memberRepository;
+        private final CareerJpaRepository careerJpaRepository;
+
         /**
          * 이력서 관리 (목록보기)
          */
@@ -170,7 +174,10 @@
             Member member = memberRepository.findById(sessionUser.getId())
                     .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
 
+            List<Career> careerList = careerJpaRepository.findByResume_ResumeIdx(resumeIdx);
+
             model.addAttribute("resume", resumeService.findById(resumeIdx));
+            model.addAttribute("careers",careerList);
             return "resume/detail";
         }
 

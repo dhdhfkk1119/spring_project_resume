@@ -43,25 +43,29 @@
                     <div class="col-md-11">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${careerIndex}].company" class="form-control" required>
+                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control" required>
                         </div>
                         <div class="mb-2">
-                            <label class="form-label">직무</label>
-                            <input type="text" name="careers[${careerIndex}].role" class="form-control" required>
+                            <label class="form-label">직책</label>
+                            <input type="text" name="careers[${careerIndex}].position" class="form-control">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">담당 업무</label>
+                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3" required></textarea>
                         </div>
                         <div class="row">
-                            <div class="col">
-                                <label class="form-label">시작일</label>
-                                <input type="date" name="careers[${careerIndex}].startDate" class="form-control" required>
+                            <div class="col-md-6">
+                                <label class="form-label">입사일</label>
+                                <input type="date" name="careers[${careerIndex}].startAt" class="form-control" required>
                             </div>
-                            <div class="col">
-                                <label class="form-label">종료일 (재직 중일 경우 비워두세요)</label>
-                                <input type="date" name="careers[${careerIndex}].endDate" class="form-control">
+                            <div class="col-md-6">
+                                <label class="form-label">퇴사일</label>
+                                <input type="date" name="careers[${careerIndex}].endAt" class="form-control" required>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-1 d-flex align-items-center justify-content-center">
-                        <button type="button" class="btn btn-danger remove-career-btn">삭제</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-career-btn">삭제</button>
                     </div>
                 </div>
             `;

@@ -45,15 +45,15 @@
 
     <h4>경력 정보</h4>
     <!-- 경력 정보가 있을 경우 순회하며 출력합니다. -->
-    {{#resume.careers}}
+    {{#careers}}
         <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">{{company}}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{role}}</h6>
-                <p class="card-text">{{startDate}} ~ {{endDate}}</p>
+                <h5 class="card-title">{{corpName}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{position}}</h6>
+                <p class="card-text">{{startAt}} ~ {{endAt}}</p>
             </div>
         </div>
-    {{/resume.careers}}
+    {{/careers}}
 
     <!-- 경력 정보가 없을 경우 메시지를 표시합니다. -->
     {{^resume.careers}}

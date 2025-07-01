@@ -1,6 +1,9 @@
 package com.join.spring_resume.resume;
 
+import com.join.spring_resume.carrer.CareerRequest;
 import lombok.Data;
+
+import java.util.List;
 
 public class ResumeRequest {
 
@@ -8,6 +11,7 @@ public class ResumeRequest {
     @Data
     public static class saveDTO {
         private String resumeContent;
+        private List<CareerRequest.SaveDTO> careers;
 
         public Resume toEntity(){
             return Resume.builder()
