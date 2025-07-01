@@ -45,14 +45,16 @@
                 <td>{{boardIdx}}</td>
                 <td><a href="/board/{{boardIdx}}" class="text-decoration-none">{{boardTitle}}</a></td>
                 <td>{{#member}}{{username}}{{/member}}</td>
-                <td>{{createdAt}}</td>
+                <td>{{formattedCreatedAt}}</td>
                 <td>{{boardHits}}</td>
                 <td>
                     {{#isAuthor}}
-                        <form method="post" action="/board/{{boardIdx}}/edit" style="display:inline;">
+                        <form method="get" action="/board/{{boardIdx}}/edit" style="display:inline;">
                             <button type="submit" class="btn btn-sm btn-outline-primary">수정</button>
                         </form>
-                        <form method="post" action="/board/{{boardIdx}}/delete" style="display:inline;">
+                        <form method="post" action="/board/{{boardIdx}}/delete"
+                              onsubmit="return confirm('정말 삭제하시겠습니까?');"
+                              style="display:inline;">
                             <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
                         </form>
                     {{/isAuthor}}

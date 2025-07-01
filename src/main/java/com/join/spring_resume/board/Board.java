@@ -1,8 +1,11 @@
 package com.join.spring_resume.board;
 
 import com.join.spring_resume.member.Member;
+import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -13,6 +16,8 @@ import java.time.LocalDateTime;
 @Table(name = "board_tb")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Board {
 
     @Id
@@ -21,7 +26,6 @@ public class Board {
 
     private String boardTitle;
 
-
     @Column(columnDefinition = "TEXT")
     private String boardContent;
 
@@ -29,7 +33,6 @@ public class Board {
 
     private int boardHits;
 
-    // 작성자 외래 키 (Member 객체 대신 ID만 저장)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx", nullable = false)
     private Member member;
@@ -40,14 +43,25 @@ public class Board {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // 화면에서 작성자 여부 판단용
     @Transient
     private boolean isAuthor;
 
-    // 필요시 Member 객체와 연결도 가능하지만 현재는 memberIdx만 사용
-
-    public boolean isOwner(Long userid){
+    public boolean isOwner(Long userid) {
         return this.member.getMemberIdx().equals(userid);
     }
 
+    public String getFormattedCreatedAt() {
+        return DateUtil.format(createdAt); // LocalDateTime 그대로 전달
+    }
+
+    public String getFormattedUpdatedAt() {
+        return DateUtil.format(updatedAt);
+    }
+
+    @Transient
+    private String formattedCreatedAt;
+
+   public void setFormattedCreatedAt(String formattedCreatedAt) {
+       this.formattedCreatedAt = formattedCreatedAt;
+   }
 }
