@@ -18,7 +18,10 @@ public class BoardService {
 
     // 게시글 저장
     @Transactional
-    public Board create(BoardCreateDto dto,Member member) {
+    public Board create(BoardCreateDto dto, Member member) {
+        if (dto.getBoardTitle() == null || dto.getBoardContent() == null) {
+            throw new IllegalArgumentException("제목과 내용을 입력해주세요");
+        }
         Board board = new Board();
         board.setBoardTitle(dto.getBoardTitle());
         board.setBoardContent(dto.getBoardContent());
@@ -41,16 +44,19 @@ public class BoardService {
     }
 
     // 게시글 수정
+    // com.join.spring_resume.board.BoardService.java
     @Transactional
-    public Board update(Long boardIdx, BoardUpdateDto dto) {
-        Board board = boardRepository.findById(boardIdx)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+    public void update(Long boardId, BoardUpdateDto dto) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+
+        if (dto.getBoardTitle() == null || dto.getBoardContent() == null) {
+            throw new IllegalArgumentException("제목과 내용을 입력해주세요.");
+        }
 
         board.setBoardTitle(dto.getBoardTitle());
         board.setBoardContent(dto.getBoardContent());
         board.setTags(dto.getTags());
-
-        return board;
     }
 
 
@@ -66,7 +72,7 @@ public class BoardService {
     public Board findByIdAndIncreaseHits(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        boardRepository.increaseHits(id);
+        boardRepository.findByIdAndIncreaseHits(id);
         board.setBoardHits(board.getBoardHits() + 1); // optional: 메모리 반영
         return board;
     }
