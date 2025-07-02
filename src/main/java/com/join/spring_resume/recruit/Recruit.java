@@ -47,5 +47,9 @@ public class Recruit {
         return this.corp.getCorpIdx().equals(userId);
     }
 
+
     private String logoImages;
+    
+    // 시간 변환 View 에서 예쁘게 보여주기
+
 }

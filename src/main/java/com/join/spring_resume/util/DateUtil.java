@@ -9,4 +9,10 @@ public class DateUtil {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return time.format(formatter);
     }
+
+    public static String formatDate(LocalDateTime time) {
+        if (time == null) return "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return time.format(formatter);
+    }
 }

@@ -83,13 +83,13 @@ public class RecruitController {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
 
         if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
-            throw new RuntimeException("기업 로그인 상태가 아닙니다.");
+            throw new Exception403("기업 로그인 상태가 아닙니다.");
         }
 
         Recruit recruit = recruitService.findById(idx); // 해당 공고 의 정보를 가져옴
 
         if(!recruit.isOwner(sessionUser.getId())){
-            throw new RuntimeException("수정권한이없습니다");
+            throw new Exception403("수정권한이없습니다");
         }
 
         RecruitResponseDTO responseDTO = new RecruitResponseDTO(recruit);

@@ -30,16 +30,6 @@ public class MyExceptionHandler {
         return "err/400";
     }
 
-    @ExceptionHandler(Exception403.class)
-    public String ex403(Exception403 e, HttpServletRequest request) {
-        log.warn(" === 403 Forbidden 에러 발생 === ");
-        log.warn(" === 요청 URL : {} " , request.getRequestURL());
-        log.warn("인증 오류 : {}" ,e.getMessage());
-        log.warn("User-Agent : {}" , request.getHeader("User-Agent"));
-        request.setAttribute("msg",e.getMessage());
-        return "err/403";
-    }
-
 
     @ExceptionHandler(Exception404.class)
     public String ex404(Exception404 e, HttpServletRequest request) {
@@ -75,6 +65,16 @@ public class MyExceptionHandler {
     @ResponseBody // 데이터를 반환 함
     public ResponseEntity<String> ex401(Exception401 e , HttpServletRequest request) {
         String script = "<script> alert('" + e.getMessage()+ "'); location.href='/login-form'; </script>";
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.TEXT_HTML)
+                .body(script);
+    }
+
+    @ExceptionHandler(Exception403.class)
+    @ResponseBody // 데이터를 반환 함
+    public ResponseEntity<String> ex403(Exception403 e , HttpServletRequest request) {
+        String script = "<script> alert('" + e.getMessage()+ "'); location.href='/'; </script>";
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .contentType(MediaType.TEXT_HTML)

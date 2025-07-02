@@ -2,8 +2,11 @@ package com.join.spring_resume.member;
 
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,14 +45,18 @@ public class MemberController {
     
     // 회원 가입 기능
     @PostMapping("/member/sign")
-    public String sign(MemberRequest.SaveDTO saveDTO){
-        System.out.println("Controller 데이터 확인" + saveDTO.toEntity()); // 엔티티 확인
-        // saveDTO.isPassCheck(); // 회원 비밀번호 체크
+    public String sign(@Valid MemberRequest.SaveDTO saveDTO ,
+                       BindingResult bindingResult,
+                       Model model){
+
+
+        if(bindingResult.hasErrors()){
+            model.addAttribute("dto",saveDTO);
+            model.addAttribute("errors",bindingResult.getFieldErrors());
+        }
 
 
         Member saved = memberService.saveMember(saveDTO);
-        System.out.println("Controller 데이터 확인" + saved.getMemberIdx()); // 엔티티 확인
-        System.out.println("Controller 데이터 확인" + saved.getCreatedAt()); // 엔티티 확인
 
         return "redirect:/";
     }
@@ -61,6 +68,4 @@ public class MemberController {
         return "redirect:/";
     }
 
-
-    
 }
