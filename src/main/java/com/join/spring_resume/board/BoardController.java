@@ -142,4 +142,19 @@ public class BoardController {
             super(message);
         }
     }
+
+    @GetMapping("/my")
+    private String listMyBoards(@PageableDefault(size = 10) Pageable pageable,
+                                HttpSession session,
+                                Model model) {
+        Member member = getLoggedInMember(session);
+        Page<Board> myBoards = boardService.findByMember(member.getMemberIdx(), pageable);
+        myBoards.forEach(board -> {
+            board.setAuthor(true); // 내거만 조회니까 true
+            board.setFormattedCreatedAt(board.getFormattedUpdatedAt());
+        });
+        model.addAttribute("boardList", myBoards.getContent());
+        model.addAttribute("sessionUser", session.getAttribute("session"));
+        return "board/list";
+    }
 }

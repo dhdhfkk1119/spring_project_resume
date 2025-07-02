@@ -77,5 +77,10 @@ public class BoardService {
         return board;
     }
 
+    // 내 게시물 조회
+    public Page<Board> findByMember(Long memberIdx, Pageable pageable) {
+        return boardRepository.findByMember_MemberIdx(memberIdx, pageable);
+    }
+
 
 }
