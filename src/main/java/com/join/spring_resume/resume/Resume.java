@@ -25,32 +25,29 @@ public class Resume {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long resumeIdx;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_idx")
-    private Member member;
-
-    @OneToMany(mappedBy = "resume",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    @Builder.Default
-    private List<Career> careerList = new ArrayList<>();
-    // @JoinColumn(name = "careerIdx") 오류뜸 수정-> @Builder.Default
-
-
-
+    private String resumeTitle;
     private String resumeContent;
+
+    //대표이력서
+    @Column(nullable = false)
+    private Boolean isRep = false;
 
     @CreationTimestamp
     private Timestamp createdAt;
 
-    @Builder
-    public Resume(Long resumeIdx, Member member, String resumeContent, List<Career> careerList) {
-        this.resumeIdx = resumeIdx;
-        this.member = member;
-        this.resumeContent = resumeContent;
-        this.careerList = careerList;
-    }
+
+    //member 테이블 가져오기
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_idx")
+    private Member member;
+
+    //career 테이블 가져오기
+    @OrderBy("career_idx")
+    @OneToMany(mappedBy = "resume",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE)
+    List<Career> careerList = new ArrayList<>();
+    //선언과 동시에 초기화 (💀❗오류가 잘 일어난다)
 
     //Resume 소유권 확인 메서드
     public boolean isOwner(Long memberIdx) {
