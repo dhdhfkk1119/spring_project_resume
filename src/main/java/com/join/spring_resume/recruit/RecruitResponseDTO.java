@@ -46,9 +46,4 @@ public class RecruitResponseDTO {
         }
     }
 
-    private boolean isRecruitOwner(Recruit recruit, SessionUser sessionUser) {
-        return sessionUser != null
-                && "CORP".equals(sessionUser.getRole())
-                && recruit.isOwner(sessionUser.getId()); // Recruit의 메서드 사용
-    }
 }
