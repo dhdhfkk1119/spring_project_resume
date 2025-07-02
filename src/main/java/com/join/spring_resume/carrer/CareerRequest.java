@@ -49,6 +49,8 @@ public class CareerRequest {
     //경력사항 수정 DTO
     @Data
     public static class UpdateDTO {
+        // 어떤 경력을 수정할지 식별하기 위한 ID
+        private Long careerIdx;
         private String corpName;
         private String position;
         private String careerContent;

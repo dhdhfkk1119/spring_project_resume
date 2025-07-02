@@ -6,6 +6,12 @@
     </div>
     <div class="card-body">
         <form action="/resume/save" method="post">
+            <!-- 이력서 제목 -->
+            <div class="mb-3">
+                <label for="resumeTitle" class="form-label fw-bold">이력서 제목</label>
+                <input type="text" class="form-control" id="resumeTitle" name="resumeTitle" placeholder="예: 성실한 개발자 홍길동입니다." required>
+            </div>
+            <!-- 이력서 본문 -->
             <div class="mb-3">
                 <label for="resumeContent" class="form-label">이력서 내용</label>
                 <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15" placeholder="자유롭게 이력서 내용을 작성해주세요. (예: 자기소개, 기술 스택, 프로젝트 경험 등)"></textarea>
