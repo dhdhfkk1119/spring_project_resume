@@ -9,12 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @RequiredArgsConstructor
 public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+
 
     // 게시글 저장
     @Transactional
@@ -83,4 +85,6 @@ public class BoardService {
     }
 
 
+    public void writeComment(Long boardId, String content, Member member, Long parentId) {
+    }
 }

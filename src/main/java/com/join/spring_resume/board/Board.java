@@ -61,7 +61,9 @@ public class Board {
     @Transient
     private String formattedCreatedAt;
 
-   public void setFormattedCreatedAt(String formattedCreatedAt) {
-       this.formattedCreatedAt = formattedCreatedAt;
-   }
+    public void setFormattedCreatedAt(String formattedCreatedAt) {
+        this.formattedCreatedAt = formattedCreatedAt;
+    }
+
+
 }

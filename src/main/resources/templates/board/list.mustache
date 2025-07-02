@@ -5,10 +5,30 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary">📋 게시판 목록</h2>
-        {{#sessionUser}}
-            <a href="/board/my" class="btn btn-outline-primary">내 게시글 보기</a>
-        {{/sessionUser}}
     </div>
+
+    <!-- 정렬 옵션 + 적용 버튼 (오른쪽 정렬, 순서 변경) -->
+    <form method="get" class="d-flex justify-content-end align-items-end gap-3 mb-4 flex-wrap">
+        <div class="col-auto">
+            <label for="sort" class="form-label">정렬 기준</label>
+            <select name="sort" id="sort" class="form-select">
+                <option value="createdAt" {{#isSortCreatedAt}}selected{{/isSortCreatedAt}}>작성일</option>
+                <option value="boardHits" {{#isSortBoardHits}}selected{{/isSortBoardHits}}>조회수</option>
+            </select>
+        </div>
+
+
+        <div class="col-auto">
+            <label for="direction" class="form-label">정렬 방향</label>
+            <select name="direction" id="direction" class="form-select">
+                <option value="desc" {{#isDesc}}selected{{/isDesc}}>내림차순 ↓</option>
+                <option value="asc" {{#isAsc}}selected{{/isAsc}}>오름차순 ↑</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">적용하기</button>
+        </div>
+    </form>
 
     <!-- 메시지 출력 -->
     {{#message}}
@@ -33,7 +53,7 @@
     {{/deleteMessage}}
 
     <!-- 게시글 테이블 -->
-    <table class="table table-striped table-hover mt-4">
+    <table class="table table-striped table-hover">
         <thead class="table-dark">
         <tr>
             <th>#</th>
@@ -92,7 +112,6 @@
         window.location.href = "/login-form";
     }
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 {{> layout/footer}}
