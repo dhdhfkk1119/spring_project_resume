@@ -44,19 +44,19 @@
                 <div class="d-flex align-items-center gap-2">
                     <input type="text" class="form-control" id="phone1" name="phone1" maxlength="3" pattern="\d{3}"
                            >
-                    {{#errors.phone1}}<div class="text-danger small">{{.}}</div>{{/errors.phone1}}
                     <span>-</span>
                     <input type="text" class="form-control" id="phone2" name="phone2" maxlength="4" pattern="\d{4}"
                            >
-                    {{#errors.phone2}}<div class="text-danger small">{{.}}</div>{{/errors.phone2}}
                     <span>-</span>
                     <input type="text" class="form-control" id="phone3" name="phone3" maxlength="4" pattern="\d{4}"
                            >
-                    {{#errors.phone3}}<div class="text-danger small">{{.}}</div>{{/errors.phone3}}
                 </div>
+                {{#errors.phone1}}<div class="text-danger small">{{.}}</div>{{/errors.phone1}}
+                {{#errors.phone2}}<div class="text-danger small">{{.}}</div>{{/errors.phone2}}
+                {{#errors.phone3}}<div class="text-danger small">{{.}}</div>{{/errors.phone3}}
             </div>
             <div class="mb-3">
-                <input type="number" class="form-control" name="age" placeholder="나이 (숫자만 입력)" >
+                <input type="text" class="form-control" name="age" placeholder="나이 (숫자만 입력)" >
                 {{#errors.age}}<div class="text-danger small">{{.}}</div>{{/errors.age}}
             </div>
             <div class="mb-3">
@@ -85,6 +85,8 @@
             </div>
 
             <button type="submit" class="btn btn-primary py-2 w-100">회원가입</button>
+            {{#errors.IsRePassword}}<div class="text-danger small">{{.}}</div>{{/errors.IsRePassword}}
+            {{#errors.IsMemberId}}<div class="text-danger small">{{.}}</div>{{/errors.IsMemberId}}
         </form>
     </div>
 
@@ -149,4 +151,12 @@
     document.getElementById('phone2').addEventListener('input', function () {
       if (this.value.length === 4) document.getElementById('phone3').focus();
     });
+
+
+  const ageInput = document.getElementById('ageInput');
+
+  ageInput.addEventListener('input', function () {
+    // 숫자가 아닌 문자 모두 제거
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
 </script>
