@@ -1,5 +1,6 @@
 package com.join.spring_resume.board;
 
+import com.join.spring_resume.Like.LikeService;
 import com.join.spring_resume.comment.Comment;
 import com.join.spring_resume.comment.CommentResponseDto;
 import com.join.spring_resume.comment.CommentService;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.join.spring_resume.util.DateUtil.format;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/board")
@@ -23,6 +26,7 @@ public class BoardController {
     private final BoardService boardService;
     private final MemberRepository memberRepository;
     private final CommentService commentService;
+    private final LikeService likeService;
 
     // 로그인 유저 조회, 없으면 예외 발생
     private Member getLoggedInMember(HttpSession session) {
@@ -134,7 +138,7 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
-    // 게시글 상세 페이지 (댓글 포함)
+    // 게시글 상세 페이지 (댓글 + 좋아요)
     @GetMapping("/{id}")
     public String viewBoard(@PathVariable Long id, Model model, HttpSession session) {
         Board board = boardService.findByIdAndIncreaseHits(id);
@@ -151,7 +155,7 @@ public class BoardController {
             model.addAttribute("isAuthor", true);
         }
 
-        // 댓글 DTO 리스트 변환해서 전달
+        // 댓글 처리
         List<Comment> commentEntities = commentService.findCommentsByBoard(id);
         List<CommentResponseDto> commentDtos = commentEntities.stream()
                 .map(parent -> {
@@ -165,6 +169,16 @@ public class BoardController {
         model.addAttribute("comments", commentDtos);
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("loginUserId", loginUserId);
+
+        // 좋아요 처리
+        boolean isLiked = false;
+        long likeCount = likeService.countLikes(board);
+        if (sessionUser != null) {
+            Member member = memberRepository.findById(sessionUser.getId()).orElseThrow();
+            isLiked = likeService.isLiked(member, board);
+        }
+        model.addAttribute("isLiked", isLiked);
+        model.addAttribute("likeCount", likeCount);
 
         return "board/detail";
     }
@@ -183,6 +197,23 @@ public class BoardController {
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
         commentService.writeComment(boardId, content, member.getMemberIdx(), parentId);
+        return "redirect:/board/" + boardId;
+    }
+
+    // 좋아요 토글
+    @PostMapping("/{boardId}/like")
+    public String toggleLike(@PathVariable Long boardId, HttpSession session) {
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) {
+            return "redirect:/login-form";
+        }
+
+        Member member = memberRepository.findById(sessionUser.getId())
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+        Board board = boardService.findById(boardId);
+
+        likeService.toggleLike(member, board);
+
         return "redirect:/board/" + boardId;
     }
 
