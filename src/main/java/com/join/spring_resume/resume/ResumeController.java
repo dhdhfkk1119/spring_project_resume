@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -90,7 +92,21 @@ public class ResumeController {
      * 수정 액션
      */
     @PostMapping("/resume/{id}/update")
-    public String update(@PathVariable(name = "id") Long resumeIdx, @Valid ResumeRequest.UpdateDTO updateDTO) {
+    public String update(@PathVariable(name = "id") Long resumeIdx,
+                         @Valid ResumeRequest.UpdateDTO updateDTO,
+                         BindingResult bindingResult,
+                         Model model) {
+        //유효성
+        Map<String, String> errorMap = new HashMap<>();//에러 바인딩
+        if (bindingResult.hasErrors()) {
+
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            model.addAttribute("errors", errorMap);
+            model.addAttribute("dto", updateDTO);
+            return "resume/save-form";
+        }
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) return "redirect:/login-form";
@@ -148,14 +164,23 @@ public class ResumeController {
      */
 
     @PostMapping("/resume/save")
-    public String save(@Valid ResumeRequest.SaveDTO saveDTO, BindingResult bindingResult) {
+    public String save(@Valid ResumeRequest.SaveDTO saveDTO,
+                       BindingResult bindingResult,
+                       Model model) {
 
-        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        //유효성
+        Map<String, String> errorMap = new HashMap<>();//에러 바인딩
+        if (bindingResult.hasErrors()) {
 
-        if(bindingResult.hasErrors()){
-            HashMap<String,String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            model.addAttribute("errors", errorMap);
+            //model.addAttribute("dto", saveDTO);
             return "resume/save-form";
         }
+
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) return "redirect:/login-form";
         if (sessionUser.getRole() != "MEMBER") {
             System.out.println("일반 회원만 작성 가능합니다");
@@ -165,6 +190,7 @@ public class ResumeController {
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
 
         Resume resume = resumeService.save(saveDTO, member);
+
         return "redirect:/resume/" + resume.getResumeIdx();
     }
 

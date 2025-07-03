@@ -10,14 +10,22 @@
             <div class="mb-3">
                 <label for="resumeTitle" class="form-label fw-bold">이력서 제목</label>
                 <input type="text" class="form-control" id="resumeTitle" name="resumeTitle" placeholder="예: 성실한 개발자 홍길동입니다.">
-                {{#errors.resumeTitle}}<div id="resumeTitle-error" class="error-message"></div>{{/errors.resumeTitle}}
+                {{#errors.resumeTitle}}<div class="text-danger small">{{.}}</div>{{/errors.resumeTitle}}
             </div>
             <!-- 이력서 본문 -->
             <div class="mb-3">
                 <label for="resumeContent" class="form-label">이력서 내용</label>
                 <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15" placeholder="자유롭게 이력서 내용을 작성해주세요. (예: 자기소개, 기술 스택, 프로젝트 경험 등)"></textarea>
-                <div id="resumeContent-error" class="error-message"></div>
+                {{#errors.resumeContent}}<div class="text-danger small">{{.}}</div>{{/errors.resumeContent}}
             </div>
+            <!-- 대표 이력서 설정 체크박스 -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="isRep" id="isRep" value="true" {{#resume.isRep}}checked{{/resume.isRep}}>
+                <label class="form-check-label" for="isRep">
+                    대표 이력서로 설정
+                </label>
+            </div>
+
             <hr>
 
             <h4>경력 정보</h4>
@@ -52,7 +60,6 @@
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
                             <input type="text" name="careers[${careerIndex}].corpName" class="form-control">
-                            <div id="corpName-error" class="error-message"></div>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
@@ -61,7 +68,6 @@
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
                             <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3"></textarea>
-                            <div id="careerContent-error" class="error-message"></div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">

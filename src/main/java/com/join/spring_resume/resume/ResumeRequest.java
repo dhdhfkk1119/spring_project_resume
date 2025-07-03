@@ -4,6 +4,7 @@ import com.join.spring_resume.carrer.CareerRequest;
 import com.join.spring_resume.member.Member;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -15,9 +16,13 @@ public class ResumeRequest {
     @Data
     public static class SaveDTO {
         @NotBlank(message = "제목은 필수 입력 값입니다.")
+        @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
         private String resumeTitle;
         @NotBlank(message = "내용은 필수 입력 값입니다.")
+        @Size(max = 1000, message = "내용은 1000자 이내로 작성해주세요.")
         private String resumeContent;
+        private Boolean isRep;
+
         @Valid
         private List<CareerRequest.SaveDTO> careers = new ArrayList<>();
 
@@ -25,41 +30,30 @@ public class ResumeRequest {
             return Resume.builder()
                     .resumeTitle(this.resumeTitle)
                     .resumeContent(this.resumeContent)
+                    .isRep(this.isRep)
                     .member(member)
                     .build();
         }
 
-        //유효성 검사
-        public void validate() {
-            if (resumeTitle == null || resumeTitle.trim().isEmpty()) {
-                throw new IllegalArgumentException("제목은 필수입니다");
-            }
-            if (this.resumeContent == null || resumeContent.trim().isEmpty()) {
-                throw new IllegalArgumentException("내용은 필수입니다");
-            }
-        }
     }//saveDTO
 
 
     //이력서 수정 DTO
     @Data
     public static class UpdateDTO {
+        @NotBlank(message = "제목은 필수 입력 값입니다.")
+        @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
         private String resumeTitle;
+        @NotBlank(message = "내용은 필수 입력 값입니다.")
+        @Size(max = 1000, message = "내용은 1000자 이내로 작성해주세요.")
         private String resumeContent;
         private Boolean isRep;
 
+        @Valid
         private List<CareerRequest.UpdateDTO> careers = new ArrayList<>();
+
         private List<Long> deletedCareerIds = new ArrayList<>();
 
-        //유효성 검사
-        public void validate() {
-            if (resumeTitle == null || resumeTitle.trim().isEmpty()) {
-                throw new IllegalArgumentException("제목은 필수입니다");
-            }
-            if (resumeContent == null || resumeContent.trim().isEmpty()) {
-                throw new IllegalArgumentException("내용은 필수입니다");
-            }
-        }//validate
     }//UpdateDTO
 
 }//

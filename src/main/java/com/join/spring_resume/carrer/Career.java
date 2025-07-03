@@ -2,12 +2,14 @@ package com.join.spring_resume.carrer;
 
 import com.join.spring_resume.resume.Resume;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
@@ -20,7 +22,7 @@ public class Career {
     private Long careerIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resumeIdx")
+    @JoinColumn(name = "resume_idx")
     private Resume resume;
 
     private String corpName;
@@ -30,13 +32,4 @@ public class Career {
     private LocalDate startAt;
     private LocalDate endAt;
 
-    @Builder
-    public Career(Long careerIdx, Resume resume, String corpName, String position, String careerContent, LocalDate startAt, LocalDate endAt) {
-        this.resume = resume;
-        this.corpName = corpName;
-        this.position = position;
-        this.careerContent = careerContent;
-        this.startAt = startAt;
-        this.endAt = endAt;
-    }
 }

@@ -26,6 +26,7 @@ public class Resume {
     private Long resumeIdx;
 
     private String resumeTitle;
+    @Lob
     private String resumeContent;
 
     //대표이력서 (notnull 제거)

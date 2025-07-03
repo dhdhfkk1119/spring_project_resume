@@ -38,10 +38,18 @@ public class ResumeService {
 
     //이력서 저장
     @Transactional
-    public Resume save(ResumeRequest.SaveDTO saveDTO, Member member) {
-        Resume resume = saveDTO.toEntity(member);
+    public Resume save(ResumeRequest.SaveDTO saveDTO, Member sessionMember) {
+
+        //대표이력서 설정
+        if (Boolean.TRUE.equals(saveDTO.getIsRep())) {
+            resumeJpaRepository.resetAllIsRepByMemberIdx(sessionMember.getMemberIdx());
+        }
+
+        //수정사항 저장
+        Resume resume = saveDTO.toEntity(sessionMember);
         Resume savedResume = resumeJpaRepository.save(resume);
 
+        //경력사항 저장
         List<CareerRequest.SaveDTO> cSaveDTOS = saveDTO.getCareers();
         if(cSaveDTOS != null && !cSaveDTOS.isEmpty()){
             // 각 Career DTO를 Career 엔티티로 변환
