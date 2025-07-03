@@ -6,9 +6,7 @@ import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,16 +25,32 @@ public class CommentController {
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
     }
 
-    // 댓글 작성 및 답글 작성
-    @PostMapping("/write")
-    public String writeComment(@RequestParam Long boardId,
-                               @RequestParam String content,
-                               @RequestParam(required = false) Long parentId,
-                               HttpSession session) {
-
+    @PostMapping("/{id}/delete")
+    public String deleteComment(@PathVariable Long id, HttpSession session) {
         Member member = getLoggedInMember(session);
-        commentService.writeComment(boardId, content, member.getMemberIdx(), parentId);
+        Comment comment = commentService.findById(id);
 
+        if (!comment.getUser().getMemberIdx().equals(member.getMemberIdx())) {
+            throw new IllegalStateException("댓글 삭제 권한이 없습니다.");
+        }
+
+        Long boardId = comment.getBoard().getBoardIdx();
+        commentService.deleteById(id);
         return "redirect:/board/" + boardId;
+    }
+
+    @PostMapping("/{id}/edit")
+    public String editComment(@PathVariable Long id,
+                              @RequestParam String content,
+                              HttpSession session) {
+        Member member = getLoggedInMember(session);
+        Comment comment = commentService.findById(id);
+
+        if (!comment.getUser().getMemberIdx().equals(member.getMemberIdx())) {
+            throw new IllegalStateException("댓글 수정 권한이 없습니다.");
+        }
+
+        commentService.updateContent(id, content);
+        return "redirect:/board/" + comment.getBoard().getBoardIdx();
     }
 }

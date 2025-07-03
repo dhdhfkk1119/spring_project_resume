@@ -2,6 +2,7 @@ package com.join.spring_resume.member;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +14,6 @@ public class MemberRequest {
 
 
     @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class SaveDTO{
 
         @NotBlank(message = "이름을 입력해주세요")
@@ -41,8 +39,12 @@ public class MemberRequest {
         @NotBlank(message = "나이를 입력해주세요")
         private int age;
 
+        @NotBlank(message = "지번을 입력해주세요")
         private String address; // 지번
+
+        @NotBlank(message = "기본주소 입력해주세요")
         private String addressDefault; // 기본 주소
+
         @NotBlank(message = "상세주소를 입력해주세요")
         private String addressDetail; // 상세 주소
 
@@ -51,8 +53,10 @@ public class MemberRequest {
 
         @NotBlank(message = "시작하는 번호를 입력해주세요")
         private String phone1;
+
         @NotBlank(message = "전화번호 앞 4자리를 입력해주세요")
         private String phone2;
+
         @NotBlank(message = "전화번호 뒷 4자리를 입력해주세요")
         private String phone3;
 
@@ -73,31 +77,18 @@ public class MemberRequest {
                     .build();
         }
 
-
-        public void isPassCheck(){
-            if(!password.equals(rePassword)){
-                throw new IllegalArgumentException("두개의 비밀번호가 다릅니다");
-            }
-        }
     }
 
     @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     // 로그인 용 DTO
     public static class LoginDTO{
-        private String memberId;
-        private String password;
 
-        // 유혀성 검사
-        public void validate() {
-            if(memberId == null || memberId.trim().isEmpty()){
-                throw new IllegalArgumentException("사용자명 입력해");
-            }
-            if(password == null || password.trim().isEmpty()){
-                throw new IllegalArgumentException("비밀번호 입력해");
-            }
-        }
+        @NotBlank(message = "아이디를 입력해주세요")
+        @Size(message = "")
+        private String memberId;
+
+        @NotBlank(message = "비밀번호를 입력해 주시기 바랍니다")
+        private String password;
+        
     }
 }

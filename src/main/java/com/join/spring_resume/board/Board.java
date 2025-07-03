@@ -3,10 +3,7 @@ package com.join.spring_resume.board;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -46,24 +43,26 @@ public class Board {
     @Transient
     private boolean isAuthor;
 
+    @Transient
+    private String formattedCreatedAt;
+
     public boolean isOwner(Long userid) {
-        return this.member.getMemberIdx().equals(userid);
+        return this.member != null && this.member.getMemberIdx().equals(userid);
     }
 
     public String getFormattedCreatedAt() {
-        return DateUtil.format(createdAt); // LocalDateTime 그대로 전달
+        return DateUtil.format(createdAt);
     }
 
     public String getFormattedUpdatedAt() {
         return DateUtil.format(updatedAt);
     }
 
-    @Transient
-    private String formattedCreatedAt;
+    public String getTags() {
+        return tags == null ? "" : tags;
+    }
 
     public void setFormattedCreatedAt(String formattedCreatedAt) {
         this.formattedCreatedAt = formattedCreatedAt;
     }
-
-
 }

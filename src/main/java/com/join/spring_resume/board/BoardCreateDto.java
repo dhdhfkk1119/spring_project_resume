@@ -7,22 +7,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BoardCreateDto {
-
     private String boardTitle;
     private String boardContent;
     private String tags;
 
-    // 엔티티로 변환하는 메서드 (작성자 ID 전달받음)
-    public Board toEntity(Member memberIdx) {
+    public Board toEntity(Member member) {
         Board board = new Board();
         board.setBoardTitle(this.boardTitle);
         board.setBoardContent(this.boardContent);
         board.setTags(this.tags);
         board.setBoardHits(0);
-        board.setMember(memberIdx);
+        board.setMember(member);
         return board;
     }
-
 }
-
-

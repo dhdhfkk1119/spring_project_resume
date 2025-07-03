@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,15 +26,16 @@ public class CommentService {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
 
-        Comment comment = new Comment();
-        comment.setComment(content);
-        comment.setBoard(board);
-        comment.setUser(member);
+        Comment comment = Comment.builder()
+                .comment(content)
+                .board(board)
+                .user(member)
+                .build();
 
         if (parentId != null) {
-            Comment parentComment = commentRepository.findById(parentId)
+            Comment parent = commentRepository.findById(parentId)
                     .orElseThrow(() -> new IllegalArgumentException("부모 댓글이 존재하지 않습니다."));
-            comment.setParent(parentComment);
+            comment.setParent(parent);
         }
 
         return commentRepository.save(comment);
@@ -43,5 +45,35 @@ public class CommentService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         return commentRepository.findByBoardAndParentIsNullOrderByCreatedAtAsc(board);
+    }
+
+    public List<CommentResponseDto> getCommentDtoList(Long boardId, Long loginUserId) {
+        List<Comment> comments = findCommentsByBoard(boardId);
+        List<CommentResponseDto> dtoList = new ArrayList<>();
+
+        for (Comment comment : comments) {
+            CommentResponseDto parentDto = new CommentResponseDto(comment, loginUserId);
+            for (Comment reply : comment.getReplies()) {
+                parentDto.addReply(new CommentResponseDto(reply, loginUserId));
+            }
+            dtoList.add(parentDto);
+        }
+        return dtoList;
+    }
+
+    public Comment findById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        commentRepository.deleteById(id);
+    }
+    @Transactional
+    public void updateContent(Long id, String newContent) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다"));
+        comment.setComment(newContent);
     }
 }
