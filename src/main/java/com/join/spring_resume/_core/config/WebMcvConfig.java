@@ -16,16 +16,18 @@ public class WebMcvConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/board/**", "/recruit/**", "/member/**")
+                .addPathPatterns("/board/**", "/recruit/**")
                 .excludePathPatterns(
                         "/recruit/{id:\\d+}",
+                        "/member/**",
+                        "/sign-form",
                         "/member/login",
-                        "/member/sign",       // GET
-                        "/member/sign/**",    // POST 포함
+                        "/member/sign",
                         "/corp/corp-sign",
                         "/corp/login",
                         "/corp/login-form",
-                        "/login-form"
+                        "/login-form",
+                        "/logout"
                 );
     }
 }

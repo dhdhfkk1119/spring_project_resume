@@ -5,11 +5,11 @@
     <!-- 버튼 클릭시 바꾸는 기능 -->
     <ul class="nav nav-tabs" id="loginTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <a href="/sign-form" class="nav-link" id="btnUser" type="button">기업 회원</a>
+            <a href="/sign-form" class="nav-link" id="btnUser" type="button">일반 회원</a>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="btnCorp" data-bs-toggle="tab" data-bs-target="#member" type="button"
-                    role="tab" aria-controls="member" aria-selected="true">일반 회원
+                    role="tab" aria-controls="member" aria-selected="true">기업 회원
             </button>
         </li>
     </ul>
@@ -35,13 +35,14 @@
             <div class="mb-3">
                 <input type="password" class="form-control" name="rePassword" placeholder="비밀번호 확인" >
                 {{#errors.rePassword}}<div class="text-danger small">{{.}}</div>{{/errors.rePassword}}
-                {{#msg}}<div class="text-danger small">{{.}}</div>{{/msg}}
             </div>
             <div class="mb-3">
-                <input type="email" class="form-control" name="email" placeholder="이메일" >
+                <input type="text" class="form-control" name="email" placeholder="이메일" >
                 {{#errors.email}}<div class="text-danger small">{{.}}</div>{{/errors.email}}
             </div>
             <button type="submit" class="btn btn-primary py-2 w-100">회원가입</button>
+            {{#errors.IsRePassword}}<div class="text-danger small">{{.}}</div>{{/errors.IsRePassword}}
+            {{#errors.IsCorpId}}<div class="text-danger small">{{.}}</div>{{/errors.IsCorpId}}
         </form>
     </div>
 </div>

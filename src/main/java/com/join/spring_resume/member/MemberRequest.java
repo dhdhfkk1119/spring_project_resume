@@ -1,8 +1,6 @@
 package com.join.spring_resume.member;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,8 +34,9 @@ public class MemberRequest {
         @NotBlank(message = "성별 선택해주세요")
         private String sex;
 
-        @NotBlank(message = "나이를 입력해주세요")
-        private int age;
+        @NotNull(message = "나이를 입력해주세요")
+        @Min(value = 0, message = "나이는 0세 이상이어야 합니다")
+        private Integer age;
 
         @NotBlank(message = "지번을 입력해주세요")
         private String address; // 지번
