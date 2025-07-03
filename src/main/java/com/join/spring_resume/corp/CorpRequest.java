@@ -2,6 +2,9 @@ package com.join.spring_resume.corp;
 
 
 import com.join.spring_resume.member.MemberRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,11 +14,26 @@ public class CorpRequest {
 
     @Data
     public static class saveDTO {
-
+        
+        @NotBlank(message = "회사명을 입력해주세요")
         private String corpName;
+
+        @NotBlank(message = "아이디를 입력해주세요")
         private String corpId;
+
+        @NotBlank(message = "올바른 이메일 형식이 아닙니다")
+        @Pattern(
+                regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.(com|co\\.kr|org|ac\\.kr)$",
+                message = "이메일 형식이 올바르지 않거나 .com 또는 .co.kr 도메인만 허용됩니다"
+        )
         private String email;
+
+        @NotBlank(message = "비밀번호를 입력해주세요")
+        @Size(min = 4, max = 20, message = "비밀번호는 4자 이상 20자 이하로 입력해주세요")
         private String password;
+
+        @NotBlank(message = "비밀번호 확인을 입력해주세요")
+        @Size(min = 4, max = 20, message = "비밀번호는 4자 이상 20자 이하로 입력해주세요")
         private String rePassword;
 
         public Corp toEntity(){
@@ -27,36 +45,15 @@ public class CorpRequest {
                     .build();
         }
 
-        public void validate() {
-            if(corpName == null || corpName.trim().isEmpty()){
-                throw new IllegalArgumentException("기업명 입력해");
-            }
-            if(corpId == null || corpId.trim().isEmpty()){
-                throw new IllegalArgumentException("아이디 입력해");
-            }
-            if(email == null || email.trim().isEmpty()){
-                throw new IllegalArgumentException(" 이메일 입력해");
-            }
-            if(password == null || password.trim().isEmpty()){
-                throw new IllegalArgumentException("비밀번호 입력해");
-            }
-            if(rePassword == null || rePassword.trim().isEmpty()){
-                throw new IllegalArgumentException("재 비밀번호 입력해");
-            }
-
-        }
-
-        public void isPassCheck(){
-            if(!password.equals(rePassword)){
-                throw new IllegalArgumentException("두개의 비밀번호가 다릅니다");
-            }
-        }
     }
 
     @Data
     // 로그인 용 DTO
     public static class LoginDTO{
+        
+        @NotBlank(message = "아이디를 입력해주시기 바랍니다")
         private String corpId;
+        @NotBlank(message = "비밀번호를 입력해주시기 바랍니다")
         private String password;
 
         // 유혀성 검사

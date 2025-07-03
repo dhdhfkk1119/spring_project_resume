@@ -7,13 +7,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
-// @RequestMapping("/member")
 public class MemberController {
 
     private final MemberService memberService;
@@ -35,31 +38,69 @@ public class MemberController {
 
     // 로그인 기능
     @PostMapping("/member/login")
-    public String login(MemberRequest.LoginDTO loginDTO){
-        Member member = memberService.login(loginDTO);
-        SessionUser sessionUser = SessionUser.fromMember(member); // 해당 유저가 있으면 세션에 정보를 담음
-        session.setAttribute("session",sessionUser); // 세선 저장
-        return "redirect:/";
+    public String login(@Valid MemberRequest.LoginDTO loginDTO,
+                        BindingResult bindingResult,
+                        Model model){
+
+        if(bindingResult.hasErrors()){
+            Map<String, String> errorMap = new HashMap<>(); // 해당 필드에 오류 메세지를 담아서 내보내기
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            model.addAttribute("errors", errorMap);
+            return "member/login-form";
+        }
+        try {
+            Member member = memberService.login(loginDTO);
+            SessionUser sessionUser = SessionUser.fromMember(member); // 해당 유저가 있으면 세션에 정보를 담음
+            session.setAttribute("session",sessionUser); // 세선 저장
+            return "redirect:/";
+        } catch (Exception e) {
+
+            model.addAttribute("isErrors",e.getMessage()); // 오류 메세지를 담음
+        }
+        return "member/login-form";
     }
 
     
     // 회원 가입 기능
     @PostMapping("/member/sign")
-    public String sign(@Valid MemberRequest.SaveDTO saveDTO ,
+    public String sign(@Valid MemberRequest.SaveDTO saveDTO,
                        BindingResult bindingResult,
                        Model model){
 
+        Map<String, String> errorMap = new HashMap<>(); // 에러 반딩 해주기 위해서 넘기기
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("dto",saveDTO);
-            model.addAttribute("errors",bindingResult.getFieldErrors());
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errorMap.put(error.getField(), error.getDefaultMessage());
+            }
+            model.addAttribute("errors", errorMap);
+            model.addAttribute("dto", saveDTO);
+            return "member/sign-form";
         }
 
+        // 비밀번호 체크
+        if (!saveDTO.getPassword().equals(saveDTO.getRePassword())) {
+            errorMap.put("rePassword", "비밀번호가 일치하지 않습니다.");
+            model.addAttribute("errors", errorMap);
+            model.addAttribute("dto", saveDTO);
+            return "member/sign-form";
+        }
 
-        Member saved = memberService.saveMember(saveDTO);
+        // 아이디 중복 체크
+        if (memberService.existsByMemberId(saveDTO.getMemberId())) {
+            errorMap.put("memberId", "이미 사용 중인 아이디입니다.");
+            model.addAttribute("errors", errorMap);
+            model.addAttribute("dto", saveDTO);
+            return "member/sign-form";
+        }
 
-        return "redirect:/";
+        memberService.saveMember(saveDTO);  // 유효성 모두 통과하면 회원가입 진행
+
+        return "redirect:/";  // 성공 시 메인 페이지 등으로 리다이렉트
     }
+
 
     // 로그아웃 기능
     @GetMapping("/logout")

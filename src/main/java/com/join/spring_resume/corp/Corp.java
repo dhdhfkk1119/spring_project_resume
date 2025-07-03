@@ -22,11 +22,18 @@ public class Corp {
     private Long corpIdx;
 
     private String corpName;
+    @Column(unique = true)
     private String corpId;
     private String email;
     private String password;
 
     @CreationTimestamp
     private Timestamp createdAt;
+
+    public void isUseridCheck(String inputId) {
+        if (this.corpId.equals(inputId)) {
+            throw new IllegalArgumentException("중복된 아이디입니다.");
+        }
+    }
 
 }
