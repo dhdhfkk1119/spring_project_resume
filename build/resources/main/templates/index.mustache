@@ -95,33 +95,6 @@
                         <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
                     </div>
                 </div>
-
-                <!-- 오른쪽 기업 정보 및 설정 버튼 -->
-                <!-- 토글 액션 박스 -->
-                <!-- 로그인 유저와 작성자 유저의 아이디를 비교 -->
-
-                {{#sessionUser}}
-                    {{#isCorp}}
-                        {{#sessionUser}}
-                        <div class="d-flex w-25 align-items-center position-relative">
-                            <span class="fw-bold">{{corp.corpName}}</span>
-                            <span class="position-absolute gear-btn" style="top: 5px; right: 5px; cursor: pointer;" onclick="toggleActions({{recruitIdx}})">
-                                <i class="fa-solid fa-gear"></i>
-                            </span>
-                            <div id="action-box-{{recruitIdx}}" class="action-buttons" >
-                                <button class="edit" onclick="location.href='/recruit/{{recruitIdx}}/update-form'">
-                                    <i class="fa-solid fa-pen-to-square"></i> 수정
-                                </button>
-                                <form action="/recruit/{{recruitIdx}}/delete" method="post">
-                                    <button class="delete">
-                                        <i class="fa-solid fa-trash"></i> 삭제
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        {{/sessionUser}}
-                    {{/isCorp}}
-                {{/sessionUser}}
             </div>
         </div>
     {{/recruitList}}
