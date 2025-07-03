@@ -1,45 +1,52 @@
 {{> layout/header}}
 
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h2 class="h4 mb-0">이력서 작성</h2>
-    </div>
-    <div class="card-body">
-        <form action="/resume/save" method="post">
-            <!-- 이력서 제목 -->
-            <div class="mb-3">
-                <label for="resumeTitle" class="form-label fw-bold">이력서 제목</label>
-                <input type="text" class="form-control" id="resumeTitle" name="resumeTitle" placeholder="예: 성실한 개발자 홍길동입니다.">
-                {{#errors.resumeTitle}}<div class="text-danger small">{{.}}</div>{{/errors.resumeTitle}}
-            </div>
-            <!-- 이력서 본문 -->
-            <div class="mb-3">
-                <label for="resumeContent" class="form-label">이력서 내용</label>
-                <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15" placeholder="자유롭게 이력서 내용을 작성해주세요. (예: 자기소개, 기술 스택, 프로젝트 경험 등)"></textarea>
-                {{#errors.resumeContent}}<div class="text-danger small">{{.}}</div>{{/errors.resumeContent}}
-            </div>
-            <!-- 대표 이력서 설정 체크박스 -->
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" name="isRep" id="isRep" value="true" {{#resume.isRep}}checked{{/resume.isRep}}>
-                <label class="form-check-label" for="isRep">
-                    대표 이력서로 설정
-                </label>
-            </div>
+<div class="container my-5" style="max-with:1200px">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h2 class="h4 mb-0">이력서 작성</h2>
+        </div>
+        <div class="card-body">
+            <form action="/resume/save" method="post">
+                <!-- 이력서 제목 -->
+                <div class="mb-3">
+                    <label for="resumeTitle" class="form-label fw-bold">이력서 제목</label>
+                    <input type="text" class="form-control" id="resumeTitle" name="resumeTitle"
+                           placeholder="예: 5년 경력의 성실한 개발자" maxlength="100">
+                    {{#errors.resumeTitle}}
+                        <div class="text-danger small">{{.}}</div>{{/errors.resumeTitle}}
+                </div>
+                <!-- 이력서 본문 -->
+                <div class="mb-3">
+                    <label for="resumeContent" class="form-label">이력서 내용</label>
+                    <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15"
+                              placeholder="예: 자기소개, 기술 스택, 프로젝트 경험 등을 작성해주세요" maxlength="1000"></textarea>
+                    {{#errors.resumeContent}}
+                        <div class="text-danger small">{{.}}</div>{{/errors.resumeContent}}
+                </div>
+                <!-- 대표 이력서 설정 체크박스 -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="isRep" id="isRep" value="true"
+                           {{#resume.isRep}}checked{{/resume.isRep}}>
+                    <label class="form-check-label" for="isRep">
+                        대표 이력서로 설정
+                    </label>
+                </div>
 
-            <hr>
+                <hr>
 
-            <h4>경력 정보</h4>
-            <div id="career-container">
-                <!-- 경력 입력 필드 -->
-            </div>
-            <button type="button" id="add-career-btn" class="btn btn-secondary mt-2">경력 추가</button>
+                <h4>경력 정보</h4>
+                <div id="career-container">
+                    <!-- 경력 입력 필드 -->
+                </div>
+                <button type="button" id="add-career-btn" class="btn btn-secondary mt-2">경력 추가</button>
 
-            <hr>
-            <div class="d-flex justify-content-end">
-                <a href="/resumes" class="btn btn-secondary me-2">취소</a>
-                <button type="submit" class="btn btn-primary">저장하기</button>
-            </div>
-        </form>
+                <hr>
+                <div class="d-flex justify-content-end">
+                    <a href="/resumes" class="btn btn-secondary me-2">취소</a>
+                    <button type="submit" class="btn btn-primary">저장하기</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -59,15 +66,15 @@
                     <div class="col-md-11">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control">
+                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control" max length="100">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
-                            <input type="text" name="careers[${careerIndex}].position" class="form-control">
+                            <input type="text" name="careers[${careerIndex}].position" class="form-control" max length="100">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
-                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3"></textarea>
+                            <input type="text" name="careers[${careerIndex}].position" class="form-control" max length="100">
                         </div>
                         <div class="row">
                             <div class="col-md-6">

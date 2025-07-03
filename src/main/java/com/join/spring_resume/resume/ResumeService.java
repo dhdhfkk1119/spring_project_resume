@@ -49,7 +49,7 @@ public class ResumeService {
         Resume resume = saveDTO.toEntity(sessionMember);
         Resume savedResume = resumeJpaRepository.save(resume);
 
-        //경력사항 저장
+        //경력정보 저장
         List<CareerRequest.SaveDTO> cSaveDTOS = saveDTO.getCareers();
         if(cSaveDTOS != null && !cSaveDTOS.isEmpty()){
             // 각 Career DTO를 Career 엔티티로 변환
