@@ -13,6 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "comment_tb")
 public class Comment {
@@ -24,22 +26,18 @@ public class Comment {
     @Column(nullable = false, length = 255)
     private String comment;
 
-    // 작성자 (Member 엔티티와 연관)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx", nullable = false)
     private Member user;
 
-    // 댓글이 달린 게시글
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    // 부모 댓글 (대댓글 구조)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-    // 자식 댓글들 (답글 리스트)
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("createdAt ASC")
     private List<Comment> replies = new ArrayList<>();
@@ -47,13 +45,7 @@ public class Comment {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Builder
-    public Comment(Long id, String comment, Member user, Board board, Comment parent, LocalDateTime createdAt) {
-        this.id = id;
+    public void updateContent(String comment) {
         this.comment = comment;
-        this.user = user;
-        this.board = board;
-        this.parent = parent;
-        this.createdAt = createdAt;
     }
 }

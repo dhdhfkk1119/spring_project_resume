@@ -1,4 +1,3 @@
-
 package com.join.spring_resume.board;
 
 import com.join.spring_resume.session.SessionUser;

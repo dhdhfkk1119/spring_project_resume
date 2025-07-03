@@ -7,10 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-
     @Query("SELECT b FROM Board b JOIN FETCH b.member WHERE b.boardIdx = :id")
     Board findByIdAndIncreaseHits(@Param("id") Long id);
 
     Page<Board> findByMember_MemberIdx(Long memberIdx, Pageable pageable);
 }
-

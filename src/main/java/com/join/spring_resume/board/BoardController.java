@@ -24,15 +24,49 @@ public class BoardController {
     private final MemberRepository memberRepository;
     private final CommentService commentService;
 
-    // 로그인 유저 조회
+    // 로그인 유저 조회, 없으면 예외 발생
     private Member getLoggedInMember(HttpSession session) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) throw new Exception401("로그인이 필요합니다.");
+        if (sessionUser == null) {
+            throw new Exception401("로그인이 필요합니다.");
+        }
         return memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
     }
 
-    // 글쓰기 페이지
+    // 게시글 목록 + 페이징 + 정렬
+    @GetMapping("/list")
+    public String listBoards(@RequestParam(defaultValue = "createdAt") String sort,
+                             @RequestParam(defaultValue = "desc") String direction,
+                             @RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "10") int size,
+                             Model model,
+                             HttpSession session) {
+
+        Sort sorting = direction.equalsIgnoreCase("asc") ?
+                Sort.by(sort).ascending() :
+                Sort.by(sort).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+        Page<Board> boardPage = boardService.findAll(pageable);
+
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
+        boardPage.forEach(board -> {
+            board.setAuthor(sessionUser != null && board.isOwner(sessionUser.getId()));
+            board.setFormattedCreatedAt(board.getFormattedCreatedAt());
+        });
+
+        model.addAttribute("boardList", boardPage.getContent());
+        model.addAttribute("page", boardPage);
+        model.addAttribute("sessionUser", sessionUser);
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
+
+        return "board/list";
+    }
+
+    // 글쓰기 페이지 폼
     @GetMapping("/new")
     public String newBoardForm(HttpSession session, Model model) {
         getLoggedInMember(session); // 로그인 체크
@@ -43,12 +77,23 @@ public class BoardController {
         return "board/form";
     }
 
+    // 글 작성 요청 처리
+    @PostMapping
+    public String createBoard(@ModelAttribute BoardCreateDto dto, HttpSession session) {
+        Member member = getLoggedInMember(session);
+        boardService.create(dto, member);
+        return "redirect:/board/list";
+    }
+
     // 글 수정 폼
     @GetMapping("/{id}/edit")
     public String editBoardForm(@PathVariable Long id, Model model, HttpSession session) {
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
-        if (!board.isOwner(member.getMemberIdx())) throw new Exception401("수정 권한이 없습니다.");
+
+        if (!board.isOwner(member.getMemberIdx())) {
+            throw new Exception401("수정 권한이 없습니다.");
+        }
 
         model.addAttribute("isEdit", true);
         model.addAttribute("boardIdx", board.getBoardIdx());
@@ -58,101 +103,38 @@ public class BoardController {
         return "board/form";
     }
 
-    // 글 작성 요청
-    @PostMapping
-    public String createBoard(@ModelAttribute BoardCreateDto dto, HttpSession session) {
-        Member member = getLoggedInMember(session);
-        boardService.create(dto, member);
-        return "redirect:/board/list";
-    }
-
-    // 글 수정 요청
+    // 글 수정 요청 처리
     @PostMapping("/{id}/edit")
     public String updateBoard(@PathVariable Long id,
                               @ModelAttribute BoardUpdateDto dto,
                               HttpSession session) {
+
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
-        if (!board.isOwner(member.getMemberIdx())) throw new Exception401("수정 권한이 없습니다.");
+
+        if (!board.isOwner(member.getMemberIdx())) {
+            throw new Exception401("수정 권한이 없습니다.");
+        }
 
         boardService.update(id, dto);
         return "redirect:/board/list";
     }
 
-    // 글 삭제 요청
+    // 글 삭제 요청 처리
     @PostMapping("/{id}/delete")
     public String deleteBoard(@PathVariable Long id, HttpSession session) {
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
-        if (!board.isOwner(member.getMemberIdx())) throw new Exception401("삭제 권한이 없습니다.");
+
+        if (!board.isOwner(member.getMemberIdx())) {
+            throw new Exception401("삭제 권한이 없습니다.");
+        }
 
         boardService.delete(id);
         return "redirect:/board/list";
     }
 
-    // 게시글 목록
-    @GetMapping("/list")
-    public String listBoards(@RequestParam(defaultValue = "createdAt") String sort,
-                             @RequestParam(defaultValue = "desc") String direction,
-                             @RequestParam(defaultValue = "0") int page,
-                             @RequestParam(defaultValue = "10") int size,
-                             Model model, HttpSession session) {
-
-        Sort sorting = direction.equals("asc") ?
-                Sort.by(sort).ascending() : Sort.by(sort).descending();
-        Pageable pageable = PageRequest.of(page, size, sorting);
-        Page<Board> boardPage = boardService.findAll(pageable);
-        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-
-        boardPage.forEach(board -> {
-            board.setAuthor(sessionUser != null && board.isOwner(sessionUser.getId()));
-            board.setFormattedCreatedAt(board.getFormattedUpdatedAt());
-        });
-
-        model.addAttribute("boardList", boardPage.getContent());
-        model.addAttribute("sessionUser", sessionUser);
-        model.addAttribute("sort", sort);
-        model.addAttribute("direction", direction);
-        model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
-        model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
-        model.addAttribute("isSortBoardTitle", sort.equals("boardTitle"));
-        model.addAttribute("isAsc", direction.equals("asc"));
-        model.addAttribute("isDesc", direction.equals("desc"));
-        return "board/list";
-    }
-
-    // 내 게시글 목록
-    @GetMapping("/mine")
-    private String listMyBoards(@RequestParam(defaultValue = "createdAt") String sort,
-                                @RequestParam(defaultValue = "asc") String direction,
-                                @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "10") int size,
-                                HttpSession session, Model model) {
-
-        Member member = getLoggedInMember(session);
-        Sort sorting = direction.equals("asc") ?
-                Sort.by(sort).ascending() : Sort.by(sort).descending();
-        Pageable pageable = PageRequest.of(page, size, sorting);
-        Page<Board> myBoards = boardService.findByMember(member.getMemberIdx(), pageable);
-
-        myBoards.forEach(board -> {
-            board.setAuthor(true);
-            board.setFormattedCreatedAt(board.getFormattedCreatedAt());
-        });
-
-        model.addAttribute("boardList", myBoards.getContent());
-        model.addAttribute("sessionUser", session.getAttribute("session"));
-        model.addAttribute("sort", sort);
-        model.addAttribute("direction", direction);
-        model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
-        model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
-        model.addAttribute("isSortBoardTitle", sort.equals("boardTitle"));
-        model.addAttribute("isAsc", direction.equals("asc"));
-        model.addAttribute("isDesc", direction.equals("desc"));
-        return "board/list";
-    }
-
-    // 게시글 상세 보기 + 댓글 목록 전달
+    // 게시글 상세 페이지 (댓글 포함)
     @GetMapping("/{id}")
     public String viewBoard(@PathVariable Long id, Model model, HttpSession session) {
         Board board = boardService.findByIdAndIncreaseHits(id);
@@ -163,25 +145,31 @@ public class BoardController {
         model.addAttribute("formattedUpdatedAt", board.getFormattedUpdatedAt());
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        Long loginUserId = sessionUser != null ? sessionUser.getId() : null;
+
         if (sessionUser != null && board.isOwner(sessionUser.getId())) {
             model.addAttribute("isAuthor", true);
         }
 
+        // 댓글 DTO 리스트 변환해서 전달
         List<Comment> commentEntities = commentService.findCommentsByBoard(id);
-        List<CommentResponseDto> commentDtos = commentEntities.stream().map(parent -> {
-            CommentResponseDto dto = new CommentResponseDto(parent);
-            for (Comment reply : parent.getReplies()) {
-                dto.addReply(new CommentResponseDto(reply));
-            }
-            return dto;
-        }).toList();
+        List<CommentResponseDto> commentDtos = commentEntities.stream()
+                .map(parent -> {
+                    CommentResponseDto dto = new CommentResponseDto(parent, loginUserId);
+                    for (Comment reply : parent.getReplies()) {
+                        dto.addReply(new CommentResponseDto(reply, loginUserId));
+                    }
+                    return dto;
+                }).toList();
 
         model.addAttribute("comments", commentDtos);
         model.addAttribute("sessionUser", sessionUser);
+        model.addAttribute("loginUserId", loginUserId);
+
         return "board/detail";
     }
 
-    // 댓글 작성 및 대댓글
+    // 댓글 작성 및 대댓글 처리
     @PostMapping("/{boardId}/comment")
     public String writeComment(@PathVariable Long boardId,
                                @RequestParam String content,
@@ -198,7 +186,7 @@ public class BoardController {
         return "redirect:/board/" + boardId;
     }
 
-    // 예외 클래스
+    // 커스텀 예외 클래스
     public static class Exception401 extends RuntimeException {
         public Exception401(String message) {
             super(message);
