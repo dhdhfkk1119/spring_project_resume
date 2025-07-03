@@ -11,6 +11,22 @@
         ✏️ {{board.member.username}} | 📅 {{formattedCreatedAt}} | 👁️ {{board.boardHits}}회 조회
     </div>
 
+    <!-- 좋아요 영역 -->
+    <div class="mb-4">
+        {{#sessionUser}}
+            <form method="post" action="/board/{{board.boardIdx}}/like" style="display: inline;">
+                <button type="submit"
+                        class="btn btn-sm {{#isLiked}}btn-danger{{/isLiked}}{{^isLiked}}btn-outline-danger{{/isLiked}}">
+                    ❤️ 좋아요 ({{likeCount}})
+                </button>
+            </form>
+        {{/sessionUser}}
+        {{^sessionUser}}
+            <span class="text-muted">❤️ 좋아요 ({{likeCount}})</span>
+            <small class="ms-2"><a href="/login-form">로그인</a> 후 좋아요를 누를 수 있어요.</small>
+        {{/sessionUser}}
+    </div>
+
     <!-- 게시글 본문 -->
     <div class="mb-4 border rounded p-3 bg-white">
         <p>{{board.boardContent}}</p>
@@ -19,7 +35,7 @@
         {{/board.tags}}
     </div>
 
-    <!-- 게시글 수정/삭제 버튼 (작성자만 표시) -->
+    <!-- 게시글 수정/삭제 버튼 -->
     {{#isAuthor}}
         <div class="mb-4">
             <a href="/board/{{board.boardIdx}}/edit" class="btn btn-outline-primary">수정</a>
@@ -39,29 +55,28 @@
         <div class="border rounded p-3 mb-3 bg-white">
             <strong>{{username}}</strong> • {{createdAt}}<br>
 
-            <!-- 댓글 본문 or 수정 폼 -->
-            <div id="comment-text-{{id}}">
-                <p class="mt-2">{{comment}}</p>
-            </div>
-            {{#isOwner}}
-                <div id="comment-edit-form-{{id}}" style="display: none;">
-                    <form method="post" action="/comments/{{id}}/edit">
-                        <textarea name="content" class="form-control mb-2" rows="2">{{comment}}</textarea>
-                        <button type="submit" class="btn btn-sm btn-primary">수정 완료</button>
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm({{id}})">취소</button>
-                    </form>
-                </div>
-            {{/isOwner}}
+            <!-- 댓글 텍스트 -->
+            <p id="comment-text-{{id}}" class="mt-2">{{comment}}</p>
 
-            <!-- 댓글 버튼들 -->
+            <!-- 댓글 수정 폼 (숨김) -->
+            <form id="edit-form-{{id}}" method="post" action="/comments/{{id}}/edit" style="display:none;" class="mt-2">
+                <textarea name="content" class="form-control mb-2" rows="3">{{comment}}</textarea>
+                <button type="submit" class="btn btn-sm btn-success">수정 완료</button>
+                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm({{id}})">취소</button>
+            </form>
+
             {{#isOwner}}
+                <!-- 수정 버튼 -->
+                <button onclick="toggleEditForm({{id}})" class="btn btn-sm btn-outline-warning">수정</button>
+
+                <!-- 삭제 버튼 -->
                 <form method="post" action="/comments/{{id}}/delete"
                       style="display:inline;" onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
                     <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
                 </form>
-                <button class="btn btn-sm btn-outline-secondary" onclick="toggleEditForm({{id}})">수정</button>
             {{/isOwner}}
 
+            <!-- 답글 버튼 -->
             <button class="btn btn-sm btn-link text-primary" onclick="toggleReplyForm({{id}})">답글 달기</button>
 
             <!-- 대댓글 입력 폼 -->
@@ -73,27 +88,16 @@
                 </form>
             </div>
 
-            <!-- 대댓글 목록 -->
+            <!-- 대댓글 -->
             {{#replies}}
                 <div class="border-start ps-3 mt-3 ms-3">
                     <strong>{{username}}</strong> • {{createdAt}}<br>
-
-                    <div id="comment-text-{{id}}">
-                        <p class="mt-1">{{comment}}</p>
-                    </div>
+                    <p class="mt-1">{{comment}}</p>
                     {{#isOwner}}
-                        <div id="comment-edit-form-{{id}}" style="display: none;">
-                            <form method="post" action="/comments/{{id}}/edit">
-                                <textarea name="content" class="form-control mb-2" rows="2">{{comment}}</textarea>
-                                <button type="submit" class="btn btn-sm btn-primary">수정 완료</button>
-                                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm({{id}})">취소</button>
-                            </form>
-                        </div>
                         <form method="post" action="/comments/{{id}}/delete"
                               style="display:inline;" onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
                             <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
                         </form>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleEditForm({{id}})">수정</button>
                     {{/isOwner}}
                 </div>
             {{/replies}}
@@ -123,7 +127,7 @@
     <a href="/board/list" class="btn btn-secondary mt-4">← 목록으로</a>
 </div>
 
-<!-- 스크립트 -->
+<!-- 댓글 및 답글 폼 토글 스크립트 -->
 <script>
     function toggleReplyForm(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
@@ -132,11 +136,13 @@
 
     function toggleEditForm(commentId) {
         const text = document.getElementById(`comment-text-${commentId}`);
-        const form = document.getElementById(`comment-edit-form-${commentId}`);
-        if (text && form) {
-            const isHidden = form.style.display === 'none';
-            text.style.display = isHidden ? 'none' : 'block';
-            form.style.display = isHidden ? 'block' : 'none';
+        const form = document.getElementById(`edit-form-${commentId}`);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            text.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            text.style.display = 'block';
         }
     }
 </script>
