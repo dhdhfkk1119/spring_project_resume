@@ -82,7 +82,7 @@ public class CorpController {
 
         // 비밀번호 체크
         if (!saveDTO.getPassword().equals(saveDTO.getRePassword())) {
-            errorMap.put("rePassword", "비밀번호가 일치하지 않습니다.");
+            errorMap.put("IsRePassword", "비밀번호가 일치하지 않습니다.");
             model.addAttribute("errors", errorMap);
             model.addAttribute("dto", saveDTO);
             return "corp/sign-form";
@@ -90,7 +90,7 @@ public class CorpController {
 
         // 아이디 중복 체크
         if (corpService.existsByCorpId(saveDTO.getCorpId())) {
-            errorMap.put("corpId", "이미 사용 중인 아이디입니다.");
+            errorMap.put("IsCorpId", "이미 사용 중인 아이디입니다.");
             model.addAttribute("errors", errorMap);
             model.addAttribute("dto", saveDTO);
             return "corp/sign-form";

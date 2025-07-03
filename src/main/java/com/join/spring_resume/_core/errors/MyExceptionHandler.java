@@ -51,15 +51,15 @@ public class MyExceptionHandler {
         return "err/500";
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public String RuntimeExceptionHandler(RuntimeException e, HttpServletRequest request) {
-        log.warn(" === RuntimeException 에러 발생 === ");
-        log.warn(" === 요청 URL : {} " , request.getRequestURL());
-        log.warn("인증 오류 : {}" ,e.getMessage());
-        log.warn("User-Agent : {}" , request.getHeader("User-Agent"));
-        request.setAttribute("msg","시스템 오류 발생, 관리자에게 문의 하세요0");
-        return "err/500";
-    }
+//    @ExceptionHandler(RuntimeException.class)
+//    public String RuntimeExceptionHandler(RuntimeException e, HttpServletRequest request) {
+//        log.warn(" === RuntimeException 에러 발생 === ");
+//        log.warn(" === 요청 URL : {} " , request.getRequestURL());
+//        log.warn("인증 오류 : {}" ,e.getMessage());
+//        log.warn("User-Agent : {}" , request.getHeader("User-Agent"));
+//        request.setAttribute("msg","시스템 오류 발생, 관리자에게 문의 하세요0");
+//        return "err/500";
+//    }
 
     @ExceptionHandler(Exception401.class)
     @ResponseBody // 데이터를 반환 함

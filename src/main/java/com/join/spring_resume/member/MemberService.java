@@ -33,6 +33,12 @@ public class MemberService {
         return memberRepository.save(saveDTO.toEntity());
     }
 
+    public Member findById(String memberId){
+        return memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception400("해당 유저를 찾을 수 없습니다"));
+    }
+
+
+    // 아이디 체크
     public boolean existsByMemberId(String Id) {
         return memberRepository.existsByMemberId(Id);
     }

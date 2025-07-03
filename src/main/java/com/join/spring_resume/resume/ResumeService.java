@@ -124,5 +124,10 @@ public class ResumeService {
         }
         resumeJpaRepository.delete(resume);
     }
-
+    
+    // 대표이력서 찾기
+    public Resume findIdMyResumes(Member member) {
+        return resumeJpaRepository.findRepresentativeResumeByMember(member)
+                .orElseThrow(() -> new IllegalStateException("대표 이력서가 존재하지 않습니다."));
+    }
 }//

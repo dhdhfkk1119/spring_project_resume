@@ -56,7 +56,6 @@ public class MemberController {
             session.setAttribute("session",sessionUser); // 세선 저장
             return "redirect:/";
         } catch (Exception e) {
-
             model.addAttribute("isErrors",e.getMessage()); // 오류 메세지를 담음
         }
         return "member/login-form";
@@ -76,23 +75,20 @@ public class MemberController {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
             model.addAttribute("errors", errorMap);
-            model.addAttribute("dto", saveDTO);
             return "member/sign-form";
         }
 
         // 비밀번호 체크
         if (!saveDTO.getPassword().equals(saveDTO.getRePassword())) {
-            errorMap.put("rePassword", "비밀번호가 일치하지 않습니다.");
+            errorMap.put("IsRePassword", "비밀번호가 일치하지 않습니다.");
             model.addAttribute("errors", errorMap);
-            model.addAttribute("dto", saveDTO);
             return "member/sign-form";
         }
 
         // 아이디 중복 체크
         if (memberService.existsByMemberId(saveDTO.getMemberId())) {
-            errorMap.put("memberId", "이미 사용 중인 아이디입니다.");
+            errorMap.put("IsMemberId", "이미 사용 중인 아이디입니다.");
             model.addAttribute("errors", errorMap);
-            model.addAttribute("dto", saveDTO);
             return "member/sign-form";
         }
 

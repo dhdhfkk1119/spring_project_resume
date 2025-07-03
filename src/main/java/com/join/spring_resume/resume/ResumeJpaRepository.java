@@ -1,5 +1,6 @@
 package com.join.spring_resume.resume;
 
+import com.join.spring_resume.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,5 +27,8 @@ public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
     @Query("UPDATE Resume r SET r.isRep = false WHERE r.member.memberIdx = :memberIdx")
     void resetAllIsRepByMemberIdx(@Param("memberIdx") Long memberIdx);
 
-}//
+    @Query("SELECT r FROM Resume r WHERE r.member = :member AND r.isRep = true")
+    Optional<Resume> findRepresentativeResumeByMember(@Param("member") Member member);
+
+}
 
