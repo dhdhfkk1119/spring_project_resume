@@ -38,7 +38,7 @@ public class ResumeService {
 
     //이력서 저장
     @Transactional
-    public Resume save(ResumeRequest.saveDTO saveDTO, Member member) {
+    public Resume save(ResumeRequest.SaveDTO saveDTO, Member member) {
         Resume resume = saveDTO.toEntity(member);
         Resume savedResume = resumeJpaRepository.save(resume);
 

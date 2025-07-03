@@ -9,12 +9,14 @@
             <!-- 이력서 제목 -->
             <div class="mb-3">
                 <label for="resumeTitle" class="form-label fw-bold">이력서 제목</label>
-                <input type="text" class="form-control" id="resumeTitle" name="resumeTitle" placeholder="예: 성실한 개발자 홍길동입니다." required>
+                <input type="text" class="form-control" id="resumeTitle" name="resumeTitle" placeholder="예: 성실한 개발자 홍길동입니다.">
+                {{#errors.resumeTitle}}<div id="resumeTitle-error" class="error-message"></div>{{/errors.resumeTitle}}
             </div>
             <!-- 이력서 본문 -->
             <div class="mb-3">
                 <label for="resumeContent" class="form-label">이력서 내용</label>
                 <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15" placeholder="자유롭게 이력서 내용을 작성해주세요. (예: 자기소개, 기술 스택, 프로젝트 경험 등)"></textarea>
+                <div id="resumeContent-error" class="error-message"></div>
             </div>
             <hr>
 
@@ -49,7 +51,8 @@
                     <div class="col-md-11">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control" required>
+                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control">
+                            <div id="corpName-error" class="error-message"></div>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
@@ -57,16 +60,17 @@
                         </div>
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
-                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3" required></textarea>
+                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3"></textarea>
+                            <div id="careerContent-error" class="error-message"></div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">입사일</label>
-                                <input type="date" name="careers[${careerIndex}].startAt" class="form-control" required>
+                                <input type="date" name="careers[${careerIndex}].startAt" class="form-control">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">퇴사일</label>
-                                <input type="date" name="careers[${careerIndex}].endAt" class="form-control" required>
+                                <input type="date" name="careers[${careerIndex}].endAt" class="form-control">
                             </div>
                         </div>
                     </div>

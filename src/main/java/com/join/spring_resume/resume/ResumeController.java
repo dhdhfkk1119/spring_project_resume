@@ -4,13 +4,17 @@ import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -86,8 +90,8 @@ public class ResumeController {
      * 수정 액션
      */
     @PostMapping("/resume/{id}/update")
-    public String update(@PathVariable(name = "id") Long resumeIdx, ResumeRequest.UpdateDTO reqDTO) {
-        reqDTO.validate();
+    public String update(@PathVariable(name = "id") Long resumeIdx, @Valid ResumeRequest.UpdateDTO updateDTO) {
+
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) return "redirect:/login-form";
         if (sessionUser.getRole() != "MEMBER") {
@@ -97,7 +101,7 @@ public class ResumeController {
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
 
-        resumeService.updateById(resumeIdx, reqDTO, member);
+        resumeService.updateById(resumeIdx, updateDTO, member);
         return "redirect:/resume/" + resumeIdx;
     }
 
@@ -144,10 +148,14 @@ public class ResumeController {
      */
 
     @PostMapping("/resume/save")
-    public String save(ResumeRequest.saveDTO reqDTO) {
-        reqDTO.validate();
+    public String save(@Valid ResumeRequest.SaveDTO saveDTO, BindingResult bindingResult) {
+
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
+        if(bindingResult.hasErrors()){
+            HashMap<String,String> errors = new HashMap<>();
+            return "resume/save-form";
+        }
         if (sessionUser == null) return "redirect:/login-form";
         if (sessionUser.getRole() != "MEMBER") {
             System.out.println("일반 회원만 작성 가능합니다");
@@ -156,7 +164,7 @@ public class ResumeController {
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
 
-        Resume resume = resumeService.save(reqDTO, member);
+        Resume resume = resumeService.save(saveDTO, member);
         return "redirect:/resume/" + resume.getResumeIdx();
     }
 

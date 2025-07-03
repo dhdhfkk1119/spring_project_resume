@@ -2,6 +2,8 @@ package com.join.spring_resume.resume;
 
 import com.join.spring_resume.carrer.CareerRequest;
 import com.join.spring_resume.member.Member;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,9 +13,12 @@ public class ResumeRequest {
 
     //이력서 저장 DTO
     @Data
-    public static class saveDTO {
+    public static class SaveDTO {
+        @NotBlank(message = "제목은 필수 입력 값입니다.")
         private String resumeTitle;
+        @NotBlank(message = "내용은 필수 입력 값입니다.")
         private String resumeContent;
+        @Valid
         private List<CareerRequest.SaveDTO> careers = new ArrayList<>();
 
         public Resume toEntity(Member member){

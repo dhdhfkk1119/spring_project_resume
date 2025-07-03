@@ -1,6 +1,7 @@
 package com.join.spring_resume.carrer;
 
 import com.join.spring_resume.resume.Resume;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -11,8 +12,10 @@ public class CareerRequest {
     //경력사항 저장 DTO
     @Data
     public static class SaveDTO {
+        @NotBlank(message = "회사명은 필수 입력 값입니다.")
         private String corpName;
         private String position;
+        @NotBlank(message = "직무내용은 필수 입력 값입니다.")
         private String careerContent;
         private LocalDate startAt;
         private LocalDate endAt;

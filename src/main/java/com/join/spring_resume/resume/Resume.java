@@ -28,8 +28,7 @@ public class Resume {
     private String resumeTitle;
     private String resumeContent;
 
-    //대표이력서
-    @Column(nullable = false)
+    //대표이력서 (notnull 제거)
     private Boolean isRep = false;
 
     @CreationTimestamp
