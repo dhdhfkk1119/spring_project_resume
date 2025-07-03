@@ -1,5 +1,0 @@
-#Very Strict! Never press tab!
-spring:
-  profiles:
-    active:
-      - dev
