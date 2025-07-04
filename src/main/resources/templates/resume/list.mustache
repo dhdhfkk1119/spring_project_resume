@@ -2,7 +2,7 @@
 
 <div class="container my-5" style="max-with:1200px">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h3">내 이력서 목록</h2>
+        <h2 class="h3 text-muted">{{member.username}}님의 이력서 목록</h2>
         <a href="/resume/save-form" class="btn btn-primary">새 이력서 작성</a>
     </div>
     <hr>
@@ -10,21 +10,30 @@
 
         <!-- 이력서가 하나 이상 있을 경우 반복문 실행 -->
         {{#resumes}}
-            <div class="card mb-3">
+            <div class="card mb-3 {{#isRep}}bg-light{{/isRep}}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
                             <a href="/resume/{{resumeIdx}}" class="text-decoration-none">
-                                <h5 class="card-title mb-1">{{resumeTitle}}</h5>
+                                <h5 class="card-title mb-1 {{#isRep}}text-primary{{/isRep}}{{^isRep}}text-muted{{/isRep}}">{{resumeTitle}}</h5>
                             </a>
                             <p class="card-text"><small class="text-muted">작성일: {{createdAt}}</small></p>
                         </div>
                         <div class="d-flex align-items-center">
+
+                            <!-- 대표 배지 -->
                             {{#isRep}}
-                                <span class="badge bg-primary me-3">대표</span>
+                                <span class="badge bg-primary me-3 p-2 fs-6">대표 이력서</span>
                             {{/isRep}}
 
-                            <a href="/resume/{{resumeIdx}}/update-form" class="btn btn-sm btn-outline-secondary">수정</a>
+                            <!-- 수정 버튼 -->
+                            <a href="/resume/{{resumeIdx}}/update-form" class="btn btn-sm btn-outline-secondary me-2">수정</a>
+
+                            <!-- 삭제 버튼 -->
+                            <form action="/resume/{{resumeIdx}}/delete" method="post" class="delete-form d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -40,5 +49,21 @@
         {{/resumes}}
     </div>
 </div>
+
+<!-- 🚨 추가: 삭제 확인 자바스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteForms = document.querySelectorAll('.delete-form');
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                // 사용자에게 삭제 여부를 확인
+                if (!confirm('정말로 이 이력서를 삭제하시겠습니까?')) {
+                    // 사용자가 '취소'를 누르면 form 전송을 막음
+                    event.preventDefault();
+                }
+            });
+        });
+    });
+</script>
 
 {{> layout/footer}}

@@ -46,6 +46,8 @@ public class ResumeController {
         //세션에서 가져온 memberIdx 회원이력서 전체조회
         List<Resume> resumeList = resumeService.findMyResumes(member.getMemberIdx());
         model.addAttribute("resumes", resumeList);
+        model.addAttribute("member", member);
+
         return "resume/list";
     }
 
@@ -84,6 +86,7 @@ public class ResumeController {
 
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
         model.addAttribute("resume", resume);
+        model.addAttribute("member", member);
         return "resume/update-form";
     }
 
@@ -143,7 +146,7 @@ public class ResumeController {
      * 이력서 작성창 요청
      */
     @GetMapping("/resume/save-form")
-    public String saveForm() {
+    public String saveForm(Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) return "redirect:/login-form";
         if (sessionUser.getRole() != "MEMBER") {
@@ -152,6 +155,7 @@ public class ResumeController {
         }
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+        model.addAttribute("member", member);
 
         return "resume/save-form";
     }
