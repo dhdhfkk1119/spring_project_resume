@@ -1,16 +1,15 @@
 {{> layout/header}}
 
-<div class="container my-5" style="max-with:1200px">
+<div class="container my-5" style="max-with:1200px;">
     <div class="card shadow-sm">
-        <div class="card-header">
+        <div class="card-header bg-light py-3">
             <!-- 양쪽으로 정렬하기 위해 d-flex 적용 -->
             <div class="d-flex justify-content-between align-items-center">
                 <h2 class="h4 mb-0">{{member.username}}님의 이력서 업그레이드 중</h2>
                 <!-- 삭제 아이콘 버튼과 form -->
                 <form id="delete-form-icon" action="/resume/{{resume.resumeIdx}}/delete" method="post">
-                    <button type="submit" class="btn btn-link text-danger p-0">
-                        <!-- 휴지통 아이콘 -->
-                        <i class="fa-solid fa-trash"></i>
+                    <button type="submit" class="btn btn-link p-0" title="삭제하기" style="color: Tomato;">
+                        <i class="fa-solid fa-trash fs-5"></i>
                     </button>
                 </form>
             </div>
@@ -19,7 +18,7 @@
             <form id="update-form" action="/resume/{{resume.resumeIdx}}/update" method="post">
                 <!-- 이력서 제목 -->
                 <div class="mb-3">
-                    <label for="resumeTitle" class="form-label">눈길을 잡아끄는 한 문장</label>
+                    <label for="resumeTitle" class="form-label fw-bold">눈길을 잡아끄는 한 문장</label>
                     <input type="text" class="form-control" id="resumeTitle" name="resumeTitle"
                            value="{{resume.resumeTitle}}" required>
                     {{#errors.resumeTitle}}
@@ -27,7 +26,7 @@
                 </div>
                 <!-- 이력서 본문 -->
                 <div class="mb-3">
-                    <label for="resumeContent" class="form-label">마음을 움직이는 소개글</label>
+                    <label for="resumeContent" class="form-label fw-bold">마음을 움직이는 소개글</label>
                     <textarea class="form-control" id="resumeContent" name="resumeContent"
                               rows="10">{{resume.resumeContent}}</textarea>
                     {{#errors.resumeContent}}
@@ -86,6 +85,14 @@
         const initialSize = careerContainer.getAttribute('data-initial-size');
         let careerIndex = initialSize ? parseInt(initialSize, 10) : 0;
 
+        // 날짜 입력을 위한 flatpickr 초기화 함수
+        function initializeFlatpickr(element) {
+            flatpickr(element, {
+                dateFormat: "Y-m-d", // 날짜 형식 지정 (YYYY-MM-DD)
+                locale: "ko" // 한글 지원 (CDN 추가 필요 시)
+            });
+        }
+
         addCareerBtn.addEventListener('click', function () {
             const careerDiv = document.createElement('div');
             careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light', 'career-item', 'new-career-item');
@@ -123,8 +130,18 @@
                 </div>
             `;
             careerContainer.appendChild(careerDiv);
+
+            // 날짜 input에 flatpickr 적용
+            const newDateInputs = careerDiv.querySelectorAll('input[type="date"]');
+            newDateInputs.forEach(initializeFlatpickr);
+
             careerIndex++;
+
         });
+
+        // 페이지 로드 시 이미 존재하는 날짜 input에 적용 (update 페이지용)
+        const existingDateInputs = document.querySelectorAll('input[type="date"]');
+        existingDateInputs.forEach(initializeFlatpickr);
 
         careerContainer.addEventListener('click', function (e) {
             if (e.target && e.target.classList.contains('remove-career-btn')) {

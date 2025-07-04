@@ -2,14 +2,26 @@
 
 <div class="container my-5" style="max-with:1200px">
     <div class="card shadow-sm">
-        <!-- 카드 헤더: 이력서 제목과 수정 버튼 -->
+        <!-- 카드 헤더: 이력서 제목과 각종 버튼 -->
         <div class="card-header bg-light py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <h1 class="h4 mb-0">{{resume.resumeTitle}}</h1>
-                <a href="/resume/{{resume.resumeIdx}}/update-form" class="btn btn-outline-primary">수정하기</a>
-                <form id="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post" class="d-inline">
-                    <button type="button" id="delete-btn" class="btn btn-outline-danger">삭제</button>
-                </form>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- 목록 버튼 -->
+                    <a href="/resumes" class="text-muted" title="목록으로">
+                        <i class="fa-solid fa-list fs-5"></i>
+                    </a>
+                    <!-- 수정 버튼 -->
+                    <a href="/resume/{{resume.resumeIdx}}/update-form" class="text-muted" title="수정하기">
+                        <i class="fa-solid fa-pen-to-square fs-5"></i>
+                    </a>
+                    <!-- 삭제 버튼 -->
+                    <form class="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post">
+                        <button type="submit" class="btn btn-link p-0" title="삭제하기" style="color: Tomato;">
+                            <i class="fa-solid fa-trash fs-5"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         <hr>
@@ -17,10 +29,10 @@
         <div class="card-body">
             <h2 class="h5 border-bottom pb-2 mb-3">{{resume.member.username}}</h2>
             <div class="col mb-4 p-3 border rounded">
-                    <p><strong>나이/성별:</strong> {{resume.member.age}}세 / {{resume.member.sex}}</p>
-                    <p><strong>연락처:</strong> {{resume.member.phoneNumber}}</p>
-                     <p><strong>이메일:</strong> {{resume.member.email}}</p>
-                    <p><strong>주소:</strong> {{resume.member.address}}</p>
+                <p><strong>나이/성별:</strong> {{resume.member.age}}세 / {{resume.member.sex}}</p>
+                <p><strong>연락처:</strong> {{resume.member.phoneNumber}}</p>
+                <p><strong>이메일:</strong> {{resume.member.email}}</p>
+                <p><strong>주소:</strong> {{resume.member.address}}</p>
             </div>
 
             <hr>
@@ -55,21 +67,38 @@
             {{/resume.careerList}}
         </div>
 
-        <!-- 목록으로 버튼 -->
-        <div class="mt-4">
-            <a href="/resumes" class="btn btn-secondary">목록으로</a>
+        <!-- 목록 수정 삭제 리스트 -->
+        <div class="card-footer bg-transparent py-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a href="/resumes" class="btn btn-outline-secondary">목록으로</a>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/resume/{{resume.resumeIdx}}/update-form" class="btn btn-outline-secondary">수정하기</a>
+                    <form class="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post">
+                        <button type="button" id="delete-btn-text" class="btn btn-outline-danger">삭제하기</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-    <script>
-        document.getElementById('delete-btn').addEventListener('click', function() {
-            // 사용자에게 삭제 여부를 확인
-            if (confirm('정말로 이 이력서를 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.')) {
-                // 사용자가 '확인'을 누르면 form을 전송
-                document.getElementById('delete-form').submit();
+<script>
+    // 1. '.delete-form' 클래스를 가진 모든 form에 공통으로 삭제 확인 로직을 적용합니다.
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function (event) {
+            if (!confirm('정말로 이 이력서를 삭제하시겠습니까?')) {
+                event.preventDefault(); // '취소'를 누르면 폼 제출을 막습니다.
             }
         });
-    </script>
+    });
+
+    // 2. 텍스트 버튼(#delete-btn-text)은 '클릭'했을 때, 자신이 속한 form을 'submit' 시키는 역할만 합니다.
+    document.getElementById('delete-btn-text').addEventListener('click', function () {
+        // this.closest('form')는 클릭된 버튼에서 가장 가까운 부모 form을 찾아줍니다.
+        this.closest('form').submit();
+    });
+</script>
 
 {{> layout/footer}}

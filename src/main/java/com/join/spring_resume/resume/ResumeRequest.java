@@ -45,7 +45,7 @@ public class ResumeRequest {
         @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
         private String resumeTitle;
         @NotBlank(message = "내용은 필수 입력 값입니다.")
-        @Size(max = 1000, message = "내용은 1000자 이내로 작성해주세요.")
+        @Size(max = 10000, message = "내용은 10000자 이내로 작성해주세요.")
         private String resumeContent;
         private Boolean isRep;
 

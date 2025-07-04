@@ -99,6 +99,9 @@ public class ResumeController {
                          @Valid ResumeRequest.UpdateDTO updateDTO,
                          BindingResult bindingResult,
                          Model model) {
+
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
         //유효성
         Map<String, String> errorMap = new HashMap<>();//에러 바인딩
         if (bindingResult.hasErrors()) {
@@ -111,7 +114,7 @@ public class ResumeController {
             return "resume/save-form";
         }
 
-        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
         if (sessionUser == null) return "redirect:/login-form";
         if (sessionUser.getRole() != "MEMBER") {
             System.out.println("일반 회원만 작성 가능합니다");
@@ -172,6 +175,8 @@ public class ResumeController {
                        BindingResult bindingResult,
                        Model model) {
 
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
         //유효성
         Map<String, String> errorMap = new HashMap<>();//에러 바인딩
         if (bindingResult.hasErrors()) {
@@ -184,7 +189,6 @@ public class ResumeController {
             return "resume/save-form";
         }
 
-        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) return "redirect:/login-form";
         if (sessionUser.getRole() != "MEMBER") {
             System.out.println("일반 회원만 작성 가능합니다");
