@@ -202,4 +202,28 @@ public class ResumeController {
         return "redirect:/resume/" + resume.getResumeIdx();
     }
 
+    /**
+     * 대표 이력서를 변경하시겠습니까?
+     */
+    @PostMapping("/resume/{id}/set-rep")
+    public String setRepresentative(@PathVariable(name = "id") Long resumeIdx) {
+
+        // 인증검사
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) return "redirect:/login-form";
+        // 권한확인
+        if (sessionUser.getRole() != "MEMBER") {
+            System.out.println("일반 회원만 작성 가능합니다");
+            return "redirect:/";
+        }
+        Member member = memberRepository.findById(sessionUser.getId())
+                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+
+        // 2. 서비스에 대표 이력서 변경 로직 위임
+        resumeService.setRep(sessionUser.getId(), resumeIdx);
+
+        // 3. 다시 이력서 목록 페이지로 리다이렉트
+        return "redirect:/resumes";
+    }
+
 }//

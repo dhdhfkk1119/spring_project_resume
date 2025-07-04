@@ -20,7 +20,7 @@
                 <div class="mb-3">
                     <label for="resumeTitle" class="form-label fw-bold">눈길을 잡아끄는 한 문장</label>
                     <input type="text" class="form-control" id="resumeTitle" name="resumeTitle"
-                           value="{{resume.resumeTitle}}" required>
+                           value="{{resume.resumeTitle}}" maxlength="50" required>
                     {{#errors.resumeTitle}}
                         <div class="text-danger small">{{.}}</div>{{/errors.resumeTitle}}
                 </div>
@@ -28,7 +28,7 @@
                 <div class="mb-3">
                     <label for="resumeContent" class="form-label fw-bold">마음을 움직이는 소개글</label>
                     <textarea class="form-control" id="resumeContent" name="resumeContent"
-                              rows="10">{{resume.resumeContent}}</textarea>
+                              rows="10" maxlength="5000" required>{{resume.resumeContent}}</textarea>
                     {{#errors.resumeContent}}
                         <div class="text-danger small">{{.}}</div>{{/errors.resumeContent}}
                 </div>
@@ -63,12 +63,12 @@
                         </div>
                     {{/resume.careerList}}
                 </div>
-                <button type="button" id="add-career-btn" class="btn btn-secondary mt-2">경력 추가</button>
+                <button type="button" id="add-career-btn" class="btn btn-outline-secondary">경력 추가</button>
 
                 <hr>
                 <div class="d-flex justify-content-end">
-                    <a href="/resume/{{resume.resumeIdx}}" class="btn btn-secondary me-2">취소</a>
-                    <button type="button" id="submit-btn" class="btn btn-primary">수정완료</button>
+                    <a href="/resume/{{resume.resumeIdx}}" class="btn btn-outline-secondary me-2">취소</a>
+                    <button type="button" id="submit-btn" class="btn btn-outline-primary">수정완료</button>
                 </div>
             </form>
         </div>
@@ -125,7 +125,9 @@
                         </div>
                     </div>
                     <div class="col-md-1 d-flex align-items-center justify-content-center">
-                        <button type="button" class="btn btn-sm btn-outline-danger remove-career-btn">삭제</button>
+                        <button type="submit" class="btn btn-link p-0" title="삭제하기" style="color: Tomato;">
+                            <i class="fa-solid fa-trash fs-5"></i>
+                        </button>
                     </div>
                 </div>
             `;

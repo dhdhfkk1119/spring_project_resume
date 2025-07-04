@@ -138,4 +138,21 @@ public class ResumeService {
         return resumeJpaRepository.findRepresentativeResumeByMember(member)
                 .orElseThrow(() -> new IllegalStateException("대표 이력서가 존재하지 않습니다."));
     }
+
+    //대표 이력서 간편 수정
+    @Transactional
+    public void setRep(Long memberIdx, Long resumeIdx) {
+
+        //이력서 조회 및 소유권 확인
+        Resume resume = resumeJpaRepository.findById(resumeIdx).orElseThrow(() -> {
+            return new RuntimeException("이력서를 찾을 수 없습니다"+ resumeIdx);
+        } );
+        if (!resume.isOwner(memberIdx)) {
+            throw new RuntimeException("대표이력서를 수정할 권한이 없습니다.");
+        }
+
+        //수정 진행
+        resumeJpaRepository.resetAllIsRepByMemberIdx(memberIdx);
+        resume.setIsRep(true);
+    }
 }//
