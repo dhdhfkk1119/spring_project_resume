@@ -41,6 +41,7 @@
                 {{#errors.email}}<div class="text-danger small">{{.}}</div>{{/errors.email}}
             </div>
             <button type="submit" class="btn btn-primary py-2 w-100">회원가입</button>
+            <!-- 비밀번호 및 아이디 중복검사 -->
             {{#errors.IsRePassword}}<div class="text-danger small">{{.}}</div>{{/errors.IsRePassword}}
             {{#errors.IsCorpId}}<div class="text-danger small">{{.}}</div>{{/errors.IsCorpId}}
         </form>

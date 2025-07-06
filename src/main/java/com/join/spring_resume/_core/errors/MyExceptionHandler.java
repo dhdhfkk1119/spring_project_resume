@@ -20,26 +20,7 @@ public class MyExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(MyExceptionHandler.class);
 
 
-    @ExceptionHandler(Exception400.class)
-    public String ex400(Exception400 e, HttpServletRequest request) {
-        log.warn(" === 400 BadRequest 에러 발생 === ");
-        log.warn(" === 요청 URL : {} " , request.getRequestURL());
-        log.warn("인증 오류 : {}" ,e.getMessage());
-        log.warn("User-Agent : {}" , request.getHeader("User-Agent"));
-        request.setAttribute("msg",e.getMessage());
-        return "err/400";
-    }
 
-
-    @ExceptionHandler(Exception404.class)
-    public String ex404(Exception404 e, HttpServletRequest request) {
-        log.warn(" === 404 NotFound 에러 발생 === ");
-        log.warn(" === 요청 URL : {} " , request.getRequestURL());
-        log.warn("인증 오류 : {}" ,e.getMessage());
-        log.warn("User-Agent : {}" , request.getHeader("User-Agent"));
-        request.setAttribute("msg",e.getMessage());
-        return "err/404";
-    }
 
     @ExceptionHandler(Exception500.class)
     public String ex500(Exception500 e, HttpServletRequest request) {
@@ -60,7 +41,8 @@ public class MyExceptionHandler {
 //        request.setAttribute("msg","시스템 오류 발생, 관리자에게 문의 하세요0");
 //        return "err/500";
 //    }
-
+    
+    // 로그인 유무를 체크 하는 오류
     @ExceptionHandler(Exception401.class)
     @ResponseBody // 데이터를 반환 함
     public ResponseEntity<String> ex401(Exception401 e , HttpServletRequest request) {
@@ -70,10 +52,35 @@ public class MyExceptionHandler {
                 .contentType(MediaType.TEXT_HTML)
                 .body(script);
     }
-
+    
+    // 오류 발생시 메인 페이지로 이동
     @ExceptionHandler(Exception403.class)
     @ResponseBody // 데이터를 반환 함
     public ResponseEntity<String> ex403(Exception403 e , HttpServletRequest request) {
+        String script = "<script> alert('" + e.getMessage()+ "'); location.href='/'; </script>";
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.TEXT_HTML)
+                .body(script);
+    }
+
+    @ExceptionHandler(Exception400.class)
+    @ResponseBody
+    public ResponseEntity<String> ex400(Exception400 e, HttpServletRequest request) {
+        String referer = request.getHeader("Referer"); // 이전 페이지
+        String redirectUrl = referer != null ? referer : "/";
+        String script = "<script>alert('" + e.getMessage() + "'); location.href='" + redirectUrl + "';</script>";
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.TEXT_HTML)
+                .body(script);
+    }
+
+    // 오류 발생시 메인 페이지로 이동
+    @ExceptionHandler(Exception404.class)
+    @ResponseBody // 데이터를 반환 함
+    public ResponseEntity<String> ex404(Exception404 e , HttpServletRequest request) {
         String script = "<script> alert('" + e.getMessage()+ "'); location.href='/'; </script>";
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)

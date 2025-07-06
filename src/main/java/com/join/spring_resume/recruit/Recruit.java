@@ -1,6 +1,7 @@
 package com.join.spring_resume.recruit;
 
 import com.join.spring_resume.corp.Corp;
+import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,7 +50,19 @@ public class Recruit {
 
 
     private String logoImages;
-    
+
     // 시간 변환 View 에서 예쁘게 보여주기
+    public String getStartAtFormatted() {
+        if (this.startAt == null) return "";
+        return DateUtil.formatDate(this.startAt);
+    }
+
+    // 시간 변환 View 에서 예쁘게 보여주기
+    public String getEndAtFormatted() {
+        if (this.endAt == null) return "";
+        return DateUtil.formatDate(this.endAt);
+    }
+
+
 
 }

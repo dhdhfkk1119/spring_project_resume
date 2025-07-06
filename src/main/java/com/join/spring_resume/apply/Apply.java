@@ -2,6 +2,7 @@ package com.join.spring_resume.apply;
 
 import com.join.spring_resume.recruit.Recruit;
 import com.join.spring_resume.resume.Resume;
+import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,4 +32,8 @@ public class Apply {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public String getFormattedAppliedAt() {
+        return DateUtil.formatDate(this.createdAt);
+    }
 }

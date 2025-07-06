@@ -34,7 +34,13 @@ public class MemberService {
     }
 
     public Member findById(String memberId){
-        return memberRepository.findByMemberId(memberId).orElseThrow(() -> new Exception400("해당 유저를 찾을 수 없습니다"));
+        return memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new Exception400("해당 유저를 찾을 수 없습니다"));
+    }
+
+    public Member findByMemberId(String memberId){
+        return memberRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new Exception400("일반 회원만 지원할수있습니다"));
     }
 
 

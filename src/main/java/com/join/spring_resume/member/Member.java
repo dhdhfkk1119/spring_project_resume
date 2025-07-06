@@ -1,5 +1,6 @@
 package com.join.spring_resume.member;
 
+import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,5 +43,11 @@ public class Member {
     @CreationTimestamp
     private Timestamp createdAt;
 
+
+    // 시간 변환 View 에서 예쁘게 보여주기
+    public String getCreatedAtFormatted() {
+        if (this.createdAt == null) return "";
+        return DateUtil.timestampFormat(this.createdAt);
+    }
 
 }

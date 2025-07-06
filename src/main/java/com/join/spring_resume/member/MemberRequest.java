@@ -51,6 +51,7 @@ public class MemberRequest {
         private String rePassword; // 비밀번호 재 입력
 
         @NotBlank(message = "시작하는 번호를 입력해주세요")
+        @Pattern(regexp = "010", message = "전화번호는 010만 입력 가능합니다.")
         private String phone1;
 
         @NotBlank(message = "전화번호 앞 4자리를 입력해주세요")

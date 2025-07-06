@@ -1,8 +1,12 @@
 package com.join.spring_resume.recruit;
 
 import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume.apply.Apply;
+import com.join.spring_resume.apply.ApplyService;
 import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.corp.CorpService;
+import com.join.spring_resume.member.Member;
+import com.join.spring_resume.member.MemberService;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,8 @@ public class RecruitController {
 
     private final RecruitService recruitService;
     private final CorpService corpService;
+    private final MemberService memberService;
+    private final ApplyService applyService;
 
     // 공고 연결하기
     @GetMapping("/recruit-form")
@@ -36,7 +42,7 @@ public class RecruitController {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
         if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
-            throw new RuntimeException("기업 로그인 상태가 아닙니다.");
+            throw new Exception403("기업 로그인 상태가 아닙니다.");
         }
 
         Corp corp = corpService.findById(sessionUser.getId());
@@ -54,12 +60,7 @@ public class RecruitController {
         Corp corp = corpService.findById(sessionUser.getId());
         List<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx());
 
-        List<RecruitResponseDTO> recruitDTOs = recruits.stream()
-                .map(RecruitResponseDTO::new)
-                .collect(Collectors.toList());
-
-
-        model.addAttribute("recruitList",recruitDTOs);
+        model.addAttribute("recruitList",recruits);
         return "recruit/recruit-list";
     }
 
@@ -70,7 +71,7 @@ public class RecruitController {
         Recruit recruit = recruitService.findById(idx); // 해당 공고 의 정보를 가져옴
 
         if(!recruit.isOwner(sessionUser.getId())){
-            throw new RuntimeException("삭제에대한 권한이없습니다");
+            throw new Exception403("삭제에대한 권한이없습니다");
         }
 
         recruitService.deleteById(idx);
@@ -92,10 +93,9 @@ public class RecruitController {
             throw new Exception403("수정권한이없습니다");
         }
 
-        RecruitResponseDTO responseDTO = new RecruitResponseDTO(recruit);
 
 
-        model.addAttribute("recruit",responseDTO); // 현재 수정 공고의 업데이트
+        model.addAttribute("recruit",recruit); // 현재 수정 공고의 업데이트
         model.addAttribute("sessionUser",sessionUser); //
         return "recruit/recruit-update-form";
     }
@@ -107,7 +107,7 @@ public class RecruitController {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
         if (sessionUser == null ) {
-            throw new RuntimeException("기업 회원만 수정할 수 있습니다");
+            throw new Exception403("기업 회원만 수정할 수 있습니다");
         }
         if(!"CORP".equals(sessionUser.getRole())){
             throw new Exception403("기업 회원만 수정할 수 있습니다.");
@@ -124,10 +124,17 @@ public class RecruitController {
 
     // 공고 상세페이지
     @GetMapping("/{recruitIdx}")
-    public String detail(@PathVariable(name = "recruitIdx")Long idx,Model model){
+    public String detail(@PathVariable(name = "recruitIdx") Long idx, Model model,HttpSession httpSession) {
         Recruit recruit = recruitService.findById(idx);
-        RecruitResponseDTO responseDTO = new RecruitResponseDTO(recruit); // 시간 변화
-        model.addAttribute("recruit",responseDTO);
+        model.addAttribute("recruit", recruit);
+
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        if (sessionUser != null) {
+            boolean isApplied = applyService.isAppliedCheck(sessionUser.getId(), idx);
+            model.addAttribute("isApplied", isApplied);
+        }
+
         return "recruit/recruit-detail";
     }
+
 }

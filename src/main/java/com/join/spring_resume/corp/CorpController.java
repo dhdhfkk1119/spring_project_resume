@@ -27,12 +27,20 @@ public class CorpController {
 
     // 회원기입 화면
     @GetMapping("/sign-form")
-    public String signForm(){
+    public String signForm(HttpSession httpSession){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        if(sessionUser != null){
+            return "redirect:/";
+        }
         return "corp/sign-form";
     }
 
     @GetMapping("/login-form")
-    public String loginForm(){
+    public String loginForm(HttpSession httpSession){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        if(sessionUser != null){
+            return "redirect:/";
+        }
         return "corp/login-form";
     }
 
