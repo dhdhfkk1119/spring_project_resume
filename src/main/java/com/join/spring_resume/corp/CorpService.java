@@ -11,7 +11,6 @@ public class CorpService {
     private final CorpRepository corpRepository;
 
     public Corp save(CorpRequest.saveDTO saveDTO){
-        System.out.println("기업 회원 가입" + saveDTO.toEntity());
 
         return corpRepository.save(saveDTO.toEntity());
     }
@@ -29,7 +28,7 @@ public class CorpService {
 
     public Corp findById(Long id) {
         return corpRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("기업을 찾을 수 없습니다."));
+                .orElseThrow(() -> new Exception400("기업을 찾을 수 없습니다."));
     }
 
     public boolean existsByCorpId(String corpId) {

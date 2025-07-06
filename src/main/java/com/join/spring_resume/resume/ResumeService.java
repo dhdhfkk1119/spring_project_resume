@@ -1,5 +1,6 @@
 package com.join.spring_resume.resume;
 
+import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume.carrer.Career;
 import com.join.spring_resume.carrer.CareerJpaRepository;
 import com.join.spring_resume.carrer.CareerRequest;
@@ -136,7 +137,7 @@ public class ResumeService {
     // 대표이력서 찾기
     public Resume findIdMyResumes(Member member) {
         return resumeJpaRepository.findRepresentativeResumeByMember(member)
-                .orElseThrow(() -> new IllegalStateException("대표 이력서가 존재하지 않습니다."));
+                .orElseThrow(() -> new Exception400("대표 이력서가 존재하지 않습니다."));
     }
 
     //대표 이력서 간편 수정

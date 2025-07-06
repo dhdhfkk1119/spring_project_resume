@@ -1,5 +1,6 @@
 package com.join.spring_resume.apply;
 
+import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberService;
 import com.join.spring_resume.recruit.Recruit;
@@ -10,8 +11,13 @@ import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -23,15 +29,36 @@ public class ApplyController {
     private final MemberService memberService;
     // 이력서 지원하기
     @PostMapping("/{recruitIdx}/apply")
-    public String apply(@PathVariable(name = "recruitIdx")Long idx,
+    @ResponseBody
+    public String apply(@PathVariable(name = "recruitIdx") Long idx,
                         ApplyRequest.SaveDTO saveDTO,
-                        HttpSession httpSession){
+                        HttpSession httpSession) {
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
-        Member member = memberService.findById(sessionUser.getUserId());
-        Resume resume = resumeService.findIdMyResumes(member);
+        if (sessionUser == null) {
+            // 로그인 안 된 경우
+            throw new Exception401("로그인해주시기 바랍니다");
+        }
+
+        Member member = memberService.findByMemberId(sessionUser.getUserId());
         Recruit recruit = recruitService.findById(idx);
-        applyService.applySave(saveDTO,recruit,resume);
-        return "redirect:/";
+        Resume resume = resumeService.findIdMyResumes(member);
+        applyService.applySave(saveDTO, recruit, resume);
+
+        // 지원 완료 alert 후 메인 페이지 이동
+        return "<script>alert('지원이 완료되었습니다.'); window.location.href='/';</script>";
+
+
     }
+
+    @GetMapping("/apply/status")
+    public String applyList(Model model,HttpSession httpSession){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        List<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId());
+
+
+        model.addAttribute("recruitList",applyRecruitList);
+        return "apply/apply-list";
+    }
+
 }

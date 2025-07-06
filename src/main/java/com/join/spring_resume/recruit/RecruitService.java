@@ -1,5 +1,7 @@
 package com.join.spring_resume.recruit;
 
+import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.session.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,7 @@ public class RecruitService {
     private final RecruitRepository recruitRepository;
 
     public Recruit findById(Long idx){
-        return recruitRepository.findById(idx).orElseThrow(() -> new RuntimeException("해당 공고를찾을 수 없습니다"));
+        return recruitRepository.findById(idx).orElseThrow(() -> new Exception404("해당 공고를찾을 수 없습니다"));
     }
     // 공고 등록하기
     @Transactional
@@ -29,10 +31,10 @@ public class RecruitService {
     @Transactional
     public void recruitDelete(Long idx){
         Recruit recruit = recruitRepository.findByRecruitIdx(idx)
-                .orElseThrow(() -> new RuntimeException("해당 유저를 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 유저를 찾을수 없습니다"));
 
         if(recruit.isOwner(idx)){
-            throw new RuntimeException("삭제권한이없습니다");
+            throw new Exception403("삭제권한이없습니다");
         }
 
         recruitRepository.delete(recruit);
@@ -43,10 +45,10 @@ public class RecruitService {
     public void recruitUpdate(Long idx,RecruitRequest.RecruitUpdateDTO recruitDTO){
 
         Recruit recruit = recruitRepository.findById(idx)
-                .orElseThrow(() -> new RuntimeException("해당 게시물을 찾을 수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 게시물을 찾을 수 없습니다"));
 
         if(recruit.isOwner(idx)){
-            throw new RuntimeException("수정권한이없습니다");
+            throw new Exception403("수정권한이없습니다");
         }
 
         recruit.setRecruitTitle(recruitDTO.getRecruitTitle());

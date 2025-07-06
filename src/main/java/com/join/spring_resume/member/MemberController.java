@@ -24,15 +24,23 @@ public class MemberController {
 
     // 로그인 화면
     @GetMapping("/login-form")
-    public String loginForm(){
+    public String loginForm(HttpSession httpSession){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        if(sessionUser != null){
+            return "redirect:/";
+        }
+
 
         return "member/login-form";
     }
 
     // 회원 가입 화면
     @GetMapping("/sign-form")
-    public String signForm(){
-
+    public String signForm(HttpSession httpSession){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        if(sessionUser != null){
+            return "redirect:/";
+        }
         return "member/sign-form";
     }
 
