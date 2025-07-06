@@ -1,6 +1,9 @@
 package com.join.spring_resume.recruit;
 
 import com.join.spring_resume.corp.Corp;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -13,15 +16,36 @@ public class RecruitRequest {
 
     @Data
     public static class RecruitDTO{
+
+        @NotBlank(message = "공고 제목을 입력해주시기 바랍니다")
         private String recruitTitle;
+
+        @NotBlank(message = "공고 모집 지역을 입력해주시기 바랍니다")
         private String area; // 모집 지역
-        private int recruitNumber;
+
+        @NotNull(message = "고용인원을 선택해주시기바랍니다")
+        @Min(value = 0, message = "고용인원은 0명이상 이어야 합니다")
+        private Integer recruitNumber;
+
+        @NotBlank(message = "공고의 직무 내용을 입력해주시기 바랍니다")
         private String recruitContent;
+
+        @NotBlank(message = "공고의 경력을 입력해주시기 바랍니다")
         private String career; // 경력 (신입 , 경력)
+
+        @NotBlank(message = "공고의 최종학력을 입력해주시기 바랍니다")
         private String education; // 최종학력
+
+        @NotBlank(message = "직무의 근무형태를 입력해주시기 바랍니다")
         private String workType; // 근무형태 (계약직, 정규직)
+
+        @NotBlank(message = "공고의 시작일을 입력해주시기 바랍니다")
         private String startAt; // 모집일, yyyy-MM-dd 형태로 들어옴
+
+        @NotBlank(message = "공고의 마감일을 입력해주시기 바랍니다")
         private String endAt;   // 마감일
+
+
         private String logoImages;
 
         public Recruit toEntity(Corp corp) {
@@ -52,26 +76,14 @@ public class RecruitRequest {
             return date.atTime(LocalTime.MAX);            // yyyy-MM-ddT23:59:59.999999999 반환
         }
 
-
-        public void validate() {
-            if(recruitTitle == null || recruitTitle.trim().isEmpty()){
-                throw new IllegalArgumentException("모집 제목을 입력해주시기 바랍니다");
-            }
-            if(area == null || area.trim().isEmpty()){
-                throw new IllegalArgumentException("모집 지역을 선택해주시기 바랍니다");
-            }
-            if(recruitNumber == 0){
-                throw new IllegalArgumentException("모집인원을 0명 이상 해주시기 바랍니다");
-            }
-            if(recruitContent == null || recruitContent.trim().isEmpty()){
-                throw new IllegalArgumentException("모집 내욜을 작성해주시기 바랍니다");
-            }if(startAt == null ){
-                throw new IllegalArgumentException("모집 시작일을 설정해주시기 바랍니다");
-            }if(endAt == null ){
-                throw new IllegalArgumentException("모집 끝나는일을 설정해주시기 바랍니다");
-            }
-
+        public LocalDateTime getParsedStartAt() {
+            return toStartOfDay(this.startAt);
         }
+
+        public LocalDateTime getParsedEndAt() {
+            return toEndOfDay(this.endAt);
+        }
+
     }
 
     // 업데이트용

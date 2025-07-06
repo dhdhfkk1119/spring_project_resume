@@ -1,5 +1,6 @@
 package com.join.spring_resume.recruit;
 
+import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.corp.Corp;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,7 +24,7 @@ public class RecruitService {
     // 공고 등록하기
     @Transactional
     public void recruit(RecruitRequest.RecruitDTO recruitDTO, Corp corp){
-        recruitDTO.validate();
+
         Recruit recruit = recruitDTO.toEntity(corp);
         recruitRepository.save(recruit);
     }

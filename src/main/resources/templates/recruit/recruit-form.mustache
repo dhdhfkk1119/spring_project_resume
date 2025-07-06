@@ -6,13 +6,14 @@
         <!-- 제목 -->
         <div class="mb-3">
             <label for="recruit_title" class="form-label">채용 제목</label>
-            <input type="text" class="form-control" id="recruit_title" name="recruitTitle" required>
+            <input type="text" class="form-control" id="recruit_title" name="recruitTitle" >
+            {{#errors.recruitTitle}}<div class="text-danger small">{{.}}</div>{{/errors.recruitTitle}}
         </div>
 
         <!-- 지역 -->
         <div class="mb-3">
             <label for="area" class="form-label">근무 지역</label>
-            <select class="form-select" id="area" name="area" required>
+            <select class="form-select" id="area" name="area" >
                 <option value="">-- 지역을 선택하세요 --</option>
                 <option value="서울특별시">서울특별시</option>
                 <option value="부산광역시">부산광역시</option>
@@ -32,6 +33,7 @@
                 <option value="경상남도">경상남도</option>
                 <option value="제주특별자치도">제주특별자치도</option>
             </select>
+            {{#errors.area}}<div class="text-danger small">{{.}}</div>{{/errors.area}}
         </div>
 
         <!-- 모집 인원 -->
@@ -39,23 +41,25 @@
             <!-- 최종 학력 -->
             <div class="col-md-3">
                 <label for="education" class="form-label">최종 학력</label>
-                <select class="form-select" id="education" name="education" required>
+                <select class="form-select" id="education" name="education" >
                     <option value="검정고시">검정고시</option>
                     <option value="고졸">고졸</option>
                     <option value="대졸">대졸</option>
                 </select>
+                {{#errors.education}}<div class="text-danger small">{{.}}</div>{{/errors.education}}
             </div>
 
             <!-- 모집 인원 -->
             <div class="col-md-3">
                 <label for="recruit_number" class="form-label">모집 인원</label>
-                <input type="number" class="form-control" id="recruit_number" name="recruitNumber" min="1" required>
+                <input type="number" class="form-control" id="recruit_number" name="recruitNumber" min="1" >
+                {{#errors.recruitNumber}}<div class="text-danger small">{{.}}</div>{{/errors.recruitNumber}}
             </div>
 
             <!-- 경력 선택 -->
             <div class="col-md-3">
                 <label for="career" class="form-label">경력 선택</label>
-                <select class="form-select" id="career" name="career" required>
+                <select class="form-select" id="career" name="career" >
                     <option value="신입">신입</option>
                     <option value="1년">1년</option>
                     <option value="2년">2년</option>
@@ -68,37 +72,46 @@
                     <option value="9년">9년</option>
                     <option value="10년">10년</option>
                 </select>
+                {{#errors.career}}<div class="text-danger small">{{.}}</div>{{/errors.career}}
             </div>
 
             <!-- 근무 형태 -->
             <div class="col-md-3">
                 <label for="work_type" class="form-label">근무 형태</label>
-                <select class="form-select" id="work_type" name="workType" required>
+                <select class="form-select" id="work_type" name="workType" >
                     <option value="계약직">계약직</option>
                     <option value="정규직">정규직</option>
                 </select>
+                {{#errors.workType}}<div class="text-danger small">{{.}}</div>{{/errors.workType}}
             </div>
         </div>
 
         <!-- 내용 -->
         <div class="mb-3">
             <label for="recruit_content" class="form-label">채용 상세 내용</label>
-            <textarea class="form-control" id="recruit_content" name="recruitContent" rows="5" required></textarea>
+            <textarea class="form-control" id="recruit_content" name="recruitContent" rows="5" ></textarea>
+            {{#errors.recruitContent}}<div class="text-danger small">{{.}}</div>{{/errors.recruitContent}}
         </div>
 
         <div class="d-flex gap-2">
             <!-- 시작일 -->
             <div class="mb-3 w-100">
                 <label for="start_at" class="form-label">시작일</label>
-                <input type="text" class="form-control" id="start_at" name="startAt" placeholder="시작일 선택" required readonly>
+                <input type="text" class="form-control" id="start_at" name="startAt" placeholder="시작일 선택"  readonly>
+                {{#errors.startAt}}<div class="text-danger small">{{.}}</div>{{/errors.startAt}}
             </div>
 
             <!-- 마감일 -->
             <div class="mb-3 w-100">
                 <label for="end_at" class="form-label">마감일</label>
-                <input type="text" class="form-control" id="end_at" name="endAt" placeholder="마감일 선택" required readonly>
+                <input type="text" class="form-control" id="end_at" name="endAt" placeholder="마감일 선택"  readonly>
+                {{#errors.endAt}}<div class="text-danger small">{{.}}</div>{{/errors.endAt}}
             </div>
+
         </div>
+        {{#dateError}}
+            <div class="text-danger">{{dateError}}</div>
+        {{/dateError}}
 
         <!-- 제출 버튼 -->
         <button type="submit" class="btn btn-primary">등록하기</button>
