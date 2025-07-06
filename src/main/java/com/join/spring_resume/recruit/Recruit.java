@@ -30,7 +30,7 @@ public class Recruit {
 
     private String recruitTitle;
     private String area;
-    private int recruitNumber;
+    private Integer recruitNumber;
     private String recruitContent;
 
     private String career; // 경력 (신입 , 경력)
@@ -62,7 +62,5 @@ public class Recruit {
         if (this.endAt == null) return "";
         return DateUtil.formatDate(this.endAt);
     }
-
-
 
 }

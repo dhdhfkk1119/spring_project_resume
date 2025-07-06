@@ -1,5 +1,6 @@
 package com.join.spring_resume.recruit;
 
+import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.apply.Apply;
 import com.join.spring_resume.apply.ApplyService;
@@ -9,14 +10,21 @@ import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberService;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -31,18 +39,46 @@ public class RecruitController {
 
     // 공고 연결하기
     @GetMapping("/recruit-form")
-    public String recruitForm(){
+    public String recruitForm(HttpSession httpSession){
+
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+
+        if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
+            throw new Exception403("기업 로그인 상태가 아닙니다.");
+        }
+
         return "recruit/recruit-form";
     }
 
     // 공고 등록하기
     @PostMapping("/corp-recruit")
-    public String recruit(RecruitRequest.RecruitDTO recruitDTO,HttpSession session){
+    public String recruit(@Valid RecruitRequest.RecruitDTO recruitDTO,
+                          BindingResult bindingResult,
+                          HttpSession session,
+                          Model model){
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
         if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
             throw new Exception403("기업 로그인 상태가 아닙니다.");
+        }
+
+        if(bindingResult.hasErrors()){
+            Map<String,String> errorMap = new HashMap<>();
+            for(FieldError error : bindingResult.getFieldErrors()){
+                errorMap.put(error.getField(),error.getDefaultMessage()); // DTO 에서 받은 에러메세지를 담음
+            }
+            model.addAttribute("errors",errorMap);
+            return "recruit/recruit-form";
+        }
+
+        LocalDateTime start = recruitDTO.getParsedStartAt();
+        LocalDateTime end = recruitDTO.getParsedEndAt();
+
+        if (start != null && end != null && end.isBefore(start)) {
+            model.addAttribute("dateError", "모집 마감일은 모집 시작일보다 이후여야 합니다.");
+            return "recruit/recruit-form";
+
         }
 
         Corp corp = corpService.findById(sessionUser.getId());
@@ -57,6 +93,11 @@ public class RecruitController {
     @GetMapping("/list")
     public String recruitList(Model model, HttpSession httpSession){
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+
+        if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
+            throw new Exception403("기업 로그인 상태가 아닙니다.");
+        }
+
         Corp corp = corpService.findById(sessionUser.getId());
         List<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx());
 
