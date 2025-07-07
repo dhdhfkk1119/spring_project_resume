@@ -58,7 +58,6 @@ public class BoardService {
         return boardRepository.findByMember_MemberIdx(memberIdx, pageable);
     }
 
-    // 수정된 부분: searchBoards는 repository의 searchBoards 메서드 호출
     public Page<Board> searchBoards(String keyword, Pageable pageable) {
         return boardRepository.searchBoards(keyword, pageable);
     }
