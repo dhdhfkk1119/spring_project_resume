@@ -16,10 +16,10 @@ public class SessionUser {
     private String role;
 
     public static SessionUser fromMember(Member member) {
-        return new SessionUser(member.getMemberIdx(), member.getUsername() ,member.getMemberId(), "MEMBER");
+        return new SessionUser(member.getMemberIdx() ,member.getMemberId(), member.getUsername(), "MEMBER");
     }
 
     public static SessionUser fromCorp(Corp corp) {
-        return new SessionUser(corp.getCorpIdx(), corp.getCorpName() ,corp.getCorpId(), "CORP");
+        return new SessionUser(corp.getCorpIdx(), corp.getCorpId(),corp.getCorpName() , "CORP");
     }
 }

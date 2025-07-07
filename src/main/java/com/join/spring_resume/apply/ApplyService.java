@@ -32,4 +32,8 @@ public class ApplyService {
        return applyRepository.findAllAppliesByMemberIdx(idx);
     }
 
+    // 자신이 지원한 공고에 대한 유저 정보를 가져오기
+    public List<Apply> getApplicantsForRecruit(Long recruitIdx) {
+        return applyRepository.findAllByRecruitIdx(recruitIdx);
+    }
 }

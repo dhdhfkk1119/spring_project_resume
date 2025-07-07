@@ -1,8 +1,11 @@
 package com.join.spring_resume.recruit;
 
 import com.join.spring_resume._core.errors.exception.Exception400;
+import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.apply.Apply;
+import com.join.spring_resume.apply.ApplyRepository;
+import com.join.spring_resume.apply.ApplyRequest;
 import com.join.spring_resume.apply.ApplyService;
 import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.corp.CorpService;
@@ -36,6 +39,7 @@ public class RecruitController {
     private final CorpService corpService;
     private final MemberService memberService;
     private final ApplyService applyService;
+    private final ApplyRepository applyRepository;
 
     // 공고 연결하기
     @GetMapping("/recruit-form")
@@ -177,5 +181,59 @@ public class RecruitController {
 
         return "recruit/recruit-detail";
     }
+
+    // 현재 공고에 지원한 유저의 정보
+    @GetMapping("/{recruitIdx}/applied")
+    public String viewApplied(@PathVariable( name = "recruitIdx") Long recruitIdx,
+                              Model model,
+                              HttpSession httpSession){
+
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+
+        if(sessionUser == null){
+            throw new Exception401("로그인 해주시기 바랍니다");
+        }
+        if(!"CORP".equals(sessionUser.getRole())){
+            throw new Exception403("기업 회원만 접근 할수있습니다");
+        }
+
+        Recruit recruit = recruitService.findById(recruitIdx);
+
+        if(!recruit.isOwner(sessionUser.getId())){
+            throw new Exception403("기업이 등록한 공고에 대해서만 조회 가능합니다");
+        }
+
+        List<Apply> appMemberList = applyService.getApplicantsForRecruit(recruit.getRecruitIdx());
+
+        model.addAttribute("recruit",recruit);
+        model.addAttribute("recruitList",appMemberList);
+        model.addAttribute("appliedCount",appMemberList.size());
+
+        return "recruit/recruit-applied";
+    }
+
+    // 현재 로그인한 유저의 공고 목록 확인 하기 ( 클릭시 지원자 정보를 확인 가능 )
+    @GetMapping("/applied/list")
+    public String appliedList(Model model, HttpSession httpSession) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+
+        if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
+            throw new Exception403("기업 로그인 상태가 아닙니다.");
+        }
+
+        Corp corp = corpService.findById(sessionUser.getId());
+        List<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx());
+
+        List<ApplyRequest.RecruitWithApplyCountDTO> recruitListWithCounts = recruits.stream()
+                .map(recruit -> {
+                    long applyCount = applyRepository.countByRecruitId(recruit.getRecruitIdx());
+                    return new ApplyRequest.RecruitWithApplyCountDTO(recruit, applyCount);
+                })
+                .collect(Collectors.toList());
+
+        model.addAttribute("recruitList", recruitListWithCounts);
+        return "recruit/recruit-applied-list";
+    }
+
 
 }

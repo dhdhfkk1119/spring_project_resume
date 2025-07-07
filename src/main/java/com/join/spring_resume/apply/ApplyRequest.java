@@ -16,4 +16,16 @@ public class ApplyRequest {
                     .build();
         }
     }
+
+    @Data
+    public static class RecruitWithApplyCountDTO {
+        private Recruit recruit;
+        private long applyCount;
+
+        public RecruitWithApplyCountDTO(Recruit recruit, long applyCount) {
+            this.recruit = recruit;
+            this.applyCount = applyCount;
+        }
+
+    }
 }
