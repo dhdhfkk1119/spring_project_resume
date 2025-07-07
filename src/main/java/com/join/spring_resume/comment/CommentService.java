@@ -76,4 +76,8 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다"));
         comment.setComment(newContent);
     }
+
+    public List<Board> getBoardsCommented(Member member) {
+        return commentRepository.findBoardsCommentedByUser(member);
+    }
 }

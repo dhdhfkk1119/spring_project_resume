@@ -5,6 +5,7 @@ import com.join.spring_resume.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +37,13 @@ public class LikeService {
     // 좋아요 수 카운트
     public long countLikes(Board board) {
         return likeRepository.countByBoard(board);
+    }
+
+    // 좋아요한 게시글 목록 보기
+    public List<Board> findLikeBoardsByMember(Member member) {
+        return likeRepository.findByMember(member)
+                .stream()
+                .map(Like::getBoard)
+                .toList();
     }
 }
