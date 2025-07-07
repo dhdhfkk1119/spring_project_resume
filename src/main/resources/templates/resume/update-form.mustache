@@ -113,24 +113,32 @@
                     <div class="col-md-11">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control" maxlength="50" required>
+                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control"
+                                                         value="좋좋소"
+                            maxlength="50" required>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
-                            <input type="text" name="careers[${careerIndex}].position" class="form-control" maxlength="50">
+                            <input type="text" name="careers[${careerIndex}].position" class="form-control"
+                            value="과장대리"
+                            maxlength="50">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
-                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3" maxlength="1000" required></textarea>
+                            <input type="text" name="careers[${careerIndex}].careerContent" class="form-control"
+                             value="복사와 커피타기"
+                             maxlength="500" required>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">입사일</label>
-                                <input type="date" name="careers[${careerIndex}].startAt" class="form-control" required>
+                                <input type="date" name="careers[${careerIndex}].startAt" class="form-control"
+                                value="2022-02-22">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">퇴사일</label>
-                                <input type="date" name="careers[${careerIndex}].endAt" class="form-control" required>
+                                <input type="date" name="careers[${careerIndex}].endAt" class="form-control"
+                                value="2022-02-22">
                             </div>
                         </div>
                     </div>
