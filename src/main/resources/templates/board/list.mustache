@@ -7,8 +7,13 @@
         <h2 class="text-primary">📋 게시판 목록</h2>
     </div>
 
-    <!-- 정렬 옵션 + 적용 버튼 (오른쪽 정렬, 순서 변경) -->
-    <form method="get" class="d-flex justify-content-end align-items-end gap-3 mb-4 flex-wrap">
+    <!-- 검색 + 정렬 통합 폼 -->
+    <form method="get" class="row row-cols-lg-auto g-3 align-items-end mb-4">
+        <div class="col-auto">
+            <label for="keyword" class="form-label">검색</label>
+            <input type="text" name="keyword" id="keyword" class="form-control" placeholder="제목 또는 내용" value="{{keyword}}">
+        </div>
+
         <div class="col-auto">
             <label for="sort" class="form-label">정렬 기준</label>
             <select name="sort" id="sort" class="form-select">
@@ -17,20 +22,20 @@
             </select>
         </div>
 
-
         <div class="col-auto">
             <label for="direction" class="form-label">정렬 방향</label>
             <select name="direction" id="direction" class="form-select">
                 <option value="desc" {{#isDesc}}selected{{/isDesc}}>내림차순 ↓</option>
-                <option value="asc" {{#isAsc}}selected{{/isAsc}}>오름차순 ↑</option>
+                <option value="asc" {{#isAsc}}selected{{/isAsc}}>올림차순 ↑</option>
             </select>
         </div>
+
         <div class="col-auto">
-            <button type="submit" class="btn btn-primary">적용하기</button>
+            <button type="submit" class="btn btn-primary">🔍 검색 / 정렬</button>
         </div>
     </form>
 
-    <!-- 메시지 출력 -->
+    <!-- 메시지 Í \xcd9c력 -->
     {{#message}}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{message}}
@@ -78,7 +83,7 @@
                             <button type="submit" class="btn btn-sm btn-outline-primary">수정</button>
                         </form>
                         <form method="post" action="/board/{{boardIdx}}/delete"
-                              onsubmit="return confirm('정말 삭제하시겠습니까?');"
+                              onsubmit="return confirm('정말 삭제하시겠습니꽈?');"
                               style="display:inline;">
                             <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
                         </form>
@@ -94,6 +99,32 @@
         {{/boardList}}
         </tbody>
     </table>
+
+    <!-- 페이지 번호 네비게션 -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {{#page.hasPrevious}}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{page.numberMinusOne}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">이전</a>
+                </li>
+            {{/page.hasPrevious}}
+
+            {{#pageNumbers}}
+                <li class="page-item {{#Current}}active{{/Current}}">
+                    <a class="page-link"
+                       href="?page={{number}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">
+                    {{displayNumber}}
+                    </a>
+                </li>
+            {{/pageNumbers}}
+
+            {{#page.hasNext}}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{page.numberPlusOne}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">다음</a>
+                </li>
+            {{/page.hasNext}}
+        </ul>
+    </nav>
 
     <!-- 버튼 영역 -->
     <div class="d-flex justify-content-end mt-4 gap-2">

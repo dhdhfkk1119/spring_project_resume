@@ -11,14 +11,12 @@ import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -31,31 +29,31 @@ public class BoardController {
     private final CommentService commentService;
     private final LikeService likeService;
 
-    // 로그인 유저 조회, 없으면 예외 발생
     private Member getLoggedInMember(HttpSession session) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) {
-            throw new Exception401("로그인이 필요합니다.");
-        }
+        if (sessionUser == null) throw new Exception401("로그인이 필요합니다.");
         return memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
     }
 
-    // 게시글 목록 + 페이징 + 정렬
     @GetMapping("/list")
     public String listBoards(@RequestParam(defaultValue = "createdAt") String sort,
                              @RequestParam(defaultValue = "desc") String direction,
                              @RequestParam(defaultValue = "0") int page,
                              @RequestParam(defaultValue = "10") int size,
+                             @RequestParam(required = false) String keyword,
                              Model model,
                              HttpSession session) {
+        if (keyword == null) keyword = "";
 
         Sort sorting = direction.equalsIgnoreCase("asc") ?
                 Sort.by(sort).ascending() :
                 Sort.by(sort).descending();
-
         Pageable pageable = PageRequest.of(page, size, sorting);
-        Page<Board> boardPage = boardService.findAll(pageable);
+
+        Page<Board> boardPage = keyword.isBlank() ?
+                boardService.findAll(pageable) :
+                boardService.searchBoards(keyword, pageable);
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
@@ -64,19 +62,26 @@ public class BoardController {
             board.setFormattedCreatedAt(board.getFormattedCreatedAt());
         });
 
+        List<PageNumberDto> pageNumbers = createPageNumbers(boardPage);
+
         model.addAttribute("boardList", boardPage.getContent());
         model.addAttribute("page", boardPage);
+        model.addAttribute("pageNumbers", pageNumbers);
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
+        model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
+        model.addAttribute("isDesc", direction.equals("desc"));
+        model.addAttribute("isAsc", direction.equals("asc"));
 
         return "board/list";
     }
 
-    // 글쓰기 페이지 폼
     @GetMapping("/new")
     public String newBoardForm(HttpSession session, Model model) {
-        getLoggedInMember(session); // 로그인 체크
+        getLoggedInMember(session);
         model.addAttribute("isEdit", false);
         model.addAttribute("boardTitle", "");
         model.addAttribute("boardContent", "");
@@ -84,7 +89,6 @@ public class BoardController {
         return "board/form";
     }
 
-    // 글 작성 요청 처리
     @PostMapping
     public String createBoard(@ModelAttribute BoardCreateDto dto, HttpSession session) {
         Member member = getLoggedInMember(session);
@@ -92,15 +96,11 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
-    // 글 수정 폼
     @GetMapping("/{id}/edit")
     public String editBoardForm(@PathVariable Long id, Model model, HttpSession session) {
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
-
-        if (!board.isOwner(member.getMemberIdx())) {
-            throw new Exception401("수정 권한이 없습니다.");
-        }
+        if (!board.isOwner(member.getMemberIdx())) throw new Exception401("수정 권한이 없습니다.");
 
         model.addAttribute("isEdit", true);
         model.addAttribute("boardIdx", board.getBoardIdx());
@@ -110,46 +110,32 @@ public class BoardController {
         return "board/form";
     }
 
-    // 글 수정 요청 처리
     @PostMapping("/{id}/edit")
     public String updateBoard(@PathVariable Long id,
                               @ModelAttribute BoardUpdateDto dto,
                               HttpSession session) {
-
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
-
-        if (!board.isOwner(member.getMemberIdx())) {
-            throw new Exception401("수정 권한이 없습니다.");
-        }
+        if (!board.isOwner(member.getMemberIdx())) throw new Exception401("수정 권한이 없습니다.");
 
         boardService.update(id, dto);
         return "redirect:/board/list";
     }
 
-    // 글 삭제 요청 처리
     @PostMapping("/{id}/delete")
     public String deleteBoard(@PathVariable Long id, HttpSession session) {
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
-
-        if (!board.isOwner(member.getMemberIdx())) {
-            throw new Exception401("삭제 권한이 없습니다.");
-        }
+        if (!board.isOwner(member.getMemberIdx())) throw new Exception401("삭제 권한이 없습니다.");
 
         boardService.delete(id);
         return "redirect:/board/list";
     }
 
-    // 게시글 상세 페이지 (댓글 + 좋아요)
     @GetMapping("/{id}")
     public String viewBoard(@PathVariable Long id, Model model, HttpSession session) {
         Board board = boardService.findByIdAndIncreaseHits(id);
         if (board.getTags() == null) board.setTags("");
-
-        model.addAttribute("board", board);
-        model.addAttribute("formattedCreatedAt", board.getFormattedCreatedAt());
-        model.addAttribute("formattedUpdatedAt", board.getFormattedUpdatedAt());
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         Long loginUserId = sessionUser != null ? sessionUser.getId() : null;
@@ -158,70 +144,59 @@ public class BoardController {
             model.addAttribute("isAuthor", true);
         }
 
-        // 댓글 처리
         List<Comment> commentEntities = commentService.findCommentsByBoard(id);
         List<CommentResponseDto> commentDtos = commentEntities.stream()
                 .map(parent -> {
                     CommentResponseDto dto = new CommentResponseDto(parent, loginUserId);
-                    for (Comment reply : parent.getReplies()) {
-                        dto.addReply(new CommentResponseDto(reply, loginUserId));
-                    }
+                    parent.getReplies().forEach(reply -> dto.addReply(new CommentResponseDto(reply, loginUserId)));
                     return dto;
                 }).toList();
 
+        model.addAttribute("board", board);
+        model.addAttribute("formattedCreatedAt", board.getFormattedCreatedAt());
+        model.addAttribute("formattedUpdatedAt", board.getFormattedUpdatedAt());
         model.addAttribute("comments", commentDtos);
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("loginUserId", loginUserId);
 
-        // 좋아요 처리
         boolean isLiked = false;
         long likeCount = likeService.countLikes(board);
         if (sessionUser != null) {
             Member member = memberRepository.findById(sessionUser.getId()).orElseThrow();
             isLiked = likeService.isLiked(member, board);
         }
+
         model.addAttribute("isLiked", isLiked);
         model.addAttribute("likeCount", likeCount);
-
         return "board/detail";
     }
 
-    // 댓글 작성 및 대댓글 처리
     @PostMapping("/{boardId}/comment")
     public String writeComment(@PathVariable Long boardId,
                                @RequestParam String content,
                                @RequestParam(required = false) Long parentId,
                                HttpSession session) {
-
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) return "redirect:/login-form";
 
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
-
         commentService.writeComment(boardId, content, member.getMemberIdx(), parentId);
         return "redirect:/board/" + boardId;
     }
 
-    // 좋아요 토글
     @PostMapping("/{boardId}/like")
     public String toggleLike(@PathVariable Long boardId, HttpSession session) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) {
-            return "redirect:/login-form";
-        }
+        if (sessionUser == null) return "redirect:/login-form";
 
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
         Board board = boardService.findById(boardId);
-
         likeService.toggleLike(member, board);
-
         return "redirect:/board/" + boardId;
     }
 
-
-    // 자신의 글만 조회하기 마이페이지 리스트
     @GetMapping("/my-list")
     public String myList(@RequestParam(defaultValue = "0") int page,
                          @RequestParam(defaultValue = "10") int size,
@@ -240,18 +215,16 @@ public class BoardController {
             board.setAuthor(true);
             board.setFormattedCreatedAt(board.getFormattedCreatedAt());
         });
+
         model.addAttribute("boardList", boardPage.getContent());
         model.addAttribute("page", boardPage);
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
         model.addAttribute("myList", true);
-
         return "board/my-list";
-
     }
 
-    // 좋아요한 게시물 조회
     @GetMapping("/likes")
     public String likedBoard(HttpSession session, Model model) {
         Member member = getLoggedInMember(session);
@@ -262,20 +235,18 @@ public class BoardController {
             board.setAuthor(board.isOwner(member.getMemberIdx()));
             board.setFormattedCreatedAt(board.getFormattedCreatedAt());
         });
+
         model.addAttribute("boardList", likeBoards);
         model.addAttribute("sessionUser", sessionUser);
-        model.addAttribute("likedList",true);
-
+        model.addAttribute("likedList", true);
         return "board/liked-list";
     }
 
-    // 내가 댓글단 게시물 조회
     @GetMapping("/comments")
     public String myComments(HttpSession session, Model model) {
         Member member = getLoggedInMember(session);
         List<Board> boards = commentService.getBoardsCommented(member);
-
-        boards.forEach(board ->  {
+        boards.forEach(board -> {
             board.setAuthor(board.isOwner(member.getMemberIdx()));
             board.setFormattedCreatedAt(board.getFormattedCreatedAt());
         });
@@ -283,8 +254,25 @@ public class BoardController {
         model.addAttribute("boardList", boards);
         model.addAttribute("sessionUser", session.getAttribute("session"));
         model.addAttribute("MyCommentList", true);
-
         return "board/my-comment-list";
     }
 
+    // 페이지 번호 생성
+    private List<PageNumberDto> createPageNumbers(Page<?> page) {
+        int totalPages = page.getTotalPages();
+        int currentPage = page.getNumber();
+        int displayRange = 5;
+
+        int startPage = Math.max(0, currentPage - displayRange / 2);
+        int endPage = Math.min(startPage + displayRange - 1, totalPages - 1);
+        if (endPage - startPage < displayRange - 1) {
+            startPage = Math.max(0, endPage - displayRange + 1);
+        }
+
+        List<PageNumberDto> pageNumbers = new ArrayList<>();
+        for (int i = startPage; i <= endPage; i++) {
+            pageNumbers.add(new PageNumberDto(i, currentPage));
+        }
+        return pageNumbers;
+    }
 }
