@@ -65,11 +65,11 @@ public class MainController {
 
         int resumeCount = resumeService.findMyResumes(sessionUser.getId()).size(); // 이력서 등록 갯수 
         int recruitCount = applyService.MyApplyList(sessionUser.getId()).size(); // 공고 등록 갯수 가져오기
-        int boardCount = boardRepository.findByMember_MemberIdx(sessionUser.getId()).size();// 게시물 작성 갯수 가져오기
+
 
         model.addAttribute("resumeCount",resumeCount);
         model.addAttribute("recruitCount",recruitCount);
-        model.addAttribute("boardCount",boardCount);
+
         return "page/member-page";
     }
 
