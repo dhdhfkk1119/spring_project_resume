@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -47,9 +48,21 @@ public class ResumeController {
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
-        //세션에서 가져온 memberIdx 회원이력서 전체조회
+        //모든 이력서 리스트 호출
         List<Resume> resumeList = resumeService.findMyResumes(member.getMemberIdx());
-        model.addAttribute("resumes", resumeList);
+
+        //대표 이력서와 나머지를 분리
+        Resume repResume = resumeList.stream()
+                .filter(r -> Boolean.TRUE.equals(r.getIsRep()))
+                .findFirst()
+                .orElse(null);
+
+        List<Resume> otherResumes = resumeList.stream()
+                .filter(r -> !Boolean.TRUE.equals(r.getIsRep()))
+                .collect(Collectors.toList());
+
+        model.addAttribute("repResume", repResume);
+        model.addAttribute("otherResumes", otherResumes);
         model.addAttribute("member", member);
 
         return "resume/list";
