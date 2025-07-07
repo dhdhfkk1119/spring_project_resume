@@ -25,7 +25,7 @@ public class MyPageController {
         menuItems.add(new MenuItem("찜한 구인 공고 목록", "/", false));
         menuItems.add(new MenuItem("댓글단 게시물 목록", "/", false));
 
-        boolean isUserLoggedIn = false;
+        boolean isUserLoggedIn = true;
 
         MyPageData data = new MyPageData(menuItems, isUserLoggedIn);
 
@@ -46,7 +46,7 @@ public class MyPageController {
         menuItems.add(new MenuItem("댓글이 달린 게시물", "/board/mine", false));
         menuItems.add(new MenuItem("댓글을 단 게시물", "/board/mine", false));
 
-        boolean isUserLoggedIn = false;
+        boolean isUserLoggedIn = true;
 
         MyPageData data = new MyPageData(menuItems, isUserLoggedIn);
 
