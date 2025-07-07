@@ -27,7 +27,8 @@ public class WebMcvConfig implements WebMvcConfigurer {
                         "/corp/login",
                         "/corp/login-form",
                         "/login-form",
-                        "/logout"
+                        "/logout",
+                        "/board/comments"
                 );
     }
 }

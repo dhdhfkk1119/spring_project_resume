@@ -15,5 +15,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 
     @Query("SELECT DISTINCT c.board FROM Comment c WHERE c.user = :user ")
-    List<Board> findBoardsCommentedByUser(@Param("member") Member member);
+    List<Board> findBoardsCommentedByUser(@Param("user") Member member);
 }

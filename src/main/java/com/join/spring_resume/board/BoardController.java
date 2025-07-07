@@ -11,14 +11,15 @@ import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static com.join.spring_resume.util.DateUtil.format;
 
 @Controller
 @RequiredArgsConstructor
@@ -285,4 +286,5 @@ public class BoardController {
 
         return "board/my-comment-list";
     }
+
 }
