@@ -1,6 +1,7 @@
 package com.join.spring_resume.apply;
 
 import com.join.spring_resume._core.errors.exception.Exception401;
+import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberService;
 import com.join.spring_resume.recruit.Recruit;
@@ -54,8 +55,17 @@ public class ApplyController {
     @GetMapping("/apply/status")
     public String applyList(Model model,HttpSession httpSession){
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
-        List<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId());
 
+        if (sessionUser == null) {
+            // 로그인 안 된 경우
+            throw new Exception401("로그인해주시기 바랍니다");
+        }
+
+        if(sessionUser.getRole() != "MEMBER"){
+            throw new Exception403("일반 회원만 접근 가능합니다");
+        }
+
+        List<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId());
 
         model.addAttribute("recruitList",applyRecruitList);
         return "apply/apply-list";
