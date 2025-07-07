@@ -21,7 +21,7 @@ public class CareerRequest {
         private String position;
 
         @NotBlank(message = "직무내용은 필수 입력 값입니다.")
-        @Size(max = 1000, message = "직무내용은 1000자 이내로 작성해주세요.")
+        @Size(max = 500, message = "직무내용은 500자 이내로 작성해주세요.")
         private String careerContent;
 
         private LocalDate startAt;

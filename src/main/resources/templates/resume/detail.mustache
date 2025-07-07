@@ -64,6 +64,11 @@
                                 <p class="card-text"><small class="text-muted">{{startAt}} ~</small></p>
                             {{/endAt}}
                         {{/startAt}}
+                        {{^startAt}}
+                            {{#endAt}}
+                                <p class="card-text"><small class="text-muted">~ {{endAt}}</small></p>
+                            {{/endAt}}
+                        {{/startAt}}
 
                         <p class="card-text" style="white-space: pre-wrap;">{{careerContent}}</p>
                     </div>
