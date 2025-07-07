@@ -27,6 +27,7 @@ public class Career {
 
     private String corpName;
     private String position;
+    @Lob
     private String careerContent;
 
     private LocalDate startAt;

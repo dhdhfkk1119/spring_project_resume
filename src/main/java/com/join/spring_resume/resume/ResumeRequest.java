@@ -16,10 +16,10 @@ public class ResumeRequest {
     @Data
     public static class SaveDTO {
         @NotBlank(message = "제목은 필수 입력 값입니다.")
-        @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
+        @Size(max = 50, message = "제목은 50자 이내로 작성해주세요.")
         private String resumeTitle;
         @NotBlank(message = "내용은 필수 입력 값입니다.")
-        @Size(max = 10000, message = "내용은 10000자 이내로 작성해주세요.")
+        @Size(max = 5000, message = "내용은 5000자 이내로 작성해주세요.")
         private String resumeContent;
         private Boolean isRep;
 
@@ -42,10 +42,10 @@ public class ResumeRequest {
     @Data
     public static class UpdateDTO {
         @NotBlank(message = "제목은 필수 입력 값입니다.")
-        @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
+        @Size(max = 50, message = "제목은 50자 이내로 작성해주세요.")
         private String resumeTitle;
         @NotBlank(message = "내용은 필수 입력 값입니다.")
-        @Size(max = 10000, message = "내용은 10000자 이내로 작성해주세요.")
+        @Size(max = 5000, message = "내용은 5000자 이내로 작성해주세요.")
         private String resumeContent;
         private Boolean isRep;
 

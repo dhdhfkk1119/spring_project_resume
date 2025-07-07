@@ -1,6 +1,7 @@
 package com.join.spring_resume.resume;
 
-import com.join.spring_resume._core.errors.exception.Exception400;
+import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.carrer.Career;
 import com.join.spring_resume.carrer.CareerJpaRepository;
 import com.join.spring_resume.carrer.CareerRequest;
@@ -34,7 +35,7 @@ public class ResumeService {
     public Resume findByIdWithCareers(Long resumeIdx) {
         // 이전에 추가했던 JOIN FETCH 쿼리를 사용합니다.
         return resumeJpaRepository.findByIdWithCareers(resumeIdx)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이력서를 찾을 수 없습니다. id: " + resumeIdx));
+                .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다. id: " + resumeIdx));
     }
 
     //이력서 저장
@@ -56,7 +57,7 @@ public class ResumeService {
             // 각 Career DTO를 Career 엔티티로 변환
             List<Career> careers = cSaveDTOS.stream()
                     .map(careerDTO -> {
-                        careerDTO.validate(); // 유효성 검사
+
                         // 방금 저장한 이력서(savedResume)와 연관관계를 맺어줌
                         return careerDTO.toEntity(savedResume);
                     })
@@ -75,10 +76,10 @@ public class ResumeService {
 
         // 1. 이력서 조회 및 소유권 확인
         Resume resume = resumeJpaRepository.findById(resumeIdx)
-                .orElseThrow(() -> new RuntimeException("해당 이력서를 찾을 수 없습니다. id=" + resumeIdx));
+                .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다. id=" + resumeIdx));
 
         if (!resume.isOwner(sessionMember.getMemberIdx())) {
-            throw new RuntimeException("이력서를 수정할 권한이 없습니다.");
+            throw new Exception403("이력서를 수정할 권한이 없습니다.");
         }
 
         // 2. 이력서 기본 정보 수정 (JPA의 더티 체킹으로 자동 UPDATE)
@@ -103,7 +104,7 @@ public class ResumeService {
                 }
 
                 //유효성 검사
-                careerDTO.validate();
+                // careerDTO.validate();
 
                 Career newCareer = Career.builder()
                         .resume(resume)
@@ -129,7 +130,7 @@ public class ResumeService {
         Resume resume = this.findByIdWithCareers(resumeIdx);
 
         if (!resume.isOwner(member.getMemberIdx())) {
-            throw new NullPointerException("본인이 작성한 이력서만 삭제할 수 있습니다");
+            throw new Exception403("본인이 작성한 이력서만 삭제할 수 있습니다");
         }
         resumeJpaRepository.delete(resume);
     }
@@ -137,7 +138,7 @@ public class ResumeService {
     // 대표이력서 찾기
     public Resume findIdMyResumes(Member member) {
         return resumeJpaRepository.findRepresentativeResumeByMember(member)
-                .orElseThrow(() -> new Exception400("대표 이력서가 존재하지 않습니다."));
+                .orElseThrow(() -> new Exception404("대표 이력서가 존재하지 않습니다."));
     }
 
     //대표 이력서 간편 수정
@@ -146,10 +147,10 @@ public class ResumeService {
 
         //이력서 조회 및 소유권 확인
         Resume resume = resumeJpaRepository.findById(resumeIdx).orElseThrow(() -> {
-            return new RuntimeException("이력서를 찾을 수 없습니다"+ resumeIdx);
+            return new Exception404("이력서를 찾을 수 없습니다"+ resumeIdx);
         } );
         if (!resume.isOwner(memberIdx)) {
-            throw new RuntimeException("대표이력서를 수정할 권한이 없습니다.");
+            throw new Exception403("대표이력서를 수정할 권한이 없습니다.");
         }
 
         //수정 진행

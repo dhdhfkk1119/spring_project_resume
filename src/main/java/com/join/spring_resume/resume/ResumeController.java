@@ -1,5 +1,8 @@
 package com.join.spring_resume.resume;
 
+import com.join.spring_resume._core.errors.exception.Exception401;
+import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
@@ -33,15 +36,16 @@ public class ResumeController {
     @GetMapping("/resumes")
     public String list(Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
 
         System.out.println("로그인된 사용자 ID: " + sessionUser.getId());
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         //세션에서 가져온 memberIdx 회원이력서 전체조회
         List<Resume> resumeList = resumeService.findMyResumes(member.getMemberIdx());
@@ -57,13 +61,14 @@ public class ResumeController {
     @GetMapping("/resume/{id}")
     public String detail(@PathVariable(name = "id") Long resumeIdx, Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
         model.addAttribute("resume", resume);
@@ -76,13 +81,14 @@ public class ResumeController {
     @GetMapping("/resume/{id}/update-form")
     public String updateForm(@PathVariable(name = "id") Long resumeIdx, Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
         model.addAttribute("resume", resume);
@@ -115,13 +121,14 @@ public class ResumeController {
         }
 
 
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         resumeService.updateById(resumeIdx, updateDTO, member);
         return "redirect:/resume/" + resumeIdx;
@@ -133,13 +140,14 @@ public class ResumeController {
     @PostMapping("/resume/{id}/delete")
     public String delete(@PathVariable(name = "id") Long resumeIdx) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         resumeService.deleteById(resumeIdx, member);
         return "redirect:/resumes";
@@ -151,13 +159,14 @@ public class ResumeController {
     @GetMapping("/resume/save-form")
     public String saveForm(Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
         model.addAttribute("member", member);
 
         return "resume/save-form";
@@ -189,13 +198,14 @@ public class ResumeController {
             return "resume/save-form";
         }
 
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         Resume resume = resumeService.save(saveDTO, member);
 
@@ -210,14 +220,15 @@ public class ResumeController {
 
         // 인증검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) return "redirect:/login-form";
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
         // 권한확인
         if (sessionUser.getRole() != "MEMBER") {
-            System.out.println("일반 회원만 작성 가능합니다");
-            return "redirect:/";
+            throw new Exception403("일반 회원만 작성 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         // 2. 서비스에 대표 이력서 변경 로직 위임
         resumeService.setRep(sessionUser.getId(), resumeIdx);

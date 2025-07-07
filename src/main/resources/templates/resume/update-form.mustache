@@ -49,9 +49,19 @@
                         <div class="card my-3 p-3 bg-light career-item">
                             <div class="row">
                                 <div class="col-md-11">
-                                    <h5 class="card-title">{{corpName}} <small class="text-muted">({{position}})</small>
-                                    </h5>
-                                    <p class="card-text mb-1"><small>{{startAt}} ~ {{endAt}}</small></p>
+                                    <h5 class="card-title">{{corpName}}</h5>
+                                    {{#position}}
+                                        <h6 class="card-subtitle mb-2 text-muted">{{position}}</h6>
+                                    {{/position}}
+
+                                    {{#startAt}}
+                                        {{#endAt}}
+                                            <p class="card-text"><small class="text-muted">{{startAt}} ~ {{endAt}}</small></p>
+                                        {{/endAt}}
+                                        {{^endAt}}
+                                            <p class="card-text"><small class="text-muted">{{startAt}} ~</small></p>
+                                        {{/endAt}}
+                                    {{/startAt}}
                                     <p class="card-text" style="white-space: pre-wrap;">{{careerContent}}</p>
                                 </div>
                                 <div class="col-md-1 d-flex align-items-center justify-content-center">
@@ -103,15 +113,15 @@
                     <div class="col-md-11">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control" required>
+                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control" maxlength="50" required>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
-                            <input type="text" name="careers[${careerIndex}].position" class="form-control">
+                            <input type="text" name="careers[${careerIndex}].position" class="form-control" maxlength="50">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
-                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3" required></textarea>
+                            <textarea name="careers[${careerIndex}].careerContent" class="form-control" rows="3" maxlength="1000" required></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
