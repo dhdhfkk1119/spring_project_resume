@@ -35,7 +35,6 @@
         </div>
     </form>
 
-    <!-- 메시지 Í \xcd9c력 -->
     {{#message}}
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{message}}
@@ -83,7 +82,7 @@
                             <button type="submit" class="btn btn-sm btn-outline-primary">수정</button>
                         </form>
                         <form method="post" action="/board/{{boardIdx}}/delete"
-                              onsubmit="return confirm('정말 삭제하시겠습니꽈?');"
+                              onsubmit="return confirm('정말 삭제하시겠습니까?');"
                               style="display:inline;">
                             <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
                         </form>
@@ -100,7 +99,7 @@
         </tbody>
     </table>
 
-    <!-- 페이지 번호 네비게션 -->
+    <!-- 페이지 번호 -->
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
             {{#page.hasPrevious}}
