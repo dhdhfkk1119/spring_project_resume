@@ -3,6 +3,7 @@ package com.join.spring_resume.main;
 import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.apply.ApplyService;
+import com.join.spring_resume.board.BoardRepository;
 import com.join.spring_resume.board.BoardService;
 import com.join.spring_resume.recruit.Recruit;
 import com.join.spring_resume.recruit.RecruitRepository;
@@ -25,7 +26,7 @@ public class MainController {
     private final RecruitService recruitService;
     private final ApplyService applyService;
     private final ResumeService resumeService;
-    private final BoardService boardService;
+    private final BoardRepository boardRepository;
 
 
     @GetMapping("/")
@@ -64,10 +65,11 @@ public class MainController {
 
         int resumeCount = resumeService.findMyResumes(sessionUser.getId()).size(); // 이력서 등록 갯수 
         int recruitCount = applyService.MyApplyList(sessionUser.getId()).size(); // 공고 등록 갯수 가져오기
-        // 게시물 작성 갯수 가져오기
+        int boardCount = boardRepository.findByMember_MemberIdx(sessionUser.getId()).size();// 게시물 작성 갯수 가져오기
 
         model.addAttribute("resumeCount",resumeCount);
         model.addAttribute("recruitCount",recruitCount);
+        model.addAttribute("boardCount",boardCount);
         return "page/member-page";
     }
 

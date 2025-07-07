@@ -1,6 +1,7 @@
 package com.join.spring_resume.member;
 
 import com.join.spring_resume._core.errors.exception.Exception400;
+import com.join.spring_resume._core.errors.exception.Exception404;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,12 +36,7 @@ public class MemberService {
 
     public Member findById(String memberId){
         return memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new Exception400("해당 유저를 찾을 수 없습니다"));
-    }
-
-    public Member findByMemberId(String memberId){
-        return memberRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new Exception400("일반 회원만 지원할수있습니다"));
+                .orElseThrow(() -> new Exception404("해당 유저를 찾을 수 없습니다"));
     }
 
 

@@ -2,6 +2,7 @@ package com.join.spring_resume.apply;
 
 import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberService;
 import com.join.spring_resume.recruit.Recruit;
@@ -28,6 +29,7 @@ public class ApplyController {
     private final RecruitService recruitService;
     private final ResumeService resumeService;
     private final MemberService memberService;
+
     // 이력서 지원하기
     @PostMapping("/{recruitIdx}/apply")
     @ResponseBody
@@ -41,9 +43,13 @@ public class ApplyController {
             throw new Exception401("로그인해주시기 바랍니다");
         }
 
-        Member member = memberService.findByMemberId(sessionUser.getUserId());
-        Recruit recruit = recruitService.findById(idx);
-        Resume resume = resumeService.findIdMyResumes(member);
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("일반 회원만 접근 가능합니다");
+        }
+
+        Member member = memberService.findById(sessionUser.getUserId()); // 현재 로그인 한 유저 정보 찾기
+        Recruit recruit = recruitService.findById(idx); // 현재 공고 번호 가져오기 
+        Resume resume = resumeService.findIdMyResumes(member); // 이력서에서 대표이력서 있는지 체크
         applyService.applySave(saveDTO, recruit, resume);
 
         // 지원 완료 alert 후 메인 페이지 이동
@@ -61,7 +67,7 @@ public class ApplyController {
             throw new Exception401("로그인해주시기 바랍니다");
         }
 
-        if(sessionUser.getRole() != "MEMBER"){
+        if (!"MEMBER".equals(sessionUser.getRole())) {
             throw new Exception403("일반 회원만 접근 가능합니다");
         }
 
@@ -70,5 +76,7 @@ public class ApplyController {
         model.addAttribute("recruitList",applyRecruitList);
         return "apply/apply-list";
     }
+
+
 
 }
