@@ -1,6 +1,8 @@
 package com.join.spring_resume.board;
 
 import com.join.spring_resume.Like.LikeService;
+import com.join.spring_resume._core.errors.exception.Exception401;
+import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.comment.Comment;
 import com.join.spring_resume.comment.CommentResponseDto;
 import com.join.spring_resume.comment.CommentService;
@@ -35,7 +37,7 @@ public class BoardController {
             throw new Exception401("로그인이 필요합니다.");
         }
         return memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
     }
 
     // 게시글 목록 + 페이징 + 정렬
@@ -194,7 +196,7 @@ public class BoardController {
         if (sessionUser == null) return "redirect:/login-form";
 
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
 
         commentService.writeComment(boardId, content, member.getMemberIdx(), parentId);
         return "redirect:/board/" + boardId;
@@ -209,7 +211,7 @@ public class BoardController {
         }
 
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
         Board board = boardService.findById(boardId);
 
         likeService.toggleLike(member, board);
@@ -217,10 +219,70 @@ public class BoardController {
         return "redirect:/board/" + boardId;
     }
 
-    // 커스텀 예외 클래스
-    public static class Exception401 extends RuntimeException {
-        public Exception401(String message) {
-            super(message);
-        }
+
+    // 자신의 글만 조회하기 마이페이지 리스트
+    @GetMapping("/my-list")
+    public String myList(@RequestParam(defaultValue = "0") int page,
+                         @RequestParam(defaultValue = "10") int size,
+                         @RequestParam(defaultValue = "createdAt") String sort,
+                         @RequestParam(defaultValue = "desc") String direction,
+                         HttpSession session, Model model) {
+        Member member = getLoggedInMember(session);
+        Sort sorting = direction.equalsIgnoreCase("asc") ?
+                Sort.by(sort).ascending() :
+                Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sorting);
+        Page<Board> boardPage = boardService.findByMemberIdx(member.getMemberIdx(), pageable);
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
+        boardPage.forEach(board -> {
+            board.setAuthor(true);
+            board.setFormattedCreatedAt(board.getFormattedCreatedAt());
+        });
+        model.addAttribute("boardList", boardPage.getContent());
+        model.addAttribute("page", boardPage);
+        model.addAttribute("sessionUser", sessionUser);
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
+        model.addAttribute("myList", true);
+
+        return "board/my-list";
+
+    }
+
+    // 좋아요한 게시물 조회
+    @GetMapping("/likes")
+    public String likedBoard(HttpSession session, Model model) {
+        Member member = getLoggedInMember(session);
+        List<Board> likeBoards = likeService.findLikeBoardsByMember(member);
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
+        likeBoards.forEach(board -> {
+            board.setAuthor(board.isOwner(member.getMemberIdx()));
+            board.setFormattedCreatedAt(board.getFormattedCreatedAt());
+        });
+        model.addAttribute("boardList", likeBoards);
+        model.addAttribute("sessionUser", sessionUser);
+        model.addAttribute("likedList",true);
+
+        return "board/liked-list";
+    }
+
+    // 내가 댓글단 게시물 조회
+    @GetMapping("/comments")
+    public String myComments(HttpSession session, Model model) {
+        Member member = getLoggedInMember(session);
+        List<Board> boards = commentService.getBoardsCommented(member);
+
+        boards.forEach(board ->  {
+            board.setAuthor(board.isOwner(member.getMemberIdx()));
+            board.setFormattedCreatedAt(board.getFormattedCreatedAt());
+        });
+
+        model.addAttribute("boardList", boards);
+        model.addAttribute("sessionUser", session.getAttribute("session"));
+        model.addAttribute("MyCommentList", true);
+
+        return "board/my-comment-list";
     }
 }

@@ -54,7 +54,7 @@ public class BoardService {
         return board;
     }
 
-    public Page<Board> findByMember(Long memberIdx, Pageable pageable) {
+    public Page<Board> findByMemberIdx(Long memberIdx, Pageable pageable) {
         return boardRepository.findByMember_MemberIdx(memberIdx, pageable);
     }
 }

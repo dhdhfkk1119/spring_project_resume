@@ -48,4 +48,5 @@ public class Comment {
     public void updateContent(String comment) {
         this.comment = comment;
     }
+
 }

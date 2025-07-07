@@ -1,5 +1,8 @@
 package com.join.spring_resume.comment;
 
+import com.join.spring_resume._core.errors.exception.Exception401;
+import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
@@ -19,10 +22,10 @@ public class CommentController {
     private Member getLoggedInMember(HttpSession session) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw new RuntimeException("로그인이 필요합니다.");
+            throw new Exception401("로그인이 필요합니다.");
         }
         return memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
     }
 
     @PostMapping("/{id}/delete")
@@ -31,7 +34,7 @@ public class CommentController {
         Comment comment = commentService.findById(id);
 
         if (!comment.getUser().getMemberIdx().equals(member.getMemberIdx())) {
-            throw new IllegalStateException("댓글 삭제 권한이 없습니다.");
+            throw new Exception403("댓글 삭제 권한이 없습니다.");
         }
 
         Long boardId = comment.getBoard().getBoardIdx();
@@ -47,7 +50,7 @@ public class CommentController {
         Comment comment = commentService.findById(id);
 
         if (!comment.getUser().getMemberIdx().equals(member.getMemberIdx())) {
-            throw new IllegalStateException("댓글 수정 권한이 없습니다.");
+            throw new Exception403("댓글 수정 권한이 없습니다.");
         }
 
         commentService.updateContent(id, content);

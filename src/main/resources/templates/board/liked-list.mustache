@@ -1,0 +1,54 @@
+{{> layout/header}}
+<body class="bg-light">
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger">❤️ 좋아요한 게시글</h2>
+        <a href="/board/list" class="btn btn-outline-secondary">← 전체 목록</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+            <th>조회수</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#boardList}}
+            <tr>
+                <td>{{boardIdx}}</td>
+                <td><a href="/board/{{boardIdx}}" class="text-decoration-none">{{boardTitle}}</a></td>
+                <td>{{#member}}{{username}}{{/member}}</td>
+                <td>{{formattedCreatedAt}}</td>
+                <td>{{boardHits}}</td>
+                <td>
+                    {{#isAuthor}}
+                        <form method="get" action="/board/{{boardIdx}}/edit" style="display:inline;">
+                            <button class="btn btn-sm btn-outline-primary">수정</button>
+                        </form>
+                        <form method="post" action="/board/{{boardIdx}}/delete"
+                              onsubmit="return confirm('정말 삭제하시겠습니까?');"
+                              style="display:inline;">
+                            <button class="btn btn-sm btn-outline-danger">삭제</button>
+                        </form>
+                    {{/isAuthor}}
+                </td>
+            </tr>
+        {{/boardList}}
+
+        {{^boardList}}
+            <tr>
+                <td colspan="6" class="text-center text-muted">좋아요한 게시글이 없습니다.</td>
+            </tr>
+        {{/boardList}}
+        </tbody>
+    </table>
+
+</div>
+</body>
+{{> layout/footer}}

@@ -1,0 +1,74 @@
+{{> layout/header}}
+
+<body class="bg-light">
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success">👤 내가 쓴 글 목록</h2>
+        <a href="/board/list" class="btn btn-outline-secondary">← 전체 목록</a>
+    </div>
+
+    <!-- 정렬 옵션 -->
+    <form method="get" class="d-flex justify-content-end gap-3 mb-4 flex-wrap">
+        <div>
+            <label for="sort">정렬 기준</label>
+            <select name="sort" id="sort" class="form-select">
+                <option value="createdAt" {{#isSortCreatedAt}}selected{{/isSortCreatedAt}}>작성일</option>
+                <option value="boardHits" {{#isSortBoardHits}}selected{{/isSortBoardHits}}>조회수</option>
+            </select>
+        </div>
+        <div>
+            <label for="direction">정렬 방향</label>
+            <select name="direction" id="direction" class="form-select">
+                <option value="desc" {{#isDesc}}selected{{/isDesc}}>내림차순</option>
+                <option value="asc" {{#isAsc}}selected{{/isAsc}}>오름차순</option>
+            </select>
+        </div>
+        <div class="align-self-end">
+            <button type="submit" class="btn btn-primary">적용</button>
+        </div>
+    </form>
+
+    <!-- 게시글 테이블 -->
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>제목</th>
+            <th>작성일</th>
+            <th>조회수</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#boardList}}
+            <tr>
+                <td>{{boardIdx}}</td>
+                <td><a href="/board/{{boardIdx}}" class="text-decoration-none">{{boardTitle}}</a></td>
+                <td>{{formattedCreatedAt}}</td>
+                <td>{{boardHits}}</td>
+                <td>
+                    <form method="get" action="/board/{{boardIdx}}/edit" style="display:inline;">
+                        <button class="btn btn-sm btn-outline-primary">수정</button>
+                    </form>
+                    <form method="post" action="/board/{{boardIdx}}/delete"
+                          onsubmit="return confirm('정말 삭제하시겠습니까?');"
+                          style="display:inline;">
+                        <button class="btn btn-sm btn-outline-danger">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/boardList}}
+
+        {{^boardList}}
+            <tr>
+                <td colspan="5" class="text-center text-muted">작성한 게시글이 없습니다.</td>
+            </tr>
+        {{/boardList}}
+        </tbody>
+    </table>
+
+</div>
+</body>
+
+{{> layout/footer}}
