@@ -26,7 +26,7 @@ public class MainController {
     private final RecruitService recruitService;
     private final ApplyService applyService;
     private final ResumeService resumeService;
-    private final BoardRepository boardRepository;
+    private final BoardService boardService;
 
 
     @GetMapping("/")
@@ -48,7 +48,7 @@ public class MainController {
     public String about(){
         return "page/about";
     }
-    
+
     // 멤버 마이페이지
     @GetMapping("/member/mypage")
     public String memberMyPage(HttpSession httpSession,
@@ -63,13 +63,13 @@ public class MainController {
             throw new Exception403("일반회원만 접근할수있습니다");
         }
 
-        int resumeCount = resumeService.findMyResumes(sessionUser.getId()).size(); // 이력서 등록 갯수 
+        int resumeCount = resumeService.findMyResumes(sessionUser.getId()).size(); // 이력서 등록 갯수
         int recruitCount = applyService.MyApplyList(sessionUser.getId()).size(); // 공고 등록 갯수 가져오기
-
+        int boardCount = boardService.findByMemberIdx(sessionUser.getId()).size();// 게시물 작성 갯수 가져오기
 
         model.addAttribute("resumeCount",resumeCount);
         model.addAttribute("recruitCount",recruitCount);
-
+        model.addAttribute("boardCount",boardCount);
         return "page/member-page";
     }
 

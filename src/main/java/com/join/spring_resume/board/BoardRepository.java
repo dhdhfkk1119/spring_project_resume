@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT b FROM Board b JOIN FETCH b.member WHERE b.boardIdx = :id")
@@ -17,4 +19,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 검색어로 제목 또는 내용 검색
     @Query("SELECT b FROM Board b WHERE b.boardTitle LIKE %:keyword% OR b.boardContent LIKE %:keyword%")
     Page<Board> searchBoards(@Param("keyword") String keyword, Pageable pageable);
+
+    List<Board> findByMember_MemberIdx(Long memberIdx);
+
 }

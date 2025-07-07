@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -60,6 +62,11 @@ public class BoardService {
 
     public Page<Board> searchBoards(String keyword, Pageable pageable) {
         return boardRepository.searchBoards(keyword, pageable);
+    }
+
+    // 자신이 작성한 게시물에 대한 정보
+    public List<Board> findByMemberIdx(Long memberIdx) {
+        return boardRepository.findByMember_MemberIdx(memberIdx);
     }
 
 }
