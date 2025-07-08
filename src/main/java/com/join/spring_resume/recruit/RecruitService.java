@@ -6,6 +6,8 @@ import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.session.SessionUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,14 +64,19 @@ public class RecruitService {
 
     }
 
-    // 등록된 모든 공고 보기
-    public List<Recruit> findAllList(){
-        return recruitRepository.findAll();
+    // 등록된 모든 공고 보기 Page 형식
+    public Page<Recruit> findAllList(Pageable pageable){
+        return recruitRepository.findAll(pageable);
+    }
+    
+    // 기존 공고 갯수 가져오기
+    public Long countByRecruit(Long corpIdx){
+        return recruitRepository.countByCorpIdx(corpIdx);
     }
 
     // 현재 로그인 기업의 모든 공고 보기
-    public List<Recruit> findByAllList(Long idx){
-        return recruitRepository.findByCorp_CorpIdx(idx);
+    public Page<Recruit> findByAllList(Long idx,Pageable pageable){
+        return recruitRepository.findByCorp_CorpIdx(idx,pageable);
     }
 
 

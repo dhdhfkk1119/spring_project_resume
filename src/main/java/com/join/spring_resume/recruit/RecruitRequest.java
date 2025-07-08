@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class RecruitRequest {
-
+    
+    // 공고 데이터 생성용
     @Data
     public static class RecruitDTO{
 

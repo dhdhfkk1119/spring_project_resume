@@ -210,11 +210,15 @@
                 <p><strong>이메일:</strong> {{resume.member.email}}</p>
                 <p><strong>이력서 제목:</strong> {{resume.resumeTitle}}</p>
                 <p><strong>지원일자:</strong> {{formattedAppliedAt}}</p>
-                <a href="/resume/{{resume.resumeIdx}}" class="btn btn-sm btn-outline-primary">이력서 보기</a>
+                <a href="/corp/resume/{{resume.resumeIdx}}" class="btn btn-sm btn-outline-primary">이력서 보기</a>
             </div>
         </div>
     {{/recruitList}}
-
+    {{^recruitList}}
+        <div class="alert alert-warning text-center mt-5">
+            아직 지원한 사람이 없네요 ㅠㅠ
+        </div>
+    {{/recruitList}}
 
 
     <ul class="pagination d-flex justify-content-center">

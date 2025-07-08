@@ -73,36 +73,97 @@
     });
 </script>
 <div class="container p-5">
+    <div id="recruit-list">
+        {{#recruitList.content}}
+            <div class="card mb-3 position-relative">
+                <div class="card-body d-flex flex-wrap">
+                    <!-- 왼쪽 공고 정보 -->
+                    <div class="w-75 overflow-hidden">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold text-truncate d-inline-block ">{{recruitTitle}}</a>
+                            <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
+                        </div>
 
-    {{#recruitList}}
-        <div class="card mb-3 position-relative">
-            <div class="card-body d-flex flex-wrap">
-                <!-- 왼쪽 공고 정보 -->
-                <div class="w-75 overflow-hidden">
-                    <div class="d-flex align-items-center flex-wrap gap-2">
-                        <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold text-truncate d-inline-block ">{{recruitTitle}}</a>
-                        <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
+                        <div class="mb-2 custom-gray">
+                            <span>{{area}} *</span>
+                            <span>{{career}} *</span>
+                            <span>{{education}} *</span>
+                            <span>{{workType}}</span>
+                        </div>
+
+                        <div>
+                            <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
+                        </div>
                     </div>
 
-                    <div class="mb-2 custom-gray">
-                        <span>{{area}} *</span>
-                        <span>{{career}} *</span>
-                        <span>{{education}} *</span>
-                        <span>{{workType}}</span>
-                    </div>
-
-                    <div>
-                        <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
+                    <div class="d-flex w-25 align-items-center position-relative">
+                        <span class="fw-bold">{{corp.corpName}}</span>
                     </div>
                 </div>
             </div>
-        </div>
-    {{/recruitList}}
-
+        {{/recruitList.content}}
+    </div>
     <ul class="pagination d-flex justify-content-center">
-        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        <li class="page-item">
+            <button id="loadMoreBtn" data-page="1">공고 더보기</button>
+        </li>
     </ul>
 </div>
 
 {{> layout/footer}}
+<!-- 공고 더보기 누를시에 실시간으로 데이터 보여주기 ajax fetch 사용-->
+<script>
+
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const recruitList = document.getElementById('recruit-list');
+
+    loadMoreBtn.addEventListener('click', () => {
+        const page = parseInt(loadMoreBtn.getAttribute('data-page'));
+        const size = 5;
+
+        fetch(`/api/recruits?page=${page}&size=${size}`)
+            .then(res => res.json())
+            .then(data => {
+                data.content.forEach(recruit => {
+                    const div = document.createElement('div');
+                    div.className = "card mb-3 position-relative";
+                    div.innerHTML = `
+                        <div class="card-body d-flex flex-wrap">
+                            <div class="w-75 overflow-hidden">
+                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <a href="/recruit/${recruit.recruitIdx}" class="recruit-link fw-bold text-truncate d-inline-block">
+                                        ${recruit.recruitTitle}
+                                    </a>
+                                    <span class="custom-gray">~ ${recruit.endAtFormatted} (월)</span>
+                                </div>
+                                <div class="mb-2 custom-gray">
+                                    <span>${recruit.area} *</span>
+                                    <span>${recruit.career} *</span>
+                                    <span>${recruit.education} *</span>
+                                    <span>${recruit.workType}</span>
+                                </div>
+                                <div>
+                                    <span class="custom-bold ellipsis-multiline">${recruit.recruitContent}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex w-25 align-items-center position-relative">
+                                <span class="fw-bold">${recruit.corp.corpName}</span>
+                            </div>
+                        </div>
+                    `;
+                    recruitList.appendChild(div);
+                });
+
+                // 페이지 증가
+                loadMoreBtn.setAttribute('data-page', page + 1);
+
+                // 마지막 페이지면 버튼 숨김
+                if (page + 1 >= data.totalPages) {
+                    loadMoreBtn.style.display = 'none';
+                }
+
+                // 부드럽게 스크롤 다운
+                loadMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            });
+    });
+</script>

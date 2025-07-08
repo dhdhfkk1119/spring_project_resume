@@ -15,14 +15,14 @@ import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -53,6 +53,7 @@ public class RecruitController {
 
         return "recruit/recruit-form";
     }
+
 
     // 공고 등록하기
     @PostMapping("/corp-recruit")
@@ -103,10 +104,33 @@ public class RecruitController {
         }
 
         Corp corp = corpService.findById(sessionUser.getId());
-        List<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx());
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx(),pageable);
+        // ✅ DTO 변환
+        RecruitResponse.RecruitPageDTO pageDTO = RecruitResponse.RecruitPageDTO.fromPage(recruits);
 
-        model.addAttribute("recruitList",recruits);
+        // ✅ 모델에 DTO 담기
+        model.addAttribute("recruitList", pageDTO);
         return "recruit/recruit-list";
+    }
+
+    // ajax 실시간으로 데이터 베이스 데이터 뿌리기 (공고 목록)
+    @GetMapping("/api/my-recruit")
+    @ResponseBody
+    public RecruitResponse.RecruitPageDTO getMyRecruits(
+            HttpSession httpSession,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size) {
+
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+
+        if (sessionUser == null || !"CORP".equals(sessionUser.getRole())) {
+            throw new Exception403("기업 로그인 상태가 아닙니다.");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Recruit> recruitPage =  recruitService.findByAllList(sessionUser.getId(), pageable); // 본인 공고만
+        return RecruitResponse.RecruitPageDTO.fromPage(recruitPage);
     }
 
     // 등록한 공고 삭제하기
@@ -222,7 +246,8 @@ public class RecruitController {
         }
 
         Corp corp = corpService.findById(sessionUser.getId());
-        List<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx());
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx(),pageable);
 
         List<ApplyRequest.RecruitWithApplyCountDTO> recruitListWithCounts = recruits.stream()
                 .map(recruit -> {
