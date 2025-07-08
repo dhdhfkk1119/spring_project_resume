@@ -30,6 +30,8 @@ public class Corp {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    private String corpImage = "basic.png";
+
     public void isUseridCheck(String inputId) {
         if (this.corpId.equals(inputId)) {
             throw new IllegalArgumentException("중복된 아이디입니다.");

@@ -21,7 +21,10 @@
                 {{/sessionUser}}
             </div>
             <div>
-                <button class="btn btn-outline-secondary btn-sm custom-btn">기업 정보 수정</button>
+                <!-- 기업 정보 수정 버튼 -->
+                <button class="btn btn-outline-secondary btn-sm custom-btn" data-bs-toggle="modal" data-bs-target="#companyEditModal">
+                    기업 정보 수정
+                </button>
             </div>
             <div class="d-flex w-100 text-dark my-2 rounded" style="background: #f5f5f5;">
                 <span class="flex-fill text-center py-2 border-end">등록한 공고 : <span class="fw-bold">{{recruitCount}}</span></span>
@@ -55,5 +58,68 @@
         </a>
 
     </div>
+
+    <!-- 기업 정보 수정 모달 -->
+    <div class="modal fade" id="companyEditModal" tabindex="-1" aria-labelledby="companyEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- 헤더 -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="companyEditModalLabel">기업 정보 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <!-- 바디 -->
+                <div class="modal-body">
+                    <form id="companyEditForm" enctype="multipart/form-data">
+
+                        <div class="d-flex align-items-start gap-4">
+                            <!-- 이미지 미리보기 -->
+                            <div>
+                                <img id="companyImagePreview" src="/profile-images/basic.png" alt="기업 이미지" width="150px" height="150px" style="border-radius: 10px; object-fit: cover;">
+                            </div>
+
+                            <!-- 오른쪽 폼 -->
+                            <div class="flex-fill">
+                                <!-- 기업 이름 입력 -->
+                                <div class="mb-3">
+                                    <label for="companyName" class="form-label">기업 이름</label>
+                                    <input type="text" class="form-control" id="companyName" name="companyName" placeholder="기업 이름 입력">
+                                </div>
+
+                                <!-- 이미지 업로드 -->
+                                <div class="mb-3">
+                                    <label for="companyImage" class="form-label">이미지 첨부</label>
+                                    <input type="file" class="form-control" id="companyImage" name="companyImage" accept="image/*">
+                                </div>
+
+                                <!-- 저장 버튼 -->
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">저장하기</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 {{> layout/footer}}
+<script>
+    document.getElementById('companyImage').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('companyImagePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
