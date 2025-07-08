@@ -38,7 +38,7 @@ public class BoardController {
                 .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
     }
 
-    @GetMapping("/my-list")
+    @GetMapping("/list")
     public String listBoards(@RequestParam(defaultValue = "createdAt") String sort,
                              @RequestParam(defaultValue = "desc") String direction,
                              @RequestParam(defaultValue = "0") int page,
@@ -48,14 +48,13 @@ public class BoardController {
                              HttpSession session) {
 
         keyword = (keyword == null) ? "" : keyword;
+        model.addAttribute("keyword", keyword);
 
         Sort sorting = direction.equalsIgnoreCase("asc") ?
-                Sort.by(Sort.Direction.ASC, sort) :
-                Sort.by(Sort.Direction.DESC, sort);
+                Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sorting);
 
         Page<BoardListResponseDto> boardPage = boardService.getBoardList(keyword, pageable);
-
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
         boardPage.forEach(dto -> {
@@ -72,12 +71,9 @@ public class BoardController {
         model.addAttribute("hasNext", navigation.isHasNext());
         model.addAttribute("prevPage", navigation.getPrevPage());
         model.addAttribute("nextPage", navigation.getNextPage());
-
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
-        model.addAttribute("keyword", keyword);
-
         model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
         model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
         model.addAttribute("isDesc", direction.equals("desc"));
@@ -85,6 +81,7 @@ public class BoardController {
 
         return "board/list";
     }
+
 
 
     @GetMapping("/new")
@@ -193,7 +190,7 @@ public class BoardController {
         return "redirect:/board/" + boardId;
     }
 
-    @GetMapping("/my-boards")
+    @GetMapping("/my-list")
     public String myBoards(HttpSession session, Model model,
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "10") int size) {
@@ -207,8 +204,16 @@ public class BoardController {
 
         model.addAttribute("boardList", boardPage);
         model.addAttribute("sessionUser", sessionUser);
-        return "board/my-boards";
+        model.addAttribute("keyword", "");
+        model.addAttribute("sort", "createdAt");
+        model.addAttribute("direction", "desc");
+        model.addAttribute("isSortCreatedAt", true);
+        model.addAttribute("isSortBoardHits", false);
+        model.addAttribute("isDesc", true);
+        model.addAttribute("isAsc", false);
+        return "board/list";
     }
+
 
     @GetMapping("/likes")
     public String likedBoard(HttpSession session, Model model) {
