@@ -56,6 +56,26 @@
         .sub-menu-link:hover {
             color: #2d67ff !important;
         }
+
+    .pagination .page-item button {
+      background-color: white; /* 기본 배경 흰색 */
+      border: 1px solid #2d67ff;
+      color: #2d67ff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .pagination .page-item button:hover {
+      background-color: #2d67ff; /* 마우스 올리면 배경색 변경 */
+      color: white; /* 글자색은 흰색으로 변경 */
+    }
+
+    .pagination .page-item.disabled button {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
     </style>
 </head>
 

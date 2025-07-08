@@ -7,15 +7,21 @@ import com.join.spring_resume.board.BoardRepository;
 import com.join.spring_resume.board.BoardService;
 import com.join.spring_resume.recruit.Recruit;
 import com.join.spring_resume.recruit.RecruitRepository;
+import com.join.spring_resume.recruit.RecruitResponse;
 import com.join.spring_resume.recruit.RecruitService;
 import com.join.spring_resume.resume.ResumeService;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.Banner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -32,16 +38,27 @@ public class MainController {
     @GetMapping("/")
     public String index(Model model, HttpSession httpSession) {
 
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<Recruit> recruitList = recruitService.findAllList(pageable);
+        RecruitResponse.RecruitPageDTO recruitPageDTO = RecruitResponse.RecruitPageDTO.fromPage(recruitList);
 
-        List<Recruit> recruitList = recruitService.findAllList();
-
-
-        model.addAttribute("recruitList",recruitList); // 모든 공고등록 가져오기
-        model.addAttribute("sessionUser",sessionUser);
+        model.addAttribute("recruitList", recruitPageDTO);
 
         return "index";
     }
+
+    // ajax 실시간으로 데이터 베이스 데이터 뿌리기 (공고 목록)
+    @GetMapping("/api/recruits")
+    @ResponseBody
+    public RecruitResponse.RecruitPageDTO getRecruits(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "3") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Recruit> recruits = recruitService.findAllList(pageable);
+        return RecruitResponse.RecruitPageDTO.fromPage(recruits);
+    }
+
 
     //팀 소개페이지
     @GetMapping("/about")
@@ -88,7 +105,7 @@ public class MainController {
             throw new Exception403("기업 회원만 접근할수있습니다");
         }
 
-        int recruitCount = recruitService.findByAllList(sessionUser.getId()).size();
+        Long recruitCount = recruitService.countByRecruit(sessionUser.getId());
         model.addAttribute("recruitCount",recruitCount);
 
         return "page/corp-page";
