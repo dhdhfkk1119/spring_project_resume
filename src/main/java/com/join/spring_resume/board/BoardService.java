@@ -69,4 +69,21 @@ public class BoardService {
         return boardRepository.findByMember_MemberIdx(memberIdx);
     }
 
+    public Page<BoardListResponseDto> findBoardListByMemberIdx(Long memberIdx, Pageable pageable) {
+        return boardRepository.findBoardListByMemberIdx(memberIdx, pageable);
+    }
+
+    public List<BoardListResponseDto> findBoardsLikedByMember(Member member) {
+        return boardRepository.findBoardsLikedByMember(member.getMemberIdx());
+    }
+
+    public List<BoardListResponseDto> getBoardsCommentedByMember(Member member) {
+        return boardRepository.findBoardsCommentedByMember(member.getMemberIdx());
+    }
+
+    public Page<BoardListResponseDto> getBoardList(String keyword, Pageable pageable) {
+        return boardRepository.findBoardListWithCounts(keyword, pageable);
+    }
+
+
 }

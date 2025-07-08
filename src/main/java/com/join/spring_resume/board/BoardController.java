@@ -1,3 +1,4 @@
+
 package com.join.spring_resume.board;
 
 import com.join.spring_resume.Like.LikeService;
@@ -16,9 +17,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.format.DateTimeFormatter;
-
-
 import java.util.List;
 
 @Controller
@@ -38,8 +38,7 @@ public class BoardController {
                 .orElseThrow(() -> new Exception404("유저를 찾을 수 없습니다."));
     }
 
-    // 게시글 리스트
-    @GetMapping("/list")
+    @GetMapping("/my-list")
     public String listBoards(@RequestParam(defaultValue = "createdAt") String sort,
                              @RequestParam(defaultValue = "desc") String direction,
                              @RequestParam(defaultValue = "0") int page,
@@ -48,16 +47,20 @@ public class BoardController {
                              Model model,
                              HttpSession session) {
 
-        keyword = keyword == null ? "" : keyword;
-        Sort sorting = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        keyword = (keyword == null) ? "" : keyword;
+
+        Sort sorting = direction.equalsIgnoreCase("asc") ?
+                Sort.by(Sort.Direction.ASC, sort) :
+                Sort.by(Sort.Direction.DESC, sort);
         Pageable pageable = PageRequest.of(page, size, sorting);
 
         Page<BoardListResponseDto> boardPage = boardService.getBoardList(keyword, pageable);
+
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
 
-        boardPage.forEach(boardListResponseDto -> {
-            if (sessionUser != null && boardListResponseDto.getUsername().equals(sessionUser.getUsername())) {
-                boardListResponseDto.setAuthor(true);
+        boardPage.forEach(dto -> {
+            if (sessionUser != null && dto.getUsername().equals(sessionUser.getUsername())) {
+                dto.setAuthor(true);
             }
         });
 
@@ -74,6 +77,7 @@ public class BoardController {
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
         model.addAttribute("keyword", keyword);
+
         model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
         model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
         model.addAttribute("isDesc", direction.equals("desc"));
@@ -82,7 +86,7 @@ public class BoardController {
         return "board/list";
     }
 
-    //  새글 작성 폼
+
     @GetMapping("/new")
     public String newBoardForm(HttpSession session, Model model) {
         getLoggedInMember(session);
@@ -100,7 +104,6 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
-    // 수정 폼
     @GetMapping("/{id}/edit")
     public String editBoardForm(@PathVariable Long id, Model model, HttpSession session) {
         Member member = getLoggedInMember(session);
@@ -116,9 +119,7 @@ public class BoardController {
     }
 
     @PostMapping("/{id}/edit")
-    public String updateBoard(@PathVariable Long id,
-                              @ModelAttribute BoardUpdateDto dto,
-                              HttpSession session) {
+    public String updateBoard(@PathVariable Long id, @ModelAttribute BoardUpdateDto dto, HttpSession session) {
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(id);
         if (!board.isOwner(member.getMemberIdx())) throw new Exception401("수정 권한이 없습니다.");
@@ -135,7 +136,6 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
-    // 상세 조회
     @GetMapping("/{id}")
     public String viewBoard(@PathVariable Long id, Model model, HttpSession session) {
         Board board = boardService.findByIdAndIncreaseHits(id);
@@ -175,7 +175,6 @@ public class BoardController {
         return "board/detail";
     }
 
-    // 댓글 작성
     @PostMapping("/{boardId}/comment")
     public String writeComment(@PathVariable Long boardId,
                                @RequestParam String content,
@@ -186,72 +185,12 @@ public class BoardController {
         return "redirect:/board/" + boardId;
     }
 
-    // 좋아요
     @PostMapping("/{boardId}/like")
     public String toggleLike(@PathVariable Long boardId, HttpSession session) {
         Member member = getLoggedInMember(session);
         Board board = boardService.findById(boardId);
         likeService.toggleLike(member, board);
         return "redirect:/board/" + boardId;
-    }
-
-    // 내가 쓴 글 목록
-    @GetMapping("/my-list")
-    public String myList(@RequestParam(defaultValue = "0") int page,
-                         @RequestParam(defaultValue = "10") int size,
-                         @RequestParam(defaultValue = "createdAt") String sort,
-                         @RequestParam(defaultValue = "desc") String direction,
-                         HttpSession session, Model model) {
-        Member member = getLoggedInMember(session);
-        Sort sorting = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-        Pageable pageable = PageRequest.of(page, size, sorting);
-        Page<Board> boardPage = boardService.findByMemberIdx(member.getMemberIdx(), pageable);
-
-        boardPage.forEach(dto -> {
-            dto.setAuthor(true);
-            dto.setFormattedCreatedAt(String.valueOf(dto.getCreatedAt()));
-        });
-
-        model.addAttribute("boardList", boardPage);
-        model.addAttribute("sessionUser", session.getAttribute("session"));
-        model.addAttribute("myList", true);
-        return "board/my-list";
-    }
-
-    //  좋아요 누른 게시글
-    @GetMapping("/likes")
-    public String likedBoard(HttpSession session, Model model) {
-        Member member = getLoggedInMember(session);
-        List<BoardListResponseDto> likedBoards = boardService.getBoardsLikedByMember(member);
-
-        likedBoards.forEach(board -> {
-            board.setAuthor(true);
-            String formattedDate = board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            board.setFormattedCreatedAt(formattedDate);
-        });
-
-        model.addAttribute("boardList", likedBoards);
-        model.addAttribute("sessionUser", session.getAttribute("session"));
-        model.addAttribute("likedList", true);
-        return "board/liked-list";
-    }
-
-    // 내가 댓글 단 게시글
-    @GetMapping("/comments")
-    public String myComments(HttpSession session, Model model) {
-        Member member = getLoggedInMember(session);
-        List<BoardListResponseDto> boards = boardService.getBoardsCommentedByMember(member);
-
-        boards.forEach(board -> {
-            board.setAuthor(true);
-            String formattedDate = board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            board.setFormattedCreatedAt(formattedDate);
-        });
-
-        model.addAttribute("boardList", boards);
-        model.addAttribute("sessionUser", session.getAttribute("session"));
-        model.addAttribute("MyCommentList", true);
-        return "board/my-comment-list";
     }
 
     @GetMapping("/my-boards")
@@ -267,7 +206,42 @@ public class BoardController {
         Page<BoardListResponseDto> boardPage = boardService.findBoardListByMemberIdx(memberIdx, pageable);
 
         model.addAttribute("boardList", boardPage);
+        model.addAttribute("sessionUser", sessionUser);
         return "board/my-boards";
+    }
+
+    @GetMapping("/likes")
+    public String likedBoard(HttpSession session, Model model) {
+        Member member = getLoggedInMember(session);
+        List<BoardListResponseDto> likedBoards = boardService.findBoardsLikedByMember(member);
+
+        likedBoards.forEach(board -> {
+            board.setAuthor(true);
+            String formattedDate = board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            board.setFormattedCreatedAt(formattedDate);
+        });
+
+        model.addAttribute("boardList", likedBoards);
+        model.addAttribute("sessionUser", session.getAttribute("session"));
+        model.addAttribute("likedList", true);
+        return "board/liked-list";
+    }
+
+    @GetMapping("/comments")
+    public String myComments(HttpSession session, Model model) {
+        Member member = getLoggedInMember(session);
+        List<BoardListResponseDto> boards = boardService.getBoardsCommentedByMember(member);
+
+        boards.forEach(board -> {
+            board.setAuthor(true);
+            String formattedDate = board.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            board.setFormattedCreatedAt(formattedDate);
+        });
+
+        model.addAttribute("boardList", boards);
+        model.addAttribute("sessionUser", session.getAttribute("session"));
+        model.addAttribute("MyCommentList", true);
+        return "board/my-comment-list";
     }
 
 

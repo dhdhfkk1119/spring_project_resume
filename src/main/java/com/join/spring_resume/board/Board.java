@@ -1,5 +1,7 @@
 package com.join.spring_resume.board;
 
+import com.join.spring_resume.comment.Comment;
+import com.join.spring_resume.Like.Like;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
@@ -8,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "board_tb")
@@ -33,6 +37,12 @@ public class Board {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_idx", nullable = false)
     private Member member;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
