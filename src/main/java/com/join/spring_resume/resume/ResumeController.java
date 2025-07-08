@@ -67,9 +67,7 @@ public class ResumeController {
         return "resume/list";
     }
 
-    /**
-     * 이력서 상세보기 화면 요청
-     */
+    // 일반 회원을 위한 이력서 상세보기
     @GetMapping("/resume/{id}")
     public String detail(@PathVariable(name = "id") Long resumeIdx, Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
@@ -81,7 +79,15 @@ public class ResumeController {
         }
 
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
-        model.addAttribute("resume", resume);
+
+        if (!resume.isOwner(sessionUser.getId())) {
+            throw new Exception403("이력서를 조회할 권한이 없습니다");
+        }
+
+        ResumeResponse.CorpDetailDTO responseDTO = new ResumeResponse.CorpDetailDTO(resume);
+
+        model.addAttribute("resume", responseDTO);
+        model.addAttribute("isOwner", true);
         return "resume/detail";
     }
 
@@ -99,7 +105,7 @@ public class ResumeController {
 
         ResumeResponse.CorpDetailDTO responseDTO = resumeService.findCorpResumeDetail(resumeIdx);
         model.addAttribute("resume", responseDTO);
-
+        model.addAttribute("isOwner", false);
         return "resume/detail";
     }
 
