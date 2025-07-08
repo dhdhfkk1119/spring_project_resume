@@ -1,31 +1,29 @@
 {{> layout/header}}
-<body class="bg-light">
 
-<div class="container py-5">
+<body class="bg-light">
+<div class="container py-5" style="max-width: 950px;">
 
     <!-- 제목 -->
     <div class="text-center mb-5">
-        <h1 class="fw-bold text-primary display-5">📘 게시판</h1>
-        <p class="text-muted">모든 게시글을 한눈에 확인하고 정렬하거나 검색해보세요.</p>
+        <h1 class="fw-bold text-primary display-6">📘 커뮤니티</h1>
     </div>
 
     <!-- 검색 및 정렬 -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="get" class="row row-cols-1 row-cols-md-auto g-3 align-items-end">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body d-flex justify-content-between flex-wrap gap-3">
+            <form method="get" class="row row-cols-1 row-cols-md-auto g-3 align-items-end flex-grow-1">
                 <div class="col">
-                    <label for="keyword" class="form-label">🔍 검색어</label>
-                    <input type="text" name="keyword" id="keyword" class="form-control" placeholder="제목 또는 내용" value="{{keyword}}">
+                    <label for="keyword" class="form-label">🔍 검색</label>
+                    <input type="text" name="keyword" id="keyword" class="form-control"
+                           placeholder="제목 또는 내용" value="{{keyword}}">
                 </div>
-
                 <div class="col">
-                    <label for="sort" class="form-label">📌 정렬 기준</label>
+                    <label for="sort" class="form-label">📌 정렬</label>
                     <select name="sort" id="sort" class="form-select">
-                        <option value="createdAt" {{#isSortCreatedAt}}selected{{/isSortCreatedAt}}>작성일</option>
-                        <option value="boardHits" {{#isSortBoardHits}}selected{{/isSortBoardHits}}>조회수</option>
+                        <option value="createdAt" {{#isSortCreatedAt}}selected{{/isSortCreatedAt}}>최신순</option>
+                        <option value="boardHits" {{#isSortBoardHits}}selected{{/isSortBoardHits}}>조회순</option>
                     </select>
                 </div>
-
                 <div class="col">
                     <label for="direction" class="form-label">⬇⬆ 방향</label>
                     <select name="direction" id="direction" class="form-select">
@@ -33,119 +31,75 @@
                         <option value="asc" {{#isAsc}}selected{{/isAsc}}>오름차순</option>
                     </select>
                 </div>
-
                 <div class="col">
-                    <button type="submit" class="btn btn-primary w-100">정렬/검색</button>
+                    <button type="submit" class="btn btn-outline-primary">검색</button>
                 </div>
             </form>
+            <div>
+                {{#sessionUser}}
+                    <a href="/board/new" class="btn btn-primary px-4 shadow-sm">✍️ 글쓰기</a>
+                {{/sessionUser}}
+                {{^sessionUser}}
+                    <button class="btn btn-outline-secondary" onclick="alertLogin()">로그인 후 작성</button>
+                {{/sessionUser}}
+            </div>
         </div>
     </div>
 
-    <!-- 메시지 영역 -->
-    {{#message}}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            ✅ {{message}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- 게시글 리스트 -->
+    {{#boardList.content}}
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <a href="/board/{{boardIdx}}" class="h5 fw-bold text-decoration-none text-dark">{{boardTitle}}</a>
+                        <div class="text-muted small mt-1">
+                            👤 {{username}} · 📅 {{formattedCreatedAt}} · 👁 {{boardHits}}회
+                        </div>
+                        <div class="text-muted small mt-1">
+                            💬 댓글 {{commentCount}} · ❤️ 좋아요 {{likeCount}}
+                        </div>
+                    </div>
+                    {{#isAuthor}}
+                        <div class="d-flex gap-1">
+                            <a href="/board/{{boardIdx}}/edit" class="btn btn-sm btn-outline-secondary">✏️</a>
+                            <form method="post" action="/board/{{boardIdx}}/delete"
+                                  onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">🗑</button>
+                            </form>
+                        </div>
+                    {{/isAuthor}}
+                </div>
+            </div>
         </div>
-    {{/message}}
+    {{/boardList.content}}
 
-    {{#updateMessage}}
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-            ✏️ {{updateMessage}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    {{^boardList.content}}
+        <div class="text-center text-muted py-5">
+            🫥 아직 게시글이 없습니다.
         </div>
-    {{/updateMessage}}
+    {{/boardList.content}}
 
-    {{#deleteMessage}}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            🗑️ {{deleteMessage}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    {{/deleteMessage}}
-
-    <!-- 게시글 테이블 -->
-    <div class="table-responsive shadow-sm rounded bg-white">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-primary text-center">
-            <tr>
-                <th style="width: 5%">#</th>
-                <th style="width: 40%">제목</th>
-                <th style="width: 15%">작성자</th>
-                <th style="width: 15%">작성일</th>
-                <th style="width: 10%">조회수</th>
-                <th style="width: 15%">관리</th>
-            </tr>
-            </thead>
-            <tbody>
-            {{#boardList}}
-                <tr>
-                    <td class="text-center">{{boardIdx}}</td>
-                    <td>
-                        <a href="/board/{{boardIdx}}" class="text-decoration-none fw-semibold text-dark">
-                            {{boardTitle}}
-                        </a>
-                    </td>
-                    <td class="text-center">{{#member}}{{username}}{{/member}}</td>
-                    <td class="text-center">{{formattedCreatedAt}}</td>
-                    <td class="text-center">{{boardHits}}</td>
-                    <td class="text-center">
-                        {{#isAuthor}}
-                            <div class="d-flex justify-content-center gap-1">
-                                <a href="/board/{{boardIdx}}/edit" class="btn btn-sm btn-outline-primary">
-                                    ✏️
-                                </a>
-                                <form method="post" action="/board/{{boardIdx}}/delete" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">🗑</button>
-                                </form>
-                            </div>
-                        {{/isAuthor}}
-                    </td>
-                </tr>
-            {{/boardList}}
-
-            {{^boardList}}
-                <tr>
-                    <td colspan="6" class="text-center text-muted">등록된 게시글이 없습니다.</td>
-                </tr>
-            {{/boardList}}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 페이지 네비게이션 -->
+    <!-- 페이징 -->
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
-            {{#page.hasPrevious}}
+            {{#hasPrev}}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{page.numberMinusOne}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">이전</a>
+                    <a class="page-link" href="?page={{prevPage}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">이전</a>
                 </li>
-            {{/page.hasPrevious}}
-
+            {{/hasPrev}}
             {{#pageNumbers}}
-                <li class="page-item {{#Current}}active{{/Current}}">
-                    <a class="page-link" href="?page={{number}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">
-                    {{displayNumber}}
-                    </a>
+                <li class="page-item {{#current}}active{{/current}}">
+                    <a class="page-link" href="?page={{number}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">{{displayNumber}}</a>
                 </li>
             {{/pageNumbers}}
-
-            {{#page.hasNext}}
+            {{#hasNext}}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{page.numberPlusOne}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">다음</a>
+                    <a class="page-link" href="?page={{nextPage}}&keyword={{keyword}}&sort={{sort}}&direction={{direction}}">다음</a>
                 </li>
-            {{/page.hasNext}}
+            {{/hasNext}}
         </ul>
     </nav>
-
-    <!-- 글쓰기 버튼 -->
-    <div class="text-end mt-4">
-        {{#sessionUser}}
-            <a href="/board/new" class="btn btn-lg btn-primary px-4 shadow-sm">✍️ 새 글 쓰기</a>
-        {{/sessionUser}}
-        {{^sessionUser}}
-            <button class="btn btn-lg btn-outline-secondary" onclick="alertLogin()">로그인 후 작성</button>
-        {{/sessionUser}}
-    </div>
 
 </div>
 
@@ -157,4 +111,5 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 {{> layout/footer}}
