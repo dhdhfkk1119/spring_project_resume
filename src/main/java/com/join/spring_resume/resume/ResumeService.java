@@ -38,6 +38,15 @@ public class ResumeService {
                 .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다. id: " + resumeIdx));
     }
 
+    // 👨‍💻 기업 채용담당관용 이력서 상세보기
+    public ResumeResponse.CorpDetailDTO findCorpResumeDetail(Long resumeIdx) {
+        Resume resume = resumeJpaRepository.findByIdWithCareers(resumeIdx)
+                .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다: " + resumeIdx));
+
+        // DTO로 변환해서 반환
+        return new ResumeResponse.CorpDetailDTO(resume);
+    }
+
     //이력서 저장
     @Transactional
     public Resume save(ResumeRequest.SaveDTO saveDTO, Member sessionMember) {

@@ -16,7 +16,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,11 +79,27 @@ public class ResumeController {
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
         }
-        Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
         model.addAttribute("resume", resume);
+        return "resume/detail";
+    }
+
+    //👨‍💻 기업 채용담당관을 위한 이력서 상세보기
+    @GetMapping("/corp/resume/{resumeIdx}")
+    public String corpResumeDetail(@PathVariable Long resumeIdx, Model model, HttpSession session) {
+
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) {
+            throw  new Exception401("로그인 해주시기 바랍니다");
+        }
+        if (sessionUser.getRole() != "CORP") {
+            throw new Exception403("기업 회원만 작성 가능합니다");
+        }
+
+        ResumeResponse.CorpDetailDTO responseDTO = resumeService.findCorpResumeDetail(resumeIdx);
+        model.addAttribute("resume", responseDTO);
+
         return "resume/detail";
     }
 
@@ -240,8 +255,6 @@ public class ResumeController {
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
         }
-        Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
         // 2. 서비스에 대표 이력서 변경 로직 위임
         resumeService.setRep(sessionUser.getId(), resumeIdx);
