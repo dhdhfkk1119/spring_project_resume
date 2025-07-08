@@ -88,4 +88,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b FROM Board b WHERE (:keyword IS NULL OR b.boardTitle LIKE CONCAT('%', :keyword, '%') OR b.boardContent LIKE CONCAT('%', :keyword, '%'))")
     Page<Board> searchBoards(@Param("keyword") String keyword, Pageable pageable);
 
+
+
+    List<Board> findByMember_MemberIdx(Long memberIdx);
+
+
 }
