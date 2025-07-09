@@ -5,7 +5,7 @@
 
     <!-- 제목 -->
     <div class="text-center mb-5">
-        <h1 class="fw-bold text-primary display-6">✍️ 내가 작성한 글</h1>
+        <h1 class="fw-bold text-primary display-6">📘 커뮤니티</h1>
     </div>
 
     <!-- 검색 및 정렬 -->
@@ -36,26 +36,31 @@
                 </div>
             </form>
             <div>
-                <a href="/board/new" class="btn btn-primary px-4 shadow-sm">✍️ 글쓰기</a>
+                {{#sessionUser}}
+                    <a href="/board/new" class="btn btn-primary px-4 shadow-sm">✍️ 글쓰기</a>
+                {{/sessionUser}}
+                {{^sessionUser}}
+                    <button class="btn btn-outline-secondary" onclick="alertLogin()">로그인 후 작성</button>
+                {{/sessionUser}}
             </div>
         </div>
     </div>
 
-    <!-- 내가 작성한 게시글 리스트 -->
+    <!-- 게시글 리스트 -->
     {{#boardList.content}}
-        {{#author}}
-            <div class="card mb-3 shadow-sm border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <a href="/board/{{boardIdx}}" class="h5 fw-bold text-decoration-none text-dark">{{boardTitle}}</a>
-                            <div class="text-muted small mt-1">
-                                👤 {{username}} · 📅 {{formattedCreatedAt}} · 👁 {{boardHits}}회
-                            </div>
-                            <div class="text-muted small mt-1">
-                                💬 댓글 {{commentCount}} · ❤️ 좋아요 {{likeCount}}
-                            </div>
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <a href="/board/{{boardIdx}}" class="h5 fw-bold text-decoration-none text-dark">{{boardTitle}}</a>
+                        <div class="text-muted small mt-1">
+                            👤 {{username}} · 📅 {{formattedCreatedAt}} · 👁 {{boardHits}}회
                         </div>
+                        <div class="text-muted small mt-1">
+                            💬 댓글 {{commentCount}} · ❤️ 좋아요 {{likeCount}}
+                        </div>
+                    </div>
+                    {{#isAuthor}}
                         <div class="d-flex gap-1">
                             <a href="/board/{{boardIdx}}/edit" class="btn btn-sm btn-outline-secondary">✏️</a>
                             <form method="post" action="/board/{{boardIdx}}/delete"
@@ -63,15 +68,15 @@
                                 <button type="submit" class="btn btn-sm btn-outline-danger">🗑</button>
                             </form>
                         </div>
-                    </div>
+                    {{/isAuthor}}
                 </div>
             </div>
-        {{/author}}
+        </div>
     {{/boardList.content}}
 
     {{^boardList.content}}
         <div class="text-center text-muted py-5">
-            🫥 아직 내가 작성한 게시글이 없습니다.
+            🫥 아직 게시글이 없습니다.
         </div>
     {{/boardList.content}}
 

@@ -13,7 +13,10 @@ import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -81,7 +84,6 @@ public class BoardController {
 
         return "board/list";
     }
-
 
 
     @GetMapping("/new")
@@ -193,25 +195,46 @@ public class BoardController {
     @GetMapping("/my-list")
     public String myBoards(HttpSession session, Model model,
                            @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "10") int size) {
+                           @RequestParam(defaultValue = "10") int size,
+                           @RequestParam(required = false) String keyword,
+                           @RequestParam(defaultValue = "createdAt") String sort,
+                           @RequestParam(defaultValue = "desc") String direction) {
+
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) throw new Exception401("로그인이 필요합니다.");
-        Long memberIdx = sessionUser.getId();
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<BoardListResponseDto> boardPage = boardService.findBoardListByMemberIdx(memberIdx, pageable);
+        Long memberIdx = sessionUser.getId();
+        keyword = (keyword == null) ? "" : keyword;
+
+        Sort sorting = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        Page<BoardListResponseDto> boardPage = boardService.searchMyBoards(memberIdx, keyword, pageable);
+
+        boardPage.forEach(dto -> {
+            if (dto.getMemberIdx().equals(memberIdx)) {
+                dto.setAuthor(true);
+            }
+        });
+
+        PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(boardPage);
 
         model.addAttribute("boardList", boardPage);
         model.addAttribute("sessionUser", sessionUser);
-        model.addAttribute("keyword", "");
-        model.addAttribute("sort", "createdAt");
-        model.addAttribute("direction", "desc");
-        model.addAttribute("isSortCreatedAt", true);
-        model.addAttribute("isSortBoardHits", false);
-        model.addAttribute("isDesc", true);
-        model.addAttribute("isAsc", false);
-        return "board/list";
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("pageNumbers", navigation.getPageNumbers());
+        model.addAttribute("hasPrev", navigation.isHasPrev());
+        model.addAttribute("hasNext", navigation.isHasNext());
+        model.addAttribute("prevPage", navigation.getPrevPage());
+        model.addAttribute("nextPage", navigation.getNextPage());
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
+        model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
+        model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
+        model.addAttribute("isDesc", direction.equals("desc"));
+        model.addAttribute("isAsc", direction.equals("asc"));
+
+        return "board/my-list";
     }
 
 
@@ -250,4 +273,57 @@ public class BoardController {
     }
 
 
+    @GetMapping("/my-boards")
+    public String myBoards(HttpSession session, Model model,
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "10") int size,
+                           @RequestParam(defaultValue = "createdAt") String sort,
+                           @RequestParam(defaultValue = "desc") String direction) {
+
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) throw new Exception401("로그인이 필요합니다.");
+        Long memberIdx = sessionUser.getId();
+
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+
+        Page<BoardListResponseDto> boardPage = boardService.getMyBoards(memberIdx, pageable);
+
+        model.addAttribute("boardList", boardPage.getContent());
+        model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
+        model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
+        model.addAttribute("isAsc", direction.equals("asc"));
+        model.addAttribute("isDesc", direction.equals("desc"));
+
+        return "board/my_list";
+    }
+
+    @GetMapping("/boards")
+    public String boardList(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            Model model
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc") ?
+                Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, 10, sort);
+
+        Page<BoardListResponseDto> boardPage = boardService.getBoardList(keyword, pageable);
+
+        model.addAttribute("boardList", boardPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", boardPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("direction", direction);
+
+        return "board/list";
+    }
+
+
 }
+
+
+
