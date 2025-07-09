@@ -2,11 +2,14 @@ package com.join.spring_resume.member;
 
 import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume._core.errors.exception.Exception404;
+import com.join.spring_resume._core.errors.exception.Exception500;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.sound.midi.MetaMessage;
+import java.io.File;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +37,8 @@ public class MemberService {
         return memberRepository.save(saveDTO.toEntity());
     }
 
-    public Member findById(String memberId){
-        return memberRepository.findByMemberId(memberId)
+    public Member findById(Long Idx){
+        return memberRepository.findByMemberIdx(Idx)
                 .orElseThrow(() -> new Exception404("해당 유저를 찾을 수 없습니다"));
     }
 
@@ -45,4 +48,40 @@ public class MemberService {
         return memberRepository.existsByMemberId(Id);
     }
 
+
+    @Transactional
+    public void updateMember(Long idx,MemberRequest.UpdateDTO updateDTO){
+        Member member = findById(idx);
+
+        // 회원 이름 수정
+        member.setUsername(updateDTO.getUsername());
+        
+        // 이미지 저장
+        MultipartFile imageFile = updateDTO.getMemberImage();
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                // 1. 저장 경로 설정
+                String uploadDir = "C:/join-uploads/member-images/";
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                String originalFilename = imageFile.getOriginalFilename();
+                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+                // 2. UUID 파일명 생성
+                String uuidFilename = UUID.randomUUID().toString() + extension;
+
+                // 3. 파일 객체로 저장
+                File saveFile = new File(uploadDir + uuidFilename);
+                imageFile.transferTo(saveFile);
+
+                // 4. DB에 저장할 파일명 (또는 상대 경로)
+                member.setMemberImage(uuidFilename); // 또는 "/corp-images/" + uuidFilename
+
+            } catch (Exception e) {
+                e.printStackTrace(); // 상세 스택 로그 출력
+                throw new Exception500("이미지 저장 실패");
+            }
+        }
+    }
 }

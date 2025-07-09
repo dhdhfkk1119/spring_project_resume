@@ -14,12 +14,13 @@ public class SessionUser {
     private String userId;
     private String username;
     private String role;
+    private String images;
 
     public static SessionUser fromMember(Member member) {
-        return new SessionUser(member.getMemberIdx() ,member.getMemberId(), member.getUsername(), "MEMBER");
+        return new SessionUser(member.getMemberIdx() ,member.getMemberId(), member.getUsername(), "MEMBER",member.getMemberImage());
     }
 
     public static SessionUser fromCorp(Corp corp) {
-        return new SessionUser(corp.getCorpIdx(), corp.getCorpId(),corp.getCorpName() , "CORP");
+        return new SessionUser(corp.getCorpIdx(), corp.getCorpId(),corp.getCorpName() , "CORP",corp.getCorpImage());
     }
 }

@@ -1,0 +1,23 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 308px);
+}
+
+.content {
+  flex: 1; /* 남은 영역을 차지하게 함 (푸터 밀림 방지) */
+  padding: 20px; /* 필요한 경우 내부 여백만 */
+  box-sizing: border-box;
+}
+
+.footer {
+  height: 200px;
+  background-color: #f8f9fa;
+  text-align: center;
+  padding: 30px;
+}

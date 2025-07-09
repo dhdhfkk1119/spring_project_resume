@@ -86,70 +86,74 @@
         });
     });
 </script>
-<div class="container p-5">
-    <div class="apply-header mb-4">
-        <h3>내가 등록한 공고 목록</h3>
-    </div>
+<div class="wrapper">
+    <div class="content">
+        <div class="container p-5">
+            <div class="apply-header mb-4">
+                <h3>내가 등록한 공고 목록</h3>
+            </div>
 
-    <div id="recruit-list">
-    {{#recruitList.content}}
-        <div class="card mb-3 position-relative">
-            <div class="card-body d-flex flex-wrap">
-                <!-- 왼쪽 공고 정보 -->
-                <div class="w-75 overflow-hidden">
-                    <div class="d-flex align-items-center flex-wrap gap-2">
-                        <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold text-truncate d-inline-block ">{{recruitTitle}}</a>
-                        <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
-                    </div>
+            <div id="recruit-list">
+                {{#recruitList.content}}
+                    <div class="card mb-3 position-relative">
+                        <div class="card-body d-flex flex-wrap">
+                            <!-- 왼쪽 공고 정보 -->
+                            <div class="w-75 overflow-hidden">
+                                <div class="d-flex align-items-center flex-wrap gap-2">
+                                    <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold text-truncate d-inline-block ">{{recruitTitle}}</a>
+                                    <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
+                                </div>
 
-                    <div class="mb-2 custom-gray">
-                        <span>{{area}} *</span>
-                        <span>{{career}} *</span>
-                        <span>{{education}} *</span>
-                        <span>{{workType}}</span>
-                    </div>
+                                <div class="mb-2 custom-gray">
+                                    <span>{{area}} *</span>
+                                    <span>{{career}} *</span>
+                                    <span>{{education}} *</span>
+                                    <span>{{workType}}</span>
+                                </div>
 
-                    <div>
-                        <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
-                    </div>
-                </div>
+                                <div>
+                                    <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
+                                </div>
+                            </div>
 
-                <!-- 오른쪽 기업 정보 및 설정 버튼 -->
-                <div class="d-flex w-25 align-items-center position-relative">
-                    <span class="fw-bold">{{corp.corpName}}</span>
+                            <!-- 오른쪽 기업 정보 및 설정 버튼 -->
+                            <div class="d-flex w-25 align-items-center position-relative">
+                                <span class="fw-bold">{{corp.corpName}}</span>
 
-                    <span class="position-absolute gear-btn" style="top: 5px; right: 5px; cursor: pointer;" onclick="toggleActions({{recruitIdx}})">
+                                <span class="position-absolute gear-btn" style="top: 5px; right: 5px; cursor: pointer;" onclick="toggleActions({{recruitIdx}})">
                         <i class="fa-solid fa-gear"></i>
                     </span>
-                    <!-- 토글 액션 박스 -->
-                    <div id="action-box-{{recruitIdx}}" class="action-buttons">
-                        <button class="edit" onclick="location.href='/recruit/{{recruitIdx}}/update-form'">
-                            <i class="fa-solid fa-pen-to-square"></i> 수정
-                        </button>
-                        <form action="/recruit/{{recruitIdx}}/delete" method="post"
-                              onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                            <button class="delete">
-                                <i class="fa-solid fa-trash"></i> 삭제
-                            </button>
-                        </form>
+                                <!-- 토글 액션 박스 -->
+                                <div id="action-box-{{recruitIdx}}" class="action-buttons">
+                                    <button class="edit" onclick="location.href='/recruit/{{recruitIdx}}/update-form'">
+                                        <i class="fa-solid fa-pen-to-square"></i> 수정
+                                    </button>
+                                    <form action="/recruit/{{recruitIdx}}/delete" method="post"
+                                          onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                        <button class="delete">
+                                            <i class="fa-solid fa-trash"></i> 삭제
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {{/recruitList.content}}
             </div>
+
+            {{^recruitList}}
+                <div class="alert alert-warning text-center mt-5">
+                    아직 등록한 공고가 없네요 ㅠㅠ
+                </div>
+            {{/recruitList}}
+
+            <ul class="pagination d-flex justify-content-center">
+                <li class="page-item">
+                    <button id="loadMoreBtn" data-page="1">공고 더보기</button>
+                </li>
+            </ul>
         </div>
-    {{/recruitList.content}}
     </div>
-
-    {{^recruitList}}
-        <div class="alert alert-warning text-center mt-5">
-            아직 등록한 공고가 없네요 ㅠㅠ
-        </div>
-    {{/recruitList}}
-
-    <ul class="pagination d-flex justify-content-center">
-        <li class="page-item">
-            <button id="loadMoreBtn" data-page="1">공고 더보기</button>
-        </li>
-    </ul>
 </div>
 
 {{> layout/footer}}
