@@ -40,5 +40,7 @@ public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
     @Query(value = "SELECT r FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = false ORDER BY r.resumeIdx DESC",
             countQuery = "SELECT count(r) FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = false")
     Page<Resume> findByMemberIdxAndIsRepFalse(@Param("memberIdx") Long memberIdx, Pageable pageable);
+
+
 }
 

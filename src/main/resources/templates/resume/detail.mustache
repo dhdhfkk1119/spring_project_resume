@@ -3,160 +3,170 @@
 <style>
     /* 화면 너비가 767.98px 이하일 때 (Bootstrap의 md 분기점) 적용될 스타일 */
     @media (max-width: 767.98px) {
-        /* * fs-5 클래스(현재 아이콘 크기)를 가진 i 태그의 폰트 크기를
-         * 기존보다 약간 작은 1rem으로 조절합니다.
-         */
         i.fs-5 {
             font-size: 1rem !important;
         }
     }
 </style>
 
-<div class="container my-5" style="max-with:1200px">
-    <div class="card shadow-sm">
-        <!-- 카드 헤더: 이력서 제목과 각종 버튼 -->
-        <div class="card-header bg-light py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="text-truncate h4 mb-0">{{resume.resumeTitle}}</h1>
+<div class="wrapper">
+    <div class="content">
+        <div class="container my-5" style="max-with:1200px">
+            <div class="card shadow-sm">
+                <!-- 카드 헤더: 이력서 제목과 각종 버튼 -->
+                <div class="card-header bg-light py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="text-truncate h4 mb-0">{{resume.resumeTitle}}</h1>
 
-                {{#isOwner}} <!--소유권 확인-->
-                    <div class="d-flex align-items-center gap-3">
-                        <!-- 목록 버튼 -->
-                        <a href="/resumes" class="text-primary" title="목록으로">
-                            <i class="fa-solid fa-list fs-5"></i>
-                        </a>
-                        <!-- 수정 버튼 -->
-                        <a href="/resume/{{resume.resumeIdx}}/update-form" class="text-primary" title="수정하기">
-                            <i class="fa-solid fa-pen-to-square fs-5"></i>
-                        </a>
-                        <!-- 삭제 버튼 -->
-                        <form class="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post">
-                            <button type="submit" class="btn btn-link p-0" title="삭제하기" style="color: Tomato;">
-                                <i class="fa-solid fa-trash fs-5"></i>
-                            </button>
-                        </form>
+                        {{#isOwner}} <!--소유권 확인-->
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- 목록 버튼 -->
+                                <a href="/resumes" class="text-primary" title="목록으로">
+                                    <i class="fa-solid fa-list fs-5"></i>
+                                </a>
+                                <!-- 수정 버튼 -->
+                                <a href="/resume/{{resume.resumeIdx}}/update-form" class="text-primary" title="수정하기">
+                                    <i class="fa-solid fa-pen-to-square fs-5"></i>
+                                </a>
+                                <!-- 삭제 버튼 -->
+                                <form class="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post">
+                                    <button type="submit" class="btn btn-link p-0" title="삭제하기" style="color: Tomato;">
+                                        <i class="fa-solid fa-trash fs-5"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {{/isOwner}}
+
                     </div>
-                {{/isOwner}}
+                </div>
+                <hr>
+                <!-- 카드 바디: 개인 정보 -->
+                <div class="card-body">
+                    <h2 class="h5 border-bottom pb-2 mb-3">{{resume.member.username}}</h2>
+                    <div class="col mb-4 p-3 border rounded">
+                        <p><strong>나이/성별:</strong> {{resume.member.age}}세 / {{resume.member.sex}}</p>
+                        <p><strong>연락처:</strong> {{resume.member.phoneNumber}}</p>
+                        <p><strong>이메일:</strong> {{resume.member.email}}</p>
+                        <p><strong>주소:</strong> {{resume.member.address}}</p>
+                    </div>
+
+                    <hr>
+
+                    <!-- 자기소개 -->
+                    <h2 class="h5 border-bottom pb-2 mb-3 mt-4">소개글</h2>
+                    <div class="p-3 bg-white border rounded">
+                        <!-- pre 태그를 사용하면 사용자가 입력한 줄바꿈과 공백이 그대로 유지됩니다. -->
+                        <pre style="white-space: pre-wrap; word-wrap: break-word; font-family: inherit; font-size: 1rem;">{{resume.resumeContent}}</pre>
+                    </div>
+
+
+                    <h2 class="h5 border-bottom pb-2 mb-3 mt-4">경력사항</h2>
+
+                    <!-- 경력사항 순회하여 출력 -->
+                    {{#resume.careerList}}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{corpName}}</h5>
+                                {{#position}}
+                                    <h6 class="card-subtitle mb-2 text-muted">{{position}}</h6>
+                                {{/position}}
+
+                                {{#startAt}}
+                                    {{#endAt}}
+                                        <p class="card-text"><small class="text-muted">{{startAt}} ~ {{endAt}}</small></p>
+                                    {{/endAt}}
+                                    {{^endAt}}
+                                        <p class="card-text"><small class="text-muted">{{startAt}} ~</small></p>
+                                    {{/endAt}}
+                                {{/startAt}}
+                                {{^startAt}}
+                                    {{#endAt}}
+                                        <p class="card-text"><small class="text-muted">~ {{endAt}}</small></p>
+                                    {{/endAt}}
+                                {{/startAt}}
+
+                                <p class="card-text" style="white-space: pre-wrap;">{{careerContent}}</p>
+                            </div>
+                        </div>
+                    {{/resume.careerList}}
+
+                    <!-- 경력사항 없을 때 나오는 메세지 -->
+                    {{^resume.careerList}}
+                        <div class="text-center p-3 border rounded">
+                            <p class="mb-0">입력된 경력 정보가 없습니다.</p>
+                        </div>
+                    {{/resume.careerList}}
+                </div>
+
+                <!-- 목록 수정 삭제 리스트 -->
+                <div class="card-footer bg-transparent py-3">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <a href="#" id="back-btn" class="btn btn-outline-primary">목록으로</a>
+                        </div>
+                        {{#isOwner}}<!--소유권 확인-->
+                            <div class="d-flex gap-2">
+                                <a href="/resume/{{resume.resumeIdx}}/update-form" class="btn btn-outline-primary">수정하기</a>
+                                <form class="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post">
+                                    <button type="submit" class="btn btn-outline-danger">삭제하기</button>
+                                </form>
+                            </div>
+                        {{/isOwner}}
+                    </div>
+                </div>
+
 
             </div>
         </div>
-        <hr>
-        <!-- 카드 바디: 개인 정보 -->
-        <div class="card-body">
-            <h2 class="h5 border-bottom pb-2 mb-3">{{resume.member.username}}</h2>
-            <div class="col mb-4 p-3 border rounded">
-                <p><strong>나이/성별:</strong> {{resume.member.age}}세 / {{resume.member.sex}}</p>
-                <p><strong>연락처:</strong> {{resume.member.phoneNumber}}</p>
-                <p><strong>이메일:</strong> {{resume.member.email}}</p>
-                <p><strong>주소:</strong> {{resume.member.address}}</p>
-            </div>
-
-            <hr>
-
-            <!-- 자기소개 -->
-            <h2 class="h5 border-bottom pb-2 mb-3 mt-4">소개글</h2>
-            <div class="p-3 bg-white border rounded">
-                <!-- pre 태그를 사용하면 사용자가 입력한 줄바꿈과 공백이 그대로 유지됩니다. -->
-                <pre style="white-space: pre-wrap; word-wrap: break-word; font-family: inherit; font-size: 1rem;">{{resume.resumeContent}}</pre>
-            </div>
-
-
-            <h2 class="h5 border-bottom pb-2 mb-3 mt-4">경력사항</h2>
-
-            <!-- 경력사항 순회하여 출력 -->
-            {{#resume.careerList}}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">{{corpName}}</h5>
-                        {{#position}}
-                            <h6 class="card-subtitle mb-2 text-muted">{{position}}</h6>
-                        {{/position}}
-
-                        {{#startAt}}
-                            {{#endAt}}
-                                <p class="card-text"><small class="text-muted">{{startAt}} ~ {{endAt}}</small></p>
-                            {{/endAt}}
-                            {{^endAt}}
-                                <p class="card-text"><small class="text-muted">{{startAt}} ~</small></p>
-                            {{/endAt}}
-                        {{/startAt}}
-                        {{^startAt}}
-                            {{#endAt}}
-                                <p class="card-text"><small class="text-muted">~ {{endAt}}</small></p>
-                            {{/endAt}}
-                        {{/startAt}}
-
-                        <p class="card-text" style="white-space: pre-wrap;">{{careerContent}}</p>
-                    </div>
-                </div>
-            {{/resume.careerList}}
-
-            <!-- 경력사항 없을 때 나오는 메세지 -->
-            {{^resume.careerList}}
-                <div class="text-center p-3 border rounded">
-                    <p class="mb-0">입력된 경력 정보가 없습니다.</p>
-                </div>
-            {{/resume.careerList}}
-        </div>
-
-        <!-- 목록 수정 삭제 리스트 -->
-        <div class="card-footer bg-transparent py-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <a href="#" id="back-btn" class="btn btn-outline-primary">목록으로</a>
-                </div>
-                {{#isOwner}}<!--소유권 확인-->
-                    <div class="d-flex gap-2">
-                        <a href="/resume/{{resume.resumeIdx}}/update-form" class="btn btn-outline-primary">수정하기</a>
-                        <form class="delete-form" action="/resume/{{resume.resumeIdx}}/delete" method="post">
-                            <button type="button" id="delete-btn-text" class="btn btn-outline-danger">삭제하기</button>
-                        </form>
-                    </div>
-                {{/isOwner}}
-            </div>
-        </div>
-
-
     </div>
 </div>
 
 <script>
-    // 🗑️✅삭제확인절차
-    document.querySelectorAll('.delete-form').forEach(form => {
-        form.addEventListener('submit', function (event) {
-            if (!confirm('정말로 이 이력서를 삭제하시겠습니까?')) {
-                event.preventDefault(); // '취소'를 누르면 폼 제출을 막습니다.
-            }
+    // 📄 이 페이지의 모든 자바스크립트 코드는 HTML 문서가 완전히 로드된 후에 실행됩니다.
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // =================================================================
+        // 🗑️ 1. 삭제 기능 (통합 버전)
+        // =================================================================
+        // 페이지 내의 모든 '.delete-form' 클래스를 가진 폼에 동일한 기능을 적용합니다.
+        // 이렇게 하면 아이콘 버튼과 텍스트 버튼의 삭제 기능을 한 곳에서 관리할 수 있어요.
+        document.querySelectorAll('.delete-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                // 폼이 제출되기 직전에 사용자에게 정말 삭제할 것인지 확인합니다.
+                if (!confirm('정말로 이 이력서를 삭제하시겠습니까? 되돌릴 수 없어요!')) {
+                    event.preventDefault(); // '취소'를 누르면 폼 제출(삭제 요청)을 막습니다.
+                }
+            });
         });
+
+        // 💡 Tip: 이전 코드에 있던 'delete-btn-text'의 개별 클릭 이벤트 리스너는 필요 없어요.
+        // HTML에서 해당 버튼의 타입을 'submit'으로 바꾸면, 이 통합 리스너가 알아서 처리해준답니다.
+        // (제가 HTML을 수정할 수 없으니, 일단 버튼 타입을 'submit'으로 바꿨다고 가정하고 코드를 정리했어요!)
+
+
+        // =================================================================
+        // ↩️ 2. '목록으로' 버튼 기능 (개선 버전)
+        // =================================================================
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function(event) {
+                event.preventDefault(); // a 태그의 기본 동작(페이지 이동)을 막습니다.
+
+                // 'document.referrer'는 이 페이지로 오기 직전 페이지의 주소를 알려줍니다.
+                const referrer = document.referrer;
+
+                // ✨ 핵심 개선사항! ✨
+                // 직전 페이지가 '수정창' 또는 '작성창'이었는지 모두 확인합니다.
+                if (referrer.includes('/update-form') || referrer.includes('/save-form')) {
+                    // 수정 또는 작성 후 상세 페이지로 온 경우, '목록' 페이지로 이동시킵니다.
+                    window.location.href = '/resumes';
+                } else {
+                    // 그 외의 경우 (예: 목록 페이지에서 바로 들어온 경우)에는 '뒤로가기'를 실행합니다.
+                    history.back();
+                }
+            });
+        }
     });
-
-    // 🗑️🔥 삭제 실행
-    const deleteBtn = document.getElementById('delete-btn-text');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function () {
-            this.closest('form').submit();
-        });
-    }
-
-    // 📋/↩️ 버튼 로직
-    const backBtn = document.getElementById('back-btn');
-    if (backBtn) {
-        backBtn.addEventListener('click', function(event) {
-            event.preventDefault(); // a 태그 기본동작 막기
-
-            // document.referrer는 직전 페이지 주소 표시
-            const referrer = document.referrer;
-
-            // 직전 페이지가 수정화면(✏️)이었다면?
-            if (referrer.includes('/update-form')) {
-                // 📋목록으로
-                window.location.href = '/resumes';
-            } else {
-                // ↩️아니면 뒤로가기
-                history.back();
-            }
-        });
-    }
 </script>
 
 {{> layout/footer}}

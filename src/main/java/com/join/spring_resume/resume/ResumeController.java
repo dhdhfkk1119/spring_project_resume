@@ -1,5 +1,6 @@
 package com.join.spring_resume.resume;
 
+import com.join.spring_resume._core.common.PageNumberDto;
 import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume._core.errors.exception.Exception404;
@@ -54,59 +55,24 @@ public class ResumeController {
         //pageable 객체 전달
         ResumeResponse.ListDTO listDTO = resumeService.findResumesForList(member.getMemberIdx(), pageable);
 
+        //페이지네이션 데이터 생성
+        PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(listDTO.getResumePage());
+
+        //이력서 카운트
+        long totalCount = listDTO.getResumePage().getTotalElements();
+        if (listDTO.getRepResume() != null) {
+            totalCount++;
+        }
+
         //뷰에 데이터 전달
         model.addAttribute("repResume", listDTO.getRepResume());
         model.addAttribute("resumePage", listDTO.getResumePage());
         model.addAttribute("member", member);
-
-        //❗todo 나중에 PageDTO에 들어갈 내용
-        int currentPage = listDTO.getResumePage().getNumber();
-        int totalPages = listDTO.getResumePage().getTotalPages();
-        int startPage = Math.max(0, currentPage - 2);
-        int endPage = Math.min(totalPages - 1, currentPage + 2);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-        model.addAttribute("prevPage", listDTO.getResumePage().getNumber() - 1);
-        model.addAttribute("nextPage", listDTO.getResumePage().getNumber() + 1);
-        //❗todo 여기까지
+        model.addAttribute("navigation", navigation);
+        model.addAttribute("totalCount", totalCount);
 
         return "resume/list";
     }
-
-
-//    @GetMapping("/resumes")
-//    public String list(Model model) {
-//        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-//        if (sessionUser == null) {
-//            throw  new Exception401("로그인 해주시기 바랍니다");
-//        }
-//
-//        System.out.println("로그인된 사용자 ID: " + sessionUser.getId());
-//        if (sessionUser.getRole() != "MEMBER") {
-//            throw new Exception403("일반 회원만 작성 가능합니다");
-//        }
-//        Member member = memberRepository.findById(sessionUser.getId())
-//                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
-//
-//        //모든 이력서 리스트 호출
-//        List<Resume> resumeList = resumeService.findMyResumes(member.getMemberIdx());
-//
-//        //대표 이력서와 나머지를 분리
-//        Resume repResume = resumeList.stream()
-//                .filter(r -> Boolean.TRUE.equals(r.getIsRep()))
-//                .findFirst()
-//                .orElse(null);
-//
-//        List<Resume> otherResumes = resumeList.stream()
-//                .filter(r -> !Boolean.TRUE.equals(r.getIsRep()))
-//                .collect(Collectors.toList());
-//
-//        model.addAttribute("repResume", repResume);
-//        model.addAttribute("otherResumes", otherResumes);
-//        model.addAttribute("member", member);
-//
-//        return "resume/list";
-//    }
 
     // 일반 회원을 위한 이력서 상세보기
     @GetMapping("/resume/{id}")
