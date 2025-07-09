@@ -56,7 +56,7 @@ public class Resume {
     private Member member;
 
     //career 테이블 가져오기
-    @OrderBy("career_idx")
+    @OrderBy("startAt DESC")
     @OneToMany(mappedBy = "resume",
             fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE)

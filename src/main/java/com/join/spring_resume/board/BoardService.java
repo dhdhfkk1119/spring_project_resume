@@ -60,13 +60,47 @@ public class BoardService {
         return boardRepository.findByMember_MemberIdx(memberIdx, pageable);
     }
 
-    public Page<Board> searchBoards(String keyword, Pageable pageable) {
-        return boardRepository.searchBoards(keyword, pageable);
+    public Page<BoardListResponseDto> searchBoards(String keyword, Pageable pageable) {
+        return boardRepository.searchBoardsByKeyword(keyword, pageable);
     }
+
 
     // 자신이 작성한 게시물에 대한 정보
     public List<Board> findByMemberIdx(Long memberIdx) {
         return boardRepository.findByMember_MemberIdx(memberIdx);
     }
+
+    public Page<BoardListResponseDto> findBoardListByMemberIdx(Long memberIdx, Pageable pageable) {
+        return boardRepository.findBoardListByMemberIdx(memberIdx, pageable);
+    }
+
+    public List<BoardListResponseDto> findBoardsLikedByMember(Member member) {
+        return boardRepository.findBoardsLikedByMember(member.getMemberIdx());
+    }
+
+    public List<BoardListResponseDto> getBoardsCommentedByMember(Member member) {
+        return boardRepository.findBoardsCommentedByMember(member.getMemberIdx());
+    }
+
+    public Page<BoardListResponseDto> getBoardList(String keyword, Pageable pageable) {
+        return boardRepository.findBoardListWithCounts(keyword, pageable);
+    }
+
+    public Page<BoardListResponseDto> searchMyBoards(Long memberIdx, String keyword, Pageable pageable) {
+        return boardRepository.searchMyBoardsByKeyword(memberIdx, keyword, pageable);
+    }
+
+    public Page<BoardListResponseDto> getMyBoards(Long memberIdx, Pageable pageable) {
+        Page<BoardListResponseDto> page = boardRepository.findBoardListByMemberIdx(memberIdx, pageable);
+        page.forEach(boardListResponseDto -> {
+            boardListResponseDto.setAuthor(boardListResponseDto.getMemberIdx().equals(memberIdx));
+        });
+        return page;
+    }
+
+    public Page<BoardListResponseDto> getAllBoards(Pageable pageable) {
+        return boardRepository.findAllBoards(pageable);
+    }
+
 
 }

@@ -1,153 +1,193 @@
 {{> layout/header}}
 
-<div class="container my-5" style="max-with:1200px;">
-    <div class="card shadow-sm">
-        <div class="card-header bg-light py-3">
-            <h2 class="h4 mb-0">{{member.username}}님의 포부를 담은 이력서</h2>
-        </div>
-        <div class="card-body">
-            <form id="save-form" action="/resume/save" method="post">
-                <!-- 이력서 제목 -->
-                <div class="mb-3">
-                    <label for="resumeTitle" class="form-label fw-bold">눈길을 잡아끄는 키워드</label>
-                    <input type="text" class="form-control" id="resumeTitle" name="resumeTitle"
-                           value="눈길을 잡아끄는 키워드를 써보세요" maxlength="50" required>
-                    {{#errors.resumeTitle}}
-                        <div class="text-danger small">{{.}}</div>{{/errors.resumeTitle}}
-                </div>
-                <!-- 이력서 본문 -->
-                <div class="mb-3">
-                    <label for="resumeContent" class="form-label fw-bold">마음을 움직이는 소개글</label>
-                    <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15"
-                              maxlength="5000" required>마음을 움직이는 소개글을 작성해보세요... 예)제가 LA에 있을때는 말이죠 정말 제가 꿈에 무대인 메이저리그로 진출해서 가는 식당마다 싸인해달라 기자들은 항상 붙어다니며 취재하고...</textarea>
-                    {{#errors.resumeContent}}
-                        <div class="text-danger small">{{.}}</div>{{/errors.resumeContent}}
-                </div>
-                <!-- 대표 이력서 설정 체크박스 -->
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="isRep" id="isRep" value="true"
-                           {{#resume.isRep}}checked{{/resume.isRep}}>
-                    <label class="form-check-label" for="isRep">
-                        이 이력서를 내 대표 이력서로 설정할게요
-                    </label>
-                </div>
+<style>
+    /* 화면 너비가 767.98px 이하일 때 (Bootstrap의 md 분기점) 적용될 스타일 */
+    @media (max-width: 767.98px) {
+        i.fs-5 {
+            font-size: 1rem !important;
+        }
+    }
+</style>
 
-                <hr>
-
-                <h4>경력 정보</h4>
-                <div id="career-container">
-                    <!-- 경력 입력 필드 -->
+<div class="wrapper">
+    <div class="content">
+        <div class="container my-5" style="max-with:1200px;">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light py-3">
+                    <h2 class="text-truncate h4 mb-0">{{member.username}}님의 포부를 담은 이력서</h2>
                 </div>
-                <button type="button" id="add-career-btn" class="btn btn-outline-secondary">경력 추가</button>
+                <div class="card-body">
+                    <form id="save-form" action="/resume/save" method="post">
+                        <!-- 이력서 제목 -->
+                        <div class="mb-3">
+                            <label for="resumeTitle" class="form-label fw-bold">제목, 눈길을 잡아끄는 키워드를 작성해주세요</label>
+                            <input type="text" class="form-control" id="resumeTitle" name="resumeTitle"
+                                   value="눈길을 잡아끄는 키워드를 써보세요" maxlength="50" required>
+                            {{#errors.resumeTitle}}
+                                <div class="text-danger small">{{.}}</div>{{/errors.resumeTitle}}
+                        </div>
+                        <!-- 이력서 본문 -->
+                        <div class="mb-3">
+                            <label for="resumeContent" class="form-label fw-bold">내용, 마음을 움직이는 소개글을 작성해주세요</label>
+                            <textarea class="form-control" id="resumeContent" name="resumeContent" rows="15"
+                                      maxlength="5000" required>마음을 움직이는 소개글을 작성해보세요... 예)제가 LA에 있을때는 말이죠 정말 제가 꿈에 무대인 메이저리그로 진출해서 가는 식당마다 싸인해달라 기자들은 항상 붙어다니며 취재하고...</textarea>
+                            {{#errors.resumeContent}}
+                                <div class="text-danger small">{{.}}</div>{{/errors.resumeContent}}
+                        </div>
+                        <!-- 대표 이력서 설정 체크박스 -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="isRep" id="isRep" value="true"
+                                   title="대표 이력서로 설정">
+                            <label class="text-truncate d-inline-block mw-100 form-check-label" for="isRep">
+                                이 이력서를 내 대표 이력서로 설정할게요
+                            </label>
+                        </div>
 
-                <hr>
-                <div class="d-flex justify-content-end">
-                    <a href="/resumes" class="btn btn-outline-secondary me-2">취소</a>
-                    <button type="submit" id="submit-btn" class="btn btn-outline-primary">저장하기</button>
+                        <hr>
+
+                        <h4>경력 정보</h4>
+                        <div id="career-container">
+                            <!-- 경력 입력 필드 -->
+                        </div>
+                        <button type="button" id="add-career-btn" class="btn btn-outline-secondary">경력 추가</button>
+
+                        <hr>
+                        <div class="d-flex justify-content-end">
+                            <a href="/resumes" class="btn btn-outline-secondary me-2">취소</a>
+                            <button type="submit" id="submit-btn" class="btn btn-outline-primary">저장하기</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // 경력 정보 동적 추가/삭제 스크립트
+    // 📄 이 페이지의 모든 자바스크립트 코드는 HTML 문서가 완전히 로드된 후에 실행됩니다.
     document.addEventListener('DOMContentLoaded', function () {
-        const careerContainer = document.getElementById('career-container');
-        const addCareerBtn = document.getElementById('add-career-btn');
-        let careerIndex = 0; // 각 경력 필드를 구분하기 위한 인덱스
 
-        // 날짜 입력을 위한 flatpickr 초기화 함수
-        function initializeFlatpickr(element) {
-            flatpickr(element, {
-                dateFormat: "Y-m-d", // 날짜 형식 지정 (YYYY-MM-DD)
-                locale: "ko" // 한글 지원 (CDN 추가 필요 시)
-            });
-        }
+        // =================================================================
+        // 🚀 1. 초기 설정 및 변수 선언
+        // =================================================================
+        const elements = {
+            saveForm: document.getElementById('save-form'),                 // 저장 내용 전체를 감싸는 폼
+            careerContainer: document.getElementById('career-container'),  // 경력 목록을 감싸는 영역
+            addCareerBtn: document.getElementById('add-career-btn'),       // '경력 추가' 버튼
+            submitBtn: document.getElementById('submit-btn')               // '저장하기' 버튼
+        };
 
-        addCareerBtn.addEventListener('click', function () {
-            const careerDiv = document.createElement('div');
-            careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light');
-            // name 속성의 careers[index].fieldName 형태는 Spring Boot가 List<DTO>로 데이터를 바인딩할 수 있게 해줍니다.
-            careerDiv.innerHTML = `
-                <div class="row">
-                    <div class="col-md-11">
+        // 새로 추가될 경력 항목의 인덱스(순번)를 관리할 변수입니다.
+        let careerIndex = 0;
+
+
+        // =================================================================
+        // 🛠️ 2. 재사용을 위한 헬퍼(Helper) 함수
+        // =================================================================
+
+        /**
+         * 📄 (함수) 새 경력 입력 폼 HTML 생성
+         */
+        function createCareerItemHTML(index) {
+            return `
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1" style="min-width: 0;">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${careerIndex}].corpName" class="form-control"
-                             value="좋좋소"
-                             maxlength="50" required>
+                            <input type="text" name="careers[${index}].corpName" class="form-control" value="좋좋소" maxlength="50" required>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
-                            <input type="text" name="careers[${careerIndex}].position" class="form-control"
-                             value="과장대리"
-                             maxlength="50">
+                            <input type="text" name="careers[${index}].position" class="form-control" value="과장대리" maxlength="50">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
-                            <input type="text" name="careers[${careerIndex}].careerContent" class="form-control"
-                             value="복사와 커피타기"
-                             maxlength="500" required>
+                            <textarea name="careers[${index}].careerContent" class="form-control" rows="3" maxlength="500" required>복사와 커피타기, 그리고 사장님 수발들기</textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">입사일</label>
-                                <input type="date" name="careers[${careerIndex}].startAt" class="form-control"
-                                value="2022-02-22">
+                                <input type="date" name="careers[${index}].startAt" class="form-control">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">퇴사일</label>
-                                <input type="date" name="careers[${careerIndex}].endAt" class="form-control"
-                                value="2022-02-22">
+                                <input type="date" name="careers[${index}].endAt" class="form-control">
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-1 d-flex align-items-center justify-content-center">
-                        <button type="submit" class="btn btn-link p-0" title="삭제하기" style="color: Tomato;">
+                    <div class="flex-shrink-0 ms-3">
+                        <button type="button" class="btn btn-link p-0 remove-career-btn" title="삭제하기" style="color: Tomato;">
                             <i class="fa-solid fa-trash fs-5"></i>
                         </button>
                     </div>
                 </div>
             `;
-            careerContainer.appendChild(careerDiv);
+        }
 
-            // 날짜 input에 flatpickr 적용
+        /**
+         * 📅 (함수) 날짜 선택기(flatpickr) 초기화
+         */
+        function initializeFlatpickr(element) {
+            flatpickr(element, {
+                dateFormat: "Y-m-d",
+                locale: "ko"
+            });
+        }
+
+
+        // =================================================================
+        // 👂 3. 사용자 행동 감지 (이벤트 리스너)
+        // =================================================================
+
+        // ➕ (이벤트) '경력 추가' 버튼 클릭
+        elements.addCareerBtn.addEventListener('click', function () {
+            const careerDiv = document.createElement('div');
+            careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light', 'career-item');
+            careerDiv.innerHTML = createCareerItemHTML(careerIndex);
+            elements.careerContainer.appendChild(careerDiv);
+
             const newDateInputs = careerDiv.querySelectorAll('input[type="date"]');
             newDateInputs.forEach(initializeFlatpickr);
+
+            // ✨ UX 개선! ✨
+            careerDiv.scrollIntoView({behavior: 'smooth', block: 'center'});
+            const firstInput = careerDiv.querySelector('input[type="text"]');
+            if (firstInput) {
+                firstInput.focus();
+            }
 
             careerIndex++;
         });
 
-
-
-        // '삭제' 버튼에 대한 이벤트 리스너 (이벤트 위임 사용)
-        careerContainer.addEventListener('click', function (e) {
-            if (e.target && e.target.classList.contains('remove-career-btn')) {
-                // 가장 가까운 .card 요소를 찾아 삭제합니다.
-                e.target.closest('.card').remove();
-            }
-        });
-    });
-
-    //빈 경력 폼을 제거, 유효성 검사, 불필요한 데이터 전송 방지
-    const saveForm = document.getElementById('save-form');
-    const submitBtn = document.getElementById('submit-btn');
-    submitBtn.addEventListener('click', function() {
-        const newCareerItems = document.querySelectorAll('.card.my-3'); // 새로 추가된 경력 아이템
-        newCareerItems.forEach(item => {
-            const corpNameInput = item.querySelector('input[name*="corpName"]');
-            // 회사명이 비어있으면 해당 경력 폼 자체를 삭제
-            if (corpNameInput && corpNameInput.value.trim() === '') {
-                item.remove();
+        // 💥 (이벤트) 개별 경력 항목 삭제
+        elements.careerContainer.addEventListener('click', function (e) {
+            const removeBtn = e.target.closest('.remove-career-btn');
+            if (removeBtn) {
+                // '저장' 폼에서는 서버에 데이터가 없으므로, 화면에서 바로 삭제하면 됩니다.
+                removeBtn.closest('.career-item').remove();
             }
         });
 
-        if (saveForm.checkValidity()) {
-            saveForm.submit();
-        } else {
-            saveForm.reportValidity(); // 유효하지 않은 필드에 브라우저 기본 경고창 표시
-        }
+        // 💾 (이벤트) '저장하기' 버튼 클릭
+        // 'submit' 타입 버튼은 폼의 'submit' 이벤트를 발생시키므로, 버튼 클릭 대신 폼 제출 이벤트를 감지하는 것이 더 안정적입니다.
+        elements.saveForm.addEventListener('submit', function (e) {
+            // 1. [정리 작업] '경력 추가'만 누르고 내용을 비운 폼이 있다면 자동으로 제거합니다.
+            const newCareerItems = document.querySelectorAll('.career-item');
+            newCareerItems.forEach(item => {
+                const corpNameInput = item.querySelector('input[name*="corpName"]');
+                if (corpNameInput && corpNameInput.value.trim() === '') {
+                    item.remove();
+                }
+            });
+
+            // 2. [유효성 검사] 폼의 유효성을 검사합니다.
+            if (!elements.saveForm.checkValidity()) {
+                // 유효하지 않으면, 기본 제출 동작을 막고 사용자에게 알림을 표시합니다.
+                e.preventDefault();
+                elements.saveForm.reportValidity();
+            }
+            // 유효하면, 폼은 정상적으로 제출됩니다.
+        });
     });
 </script>
 

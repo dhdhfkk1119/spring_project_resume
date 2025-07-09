@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
+@Entity(name = "LikeEntity")
 @Table(name = "likes", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"member_id", "board_id"})
 })
@@ -25,4 +25,8 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
+
+
+    @Column(nullable = false)
+    private boolean likeYn = true;
 }
