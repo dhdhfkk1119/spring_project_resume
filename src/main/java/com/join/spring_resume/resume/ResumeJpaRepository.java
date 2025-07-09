@@ -1,6 +1,8 @@
 package com.join.spring_resume.resume;
 
 import com.join.spring_resume.member.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +19,6 @@ public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
             "WHERE r.member.memberIdx = :memberIdx ORDER BY r.resumeIdx DESC")
     List<Resume> findAllByMemberIdx(@Param("memberIdx") Long memberIdx);
 
-
     //이력서 단건조회
     @Query("SELECT r FROM Resume r LEFT JOIN FETCH r.careerList WHERE r.resumeIdx = :resumeIdx")
     Optional<Resume> findByIdWithCareers(@Param("resumeIdx") Long resumeIdx);
@@ -27,8 +28,17 @@ public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
     @Query("UPDATE Resume r SET r.isRep = false WHERE r.member.memberIdx = :memberIdx")
     void resetAllIsRepByMemberIdx(@Param("memberIdx") Long memberIdx);
 
+    //member로 대표이력서 조회
     @Query("SELECT r FROM Resume r WHERE r.member = :member AND r.isRep = true")
     Optional<Resume> findRepresentativeResumeByMember(@Param("member") Member member);
 
+    //memberIdx로 대표이력서 조회
+    @Query("SELECT r FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = true")
+    Optional<Resume> findRepresentativeResumeByMemberIdx(@Param("memberIdx") Long memberIdx);
+
+    // 📚 페이징 메서드 ( 일반 이력서 조회 / 조회된 이력서 카운트)
+    @Query(value = "SELECT r FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = false ORDER BY r.resumeIdx DESC",
+            countQuery = "SELECT count(r) FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = false")
+    Page<Resume> findByMemberIdxAndIsRepFalse(@Param("memberIdx") Long memberIdx, Pageable pageable);
 }
 
