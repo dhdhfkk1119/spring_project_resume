@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 public class CorpRequest {
 
@@ -55,15 +56,14 @@ public class CorpRequest {
         private String corpId;
         @NotBlank(message = "비밀번호를 입력해주시기 바랍니다")
         private String password;
+    }
 
-        // 유혀성 검사
-        public void validate() {
-            if(corpId == null || corpId.trim().isEmpty()){
-                throw new IllegalArgumentException("사용자명 입력해");
-            }
-            if(password == null || password.trim().isEmpty()){
-                throw new IllegalArgumentException("비밀번호 입력해");
-            }
-        }
+    @Data
+    // 로그인 용 DTO
+    public static class UpdateDTO{
+
+        private String corpName;
+        private MultipartFile corpImage; // 이미지 파일 multipartFile로 받음
+
     }
 }

@@ -11,6 +11,7 @@ import com.join.spring_resume.corp.Corp;
 import com.join.spring_resume.corp.CorpService;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberService;
+import com.join.spring_resume.recruit_like.RecruitLikeService;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -37,7 +38,7 @@ public class RecruitController {
 
     private final RecruitService recruitService;
     private final CorpService corpService;
-    private final MemberService memberService;
+    private final RecruitLikeService recruitLikeService;
     private final ApplyService applyService;
     private final ApplyRepository applyRepository;
 
@@ -198,9 +199,12 @@ public class RecruitController {
         model.addAttribute("recruit", recruit);
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
-        if (sessionUser != null) {
+
+        if (sessionUser != null && "MEMBER".equals(sessionUser.getRole())) {
             boolean isApplied = applyService.isAppliedCheck(sessionUser.getId(), idx);
+            boolean isLiked = recruitLikeService.isCheckLike(sessionUser.getId(), idx);
             model.addAttribute("isApplied", isApplied);
+            model.addAttribute("isLiked", isLiked);
         }
 
         return "recruit/recruit-detail";

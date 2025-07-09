@@ -50,4 +50,5 @@ public class Member {
         return DateUtil.timestampFormat(this.createdAt);
     }
 
+    private String memberImage = "basic.png";
 }

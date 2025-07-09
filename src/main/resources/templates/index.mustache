@@ -1,60 +1,122 @@
 {{> layout/header}}
 <style>
-    .action-buttons {
-        display: none;
-        position: absolute;
-        top: 30px;
-        right: 5px;
-        background-color: white;
-        border: 1px solid #ddd;
-        padding: 5px 10px;
-        border-radius: 6px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        z-index: 100;
-    }
+.action-buttons {
+display: none;
+position: absolute;
+top: 30px;
+right: 5px;
+background-color: white;
+border: 1px solid #ddd;
+padding: 5px 10px;
+border-radius: 6px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+z-index: 100;
+}
 
-    .action-buttons button {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        background: none;
-        border: none;
-        padding: 5px 8px;
-        cursor: pointer;
-        width: 100%;
-        text-align: left;
-    }
+.action-buttons button {
+display: flex;
+align-items: center;
+gap: 5px;
+background: none;
+border: none;
+padding: 5px 8px;
+cursor: pointer;
+width: 100%;
+text-align: left;
+}
 
-    .action-buttons button:hover {
-        background-color: #f5f5f5;
-    }
+.action-buttons button:hover {
+background-color: #f5f5f5;
+}
 
-    .action-buttons .delete:hover {
-        color: red;
-    }
+.action-buttons .delete:hover {
+color: red;
+}
 
-    @media (max-width: 768px) {
-        .card-body {
-            flex-direction: column;
-        }
+@media (max-width: 768px) {
+.card-body {
+    flex-direction: column;
+}
 
-        .card-body .w-75,
-        .card-body .w-25 {
-            width: 100% !important;
-        }
+.card-body .w-75,
+.card-body .w-25 {
+    width: 100% !important;
+}
 
-        .action-buttons {
-            right: 10px;
-        }
-    }
-    .custom-gray {
-        color: #373f57;
-        font-size:12px;
-    }
-    .custom-bold {
-        font-size : 16px;
-        font-weight:700;
-    }
+.action-buttons {
+    right: 10px;
+}
+}
+
+.custom-gray {
+color: #373f57;
+font-size:12px;
+}
+
+.custom-bold {
+font-size: 16px;
+font-weight: 700;
+}
+
+.company-logo-wrapper {
+position: relative;
+width: 200px;
+height: 120px;
+overflow: hidden;
+border: 2px solid #ddd;
+border-radius: 8px;
+}
+
+.company-logo-wrapper img {
+width: 100%;
+height: 100%;
+object-fit: cover; /* 이미지를 자르면서 크기를 맞추기 */
+}
+
+.company-name {
+position: absolute;
+bottom: 10px;
+left: 50%;
+transform: translateX(-50%);
+font-weight: bold;
+color: #373f57;
+background: rgba(255, 255, 255, 0.7);
+padding: 5px;
+border-radius: 5px;
+}
+
+.ellipsis-multiline {
+display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+overflow: hidden;
+}
+
+.custom-bold {
+font-size: 0.95rem;
+font-weight: 600;
+}
+
+.custom-hover .card {
+transition: all 0.3s ease-in-out;
+border-radius: 12px;
+overflow: hidden;
+}
+
+.custom-hover .card:hover {
+transform: scale(1.03);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+background-color: #fafafa;
+}
+
+/* 이미지도 부드럽게 반응하도록 */
+.custom-hover .card-img-top {
+transition: transform 0.3s ease;
+}
+
+.custom-hover .card:hover .card-img-top {
+transform: scale(1.05);
+}
 </style>
 
 <script>
@@ -72,98 +134,125 @@
         });
     });
 </script>
-<div class="container p-5">
-    <div id="recruit-list">
-        {{#recruitList.content}}
-            <div class="card mb-3 position-relative">
-                <div class="card-body d-flex flex-wrap">
-                    <!-- 왼쪽 공고 정보 -->
-                    <div class="w-75 overflow-hidden">
-                        <div class="d-flex align-items-center flex-wrap gap-2">
-                            <a href="/recruit/{{recruitIdx}}" class="recruit-link fw-bold text-truncate d-inline-block ">{{recruitTitle}}</a>
-                            <span class="custom-gray">~ {{endAtFormatted}} (월)</span>
-                        </div>
+<div class="wrapper">
+    <div class="content">
+        <div class="container p-5">
+            <div class="row" id="recruit-list">
+                {{#recruitList.content}}
+                    <div class="col-12 col-md-6 col-lg-3 mb-4 custom-hover">
+                        <div class="card h-100 shadow-sm">
+                            <!-- 기업 로고 -->
+                            <img src="/corp-images/{{corp.corpImage}}" class="card-img-top p-3" alt="기업 로고" style="height: 120px; object-fit: contain;">
 
-                        <div class="mb-2 custom-gray">
-                            <span>{{area}} *</span>
-                            <span>{{career}} *</span>
-                            <span>{{education}} *</span>
-                            <span>{{workType}}</span>
-                        </div>
+                            <div class="card-body d-flex flex-column">
+                                <!-- 기업명 + 마감일 -->
+                                <div class="d-flex mb-2">
+                                    <span class="fw-bold text-truncate">[ {{corp.corpName}} ]</span>
+                                    <span class="text-muted small">~ {{endAtFormatted}} (월)</span>
+                                </div>
 
-                        <div>
-                            <span class="custom-bold ellipsis-multiline ">{{recruitContent}}</span>
+                                <!-- 조건들 -->
+                                <div class="mb-2 text-muted" style="font-size: 0.85rem;">
+                                    <span>{{area}} *</span>
+                                    <span>{{career}} *</span>
+                                    <span>{{education}} *</span>
+                                    <span>{{workType}}</span>
+                                </div>
+
+                                <!-- 공고 내용 -->
+                                <div class="flex-grow-1">
+                                    <span class="custom-bold ellipsis-multiline">{{recruitContent}}</span>
+                                </div>
+
+                                <!-- 상세보기 링크 -->
+                                <div class="mt-3 text-end">
+                                    <a href="/recruit/{{recruitIdx}}" class="btn btn-sm btn-outline-primary">자세히 보기</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="d-flex w-25 align-items-center position-relative">
-                        <span class="fw-bold">{{corp.corpName}}</span>
-                    </div>
-                </div>
+                {{/recruitList.content}}
             </div>
-        {{/recruitList.content}}
+
+            <ul class="pagination d-flex justify-content-center">
+                <li class="page-item">
+                    <button id="loadMoreBtn" data-page="1">공고 더보기</button>
+                </li>
+            </ul>
+        </div>
     </div>
-    <ul class="pagination d-flex justify-content-center">
-        <li class="page-item">
-            <button id="loadMoreBtn" data-page="1">공고 더보기</button>
-        </li>
-    </ul>
 </div>
 
 {{> layout/footer}}
 <!-- 공고 더보기 누를시에 실시간으로 데이터 보여주기 ajax fetch 사용-->
 <script>
 
-    const loadMoreBtn = document.getElementById('loadMoreBtn');
-    const recruitList = document.getElementById('recruit-list');
+    function toggleActions(id) {
+        const box = document.getElementById('action-box-' + id);
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
 
-    loadMoreBtn.addEventListener('click', () => {
-        const page = parseInt(loadMoreBtn.getAttribute('data-page'));
-        const size = 5;
-
-        fetch(`/api/recruits?page=${page}&size=${size}`)
-            .then(res => res.json())
-            .then(data => {
-                data.content.forEach(recruit => {
-                    const div = document.createElement('div');
-                    div.className = "card mb-3 position-relative";
-                    div.innerHTML = `
-                        <div class="card-body d-flex flex-wrap">
-                            <div class="w-75 overflow-hidden">
-                                <div class="d-flex align-items-center flex-wrap gap-2">
-                                    <a href="/recruit/${recruit.recruitIdx}" class="recruit-link fw-bold text-truncate d-inline-block">
-                                        ${recruit.recruitTitle}
-                                    </a>
-                                    <span class="custom-gray">~ ${recruit.endAtFormatted} (월)</span>
-                                </div>
-                                <div class="mb-2 custom-gray">
-                                    <span>${recruit.area} *</span>
-                                    <span>${recruit.career} *</span>
-                                    <span>${recruit.education} *</span>
-                                    <span>${recruit.workType}</span>
-                                </div>
-                                <div>
-                                    <span class="custom-bold ellipsis-multiline">${recruit.recruitContent}</span>
-                                </div>
-                            </div>
-                            <div class="d-flex w-25 align-items-center position-relative">
-                                <span class="fw-bold">${recruit.corp.corpName}</span>
-                            </div>
-                        </div>
-                    `;
-                    recruitList.appendChild(div);
-                });
-
-                // 페이지 증가
-                loadMoreBtn.setAttribute('data-page', page + 1);
-
-                // 마지막 페이지면 버튼 숨김
-                if (page + 1 >= data.totalPages) {
-                    loadMoreBtn.style.display = 'none';
-                }
-
-                // 부드럽게 스크롤 다운
-                loadMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            });
+    // 바깥 클릭 시 닫기
+    window.addEventListener('click', function(e) {
+        document.querySelectorAll('.action-buttons').forEach(box => {
+            if (!box.contains(e.target) && !e.target.closest('.gear-btn')) {
+                box.style.display = 'none';
+            }
+        });
     });
+
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const recruitList = document.getElementById('recruit-list');
+
+loadMoreBtn.addEventListener('click', () => {
+    const page = parseInt(loadMoreBtn.getAttribute('data-page'));
+    const size = 4;
+
+    fetch(`/api/recruits?page=${page}&size=${size}`)
+        .then(res => res.json())
+        .then(data => {
+            data.content.forEach(recruit => {
+    const col = document.createElement('div');
+    col.className = "col-12 col-md-6 col-lg-3 mb-4 custom-hover";
+
+    col.innerHTML = `
+        <div class="card h-100 shadow-sm">
+            <img src="/corp-images/${recruit.corp.corpImage}" class="card-img-top p-3" alt="기업 로고" style="height: 120px; object-fit: contain;">
+
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex mb-2">
+                    <span class="fw-bold text-truncate">[ ${recruit.corp.corpName} ]</span>
+                    <span class="text-muted small">~ ${recruit.endAtFormatted} (월)</span>
+                </div>
+                <div class="mb-2 text-muted" style="font-size: 0.85rem;">
+                    <span>${recruit.area} *</span>
+                    <span>${recruit.career} *</span>
+                    <span>${recruit.education} *</span>
+                    <span>${recruit.workType}</span>
+                </div>
+                <div class="flex-grow-1">
+                    <span class="custom-bold ellipsis-multiline">${recruit.recruitContent}</span>
+                </div>
+                <div class="mt-3 text-end">
+                    <a href="/recruit/${recruit.recruitIdx}" class="btn btn-sm btn-outline-primary">자세히 보기</a>
+                </div>
+            </div>
+        </div>
+    `;
+
+    recruitList.appendChild(col);
+});
+
+            // 페이지 증가
+            loadMoreBtn.setAttribute('data-page', page + 1);
+
+            // 마지막 페이지면 버튼 숨김
+            if (page + 1 >= data.totalPages) {
+                loadMoreBtn.style.display = 'none';
+            }
+
+            // 부드럽게 스크롤 다운
+            loadMoreBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        });
+});
 </script>

@@ -9,11 +9,14 @@ public class CorpResponse {
     public static class CorpDTO {
         private Long corpIdx;
         private String corpName;
+        private String corpImage;
 
         public static CorpDTO fromEntity(Corp corp) {
             return new CorpDTO(
                     corp.getCorpIdx(),
-                    corp.getCorpName()
+                    corp.getCorpName(),
+                    corp.getCorpImage()
+
             );
         }
     }

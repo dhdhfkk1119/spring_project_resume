@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -90,5 +91,14 @@ public class MemberRequest {
         @NotBlank(message = "비밀번호를 입력해 주시기 바랍니다")
         private String password;
         
+    }
+
+    @Data
+    // 로그인 용 DTO
+    public static class UpdateDTO{
+
+        private String username;
+        private MultipartFile memberImage;
+
     }
 }

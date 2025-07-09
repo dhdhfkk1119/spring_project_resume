@@ -5,6 +5,10 @@ import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.apply.ApplyService;
 import com.join.spring_resume.board.BoardRepository;
 import com.join.spring_resume.board.BoardService;
+import com.join.spring_resume.corp.Corp;
+import com.join.spring_resume.corp.CorpService;
+import com.join.spring_resume.member.Member;
+import com.join.spring_resume.member.MemberService;
 import com.join.spring_resume.recruit.Recruit;
 import com.join.spring_resume.recruit.RecruitRepository;
 import com.join.spring_resume.recruit.RecruitResponse;
@@ -33,12 +37,13 @@ public class MainController {
     private final ApplyService applyService;
     private final ResumeService resumeService;
     private final BoardService boardService;
-
+    private final CorpService corpService;
+    private final MemberService memberService;
 
     @GetMapping("/")
     public String index(Model model, HttpSession httpSession) {
 
-        Pageable pageable = PageRequest.of(0, 5);
+        Pageable pageable = PageRequest.of(0, 8);
         Page<Recruit> recruitList = recruitService.findAllList(pageable);
         RecruitResponse.RecruitPageDTO recruitPageDTO = RecruitResponse.RecruitPageDTO.fromPage(recruitList);
 
@@ -83,10 +88,12 @@ public class MainController {
         int resumeCount = resumeService.findMyResumes(sessionUser.getId()).size(); // 이력서 등록 갯수
         int recruitCount = applyService.MyApplyList(sessionUser.getId()).size(); // 공고 등록 갯수 가져오기
         int boardCount = boardService.findByMemberIdx(sessionUser.getId()).size();// 게시물 작성 갯수 가져오기
+        Member member = memberService.findById(sessionUser.getId());
 
         model.addAttribute("resumeCount",resumeCount);
         model.addAttribute("recruitCount",recruitCount);
         model.addAttribute("boardCount",boardCount);
+        model.addAttribute("member",member);
         return "page/member-page";
     }
 
@@ -101,12 +108,14 @@ public class MainController {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
 
-        if(sessionUser.getRole() != "CORP"){
-            throw new Exception403("기업 회원만 접근할수있습니다");
+        if (!"CORP".equals(sessionUser.getRole())) {
+            throw new Exception403("기업 회원만 접근할 수 있습니다");
         }
 
+        Corp corp = corpService.findById(sessionUser.getId());
         Long recruitCount = recruitService.countByRecruit(sessionUser.getId());
         model.addAttribute("recruitCount",recruitCount);
+        model.addAttribute("corp",corp);
 
         return "page/corp-page";
     }

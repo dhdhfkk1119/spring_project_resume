@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 // 모든 컨트롤러에서 발생하는 예외 처리를 이 클래스에 서 처리한다
 // RuntimeException 발생하면 해당 파일로 예외 처리가 집중 됨
@@ -20,17 +22,6 @@ public class MyExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(MyExceptionHandler.class);
 
 
-
-
-    @ExceptionHandler(Exception500.class)
-    public String ex500(Exception500 e, HttpServletRequest request) {
-        log.warn(" === 500 ServerError 에러 발생 === ");
-        log.warn(" === 요청 URL : {} " , request.getRequestURL());
-        log.warn("인증 오류 : {}" ,e.getMessage());
-        log.warn("User-Agent : {}" , request.getHeader("User-Agent"));
-        request.setAttribute("msg",e.getMessage());
-        return "err/500";
-    }
 
 //    @ExceptionHandler(RuntimeException.class)
 //    public String RuntimeExceptionHandler(RuntimeException e, HttpServletRequest request) {
@@ -84,6 +75,28 @@ public class MyExceptionHandler {
         String script = "<script> alert('" + e.getMessage()+ "'); location.href='/'; </script>";
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.TEXT_HTML)
+                .body(script);
+    }
+
+    // 오류 발생시 메인 페이지로 이동
+    @ExceptionHandler(Exception500.class)
+    @ResponseBody // 데이터를 반환 함
+    public ResponseEntity<String> ex500(Exception500 e , HttpServletRequest request) {
+        String script = "<script> alert('" + e.getMessage()+ "'); location.href='/'; </script>";
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.TEXT_HTML)
+                .body(script);
+    }
+
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseBody
+    public ResponseEntity<String> handleMaxSizeException(HttpServletRequest request) {
+        String script = "<script>alert('파일 크기가 너무 큽니다. 최대 5MB까지 업로드 가능합니다.'); history.back();</script>";
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.TEXT_HTML)
                 .body(script);
     }

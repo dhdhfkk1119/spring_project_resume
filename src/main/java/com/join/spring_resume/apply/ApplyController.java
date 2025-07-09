@@ -47,7 +47,7 @@ public class ApplyController {
             throw new Exception403("일반 회원만 접근 가능합니다");
         }
 
-        Member member = memberService.findById(sessionUser.getUserId()); // 현재 로그인 한 유저 정보 찾기
+        Member member = memberService.findById(sessionUser.getId()); // 현재 로그인 한 유저 정보 찾기
         Recruit recruit = recruitService.findById(idx); // 현재 공고 번호 가져오기 
         Resume resume = resumeService.findIdMyResumes(member); // 이력서에서 대표이력서 있는지 체크
         applyService.applySave(saveDTO, recruit, resume);
