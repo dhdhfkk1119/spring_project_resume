@@ -86,32 +86,34 @@
         // =================================================================
 
         /**
-         * 📄 (함수) 새 경력 입력 폼 HTML 생성
-         */
+        * 📄 (함수) 새 경력 입력 폼 HTML 생성
+        */
         function createCareerItemHTML(index) {
             return `
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1" style="min-width: 0;">
                         <div class="mb-2">
                             <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${index}].corpName" class="form-control" value="좋좋소" maxlength="50" required>
+                            <input type="text" name="careers[${index}].corpName" class="form-control" value="테스트 회사" maxlength="50" required>
                         </div>
                         <div class="mb-2">
                             <label class="form-label">직책</label>
-                            <input type="text" name="careers[${index}].position" class="form-control" value="과장대리" maxlength="50">
+                            <input type="text" name="careers[${index}].position" class="form-control" value="테스트 직책" maxlength="50">
                         </div>
                         <div class="mb-2">
                             <label class="form-label">담당 업무</label>
-                            <textarea name="careers[${index}].careerContent" class="form-control" rows="3" maxlength="500" required>복사와 커피타기, 그리고 사장님 수발들기</textarea>
+                            <textarea name="careers[${index}].careerContent" class="form-control" rows="3" maxlength="500" required>테스트용 경력 내용입니다. 이 내용은 폼 제출 시 함께 전송됩니다.</textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">입사일</label>
-                                <input type="date" name="careers[${index}].startAt" class="form-control">
+                                <!--✨ YYYY-MM-DD 형식으로 날짜 기본값 추가-->
+                                <input type="date" name="careers[${index}].startAt" class="form-control" value="2022-03-01">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">퇴사일</label>
-                                <input type="date" name="careers[${index}].endAt" class="form-control">
+                                <!--✨ YYYY-MM-DD 형식으로 날짜 기본값 추가-->
+                                <input type="date" name="careers[${index}].endAt" class="form-control" value="2024-02-28">
                             </div>
                         </div>
                     </div>

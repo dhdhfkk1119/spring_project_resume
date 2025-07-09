@@ -1,7 +1,7 @@
 {{> layout/header}}
 
 <style>
-    /* 화면 너비가 767.98px 이하일 때 (Bootstrap의 md 분기점) 적용될 스타일 */
+    /* 📱 화면 너비가 767.98px 이하일 때 (Bootstrap의 md 분기점) 적용될 스타일 */
     @media (max-width: 767.98px) {
         i.fs-5 {
             font-size: 1rem !important;
@@ -12,6 +12,7 @@
 <div class="wrapper">
     <div class="content">
         <div class="container my-5" style="max-width: 1200px;">
+            <!-- 📄 페이지 헤더: 제목과 '새 이력서' 버튼 -->
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <h2 class="text-truncate h3 text-muted"
                     title="{{member.username}}님의 이력서 목록입니다. 모두 {{totalCount}}개의 이력서가 있습니다.">
@@ -24,6 +25,7 @@
             </div>
             <hr>
 
+            <!-- 👑 대표 이력서가 있을 경우, 특별하게 상단에 표시하는 섹션 -->
             {{#repResume}}
                 <div class="card border-primary shadow-sm mt-3 mb-3">
                     <div class="card-body">
@@ -37,15 +39,17 @@
                             </div>
                             <div class="flex-shrink-0 ms-3">
                                 <div class="d-flex align-items-center gap-3">
-                            <span class="badge text-primary p-0 fs-5" title="대표 이력서입니다.">
-                                <i class="fa-solid fa-trophy"></i>
-                                <span class="d-none d-md-inline"> 대표 이력서</span>
-                            </span>
+                                    <span class="badge text-primary p-0 fs-5" title="대표 이력서입니다.">
+                                        <i class="fa-solid fa-trophy"></i>
+                                        <span class="d-none d-md-inline"> 대표 이력서</span>
+                                    </span>
                                     <a href="/resume/{{resumeIdx}}/update-form" class="text-primary" title="수정하기">
                                         <i class="fa-solid fa-pen-to-square fs-5"></i>
                                     </a>
+
+                                    <!-- ✨ [핵심] 삭제 폼에 이력서 제목을 data 속성으로 저장 -->
                                     <form action="/resume/{{resumeIdx}}/delete" method="post"
-                                          class="delete-form d-inline">
+                                          class="delete-form d-inline" data-resume-title="{{resumeTitle}}">
                                         <button type="submit" class="btn btn-link p-0" title="삭제하기"
                                                 style="color: Tomato !important;">
                                             <i class="fa-solid fa-trash fs-5"></i>
@@ -58,6 +62,7 @@
                 </div>
             {{/repResume}}
 
+            <!-- 📃 일반 이력서 목록을 표시하는 섹션 -->
             <div class="row row-cols-1 gy-3">
                 {{#resumePage.content}}
                     <hr class="mt-3 mb-0">
@@ -76,8 +81,9 @@
                                     </div>
                                     <div class="flex-shrink-0 ms-3">
                                         <div class="d-flex align-items-center gap-3">
+                                            <!-- ✨ [핵심] 대표 설정 폼에 이력서 제목을 data 속성으로 저장 -->
                                             <form action="/resume/{{resumeIdx}}/set-rep" method="post"
-                                                  class="set-rep-form d-inline">
+                                                  class="set-rep-form d-inline" data-resume-title="{{resumeTitle}}">
                                                 <button type="submit" class="btn btn-link text-primary p-0"
                                                         title="대표 이력서로 설정">
                                                     <i class="fa-regular fa-star fs-5"></i>
@@ -87,8 +93,9 @@
                                                title="수정하기">
                                                 <i class="fa-solid fa-pen-to-square fs-5"></i>
                                             </a>
+                                            <!-- ✨ [핵심] 삭제 폼에 이력서 제목을 data 속성으로 저장 -->
                                             <form action="/resume/{{resumeIdx}}/delete" method="post"
-                                                  class="delete-form d-inline">
+                                                  class="delete-form d-inline" data-resume-title="{{resumeTitle}}">
                                                 <button type="submit" class="btn btn-link p-0" title="삭제하기"
                                                         style="color: Tomato !important;">
                                                     <i class="fa-solid fa-trash fs-5"></i>
@@ -100,9 +107,9 @@
                             </div>
                         </div>
                     </div>
-
                 {{/resumePage.content}}
 
+                <!-- 🤷‍♂️ 이력서가 하나도 없을 때 표시되는 메시지 -->
                 {{^repResume}}
                     {{#resumePage.empty}}
                         <div class="col">
@@ -114,7 +121,7 @@
                 {{/repResume}}
             </div>
 
-            <!--페이징 기능을 위한 버튼-->
+            <!-- 🚶‍♂️ 페이지네이션(페이지 번호)을 위한 버튼 목록 -->
             <div class="d-flex justify-content-center mt-4">
                 <ul class="pagination">
                     <li class="page-item {{^navigation.hasPrev}}disabled{{/navigation.hasPrev}}">
@@ -138,26 +145,44 @@
 </div>
 
 <script>
+    // =================================================================
+    // 🚀 스크립트 시작: 페이지가 모두 로드되면 실행됩니다.
+    // =================================================================
     document.addEventListener('DOMContentLoaded', function () {
+
         /**
-         * 📄 (함수) 폼 제출 시 사용자에게 확인을 받는 공통 함수
+         * 📄 (함수) 폼 제출 시 동적인 확인 메시지를 보여주는 공통 함수
+         * 이 함수 하나로 '삭제'와 '대표 설정' 기능을 모두 처리할 수 있어요!
          * @param {string} selector - 확인을 추가할 폼의 CSS 선택자 (예: '.delete-form')
-         * @param {string} message - 사용자에게 보여줄 확인 메시지
+         * @param {string} messageTemplate - '{title}'을 포함하는 메시지 템플릿
          */
-        function addConfirmationToForms(selector, message) {
+        function addDynamicConfirmationToForms(selector, messageTemplate) {
+            // 1. selector에 해당하는 모든 폼(form)을 찾습니다.
             const forms = document.querySelectorAll(selector);
+
+            // 2. 찾은 폼 각각에 'submit' 이벤트 리스너를 달아줍니다.
             forms.forEach(form => {
                 form.addEventListener('submit', function (event) {
-                    if (!confirm(message)) {
-                        event.preventDefault(); // '취소'를 누르면 폼 제출을 막습니다.
+                    // ✨ 1. 🔍 폼(form) 태그에 숨겨둔 data-resume-title 속성에서 이력서 제목을 가져옵니다.
+                    const resumeTitle = form.dataset.resumeTitle || '이 이력서'; // 제목이 없는 경우를 대비한 기본값
+
+                    // ✨ 2. ✍️ 메시지 템플릿의 '{title}' 부분을 실제 이력서 제목으로 바꿔치기 합니다.
+                    const dynamicMessage = messageTemplate.replace('{title}', resumeTitle);
+
+                    // ✨ 3. 💬 동적으로 만들어진 메시지로 사용자에게 최종 확인을 받습니다.
+                    if (!confirm(dynamicMessage)) {
+                        // 사용자가 '취소'를 누르면,
+                        event.preventDefault(); // 폼 제출(삭제 또는 대표 설정 요청)을 막습니다.
                     }
                 });
             });
         }
 
-        // 위에서 만든 공통 함수를 사용해서 각 기능에 확인 창을 추가합니다.
-        addConfirmationToForms('.delete-form', '정말로 이 이력서를 삭제하시겠습니까?');
-        addConfirmationToForms('.set-rep-form', '이 이력서를 대표 이력서로 설정하시겠습니까?');
+        // 💥 이제, 위에서 만든 똑똑한 함수를 사용해서 각 기능에 '맞춤형' 확인 창을 연결합니다.
+        // 삭제 버튼(.delete-form)을 누르면 -> "'OOO' 이력서를 정말로 삭제하시겠습니까?"
+        addDynamicConfirmationToForms('.delete-form', "'{title}' 이력서를 정말로 삭제하시겠습니까?");
+        // 대표 설정 버튼(.set-rep-form)을 누르면 -> "'OOO' 이력서를 대표 이력서로 설정하시겠습니까?"
+        addDynamicConfirmationToForms('.set-rep-form', "'{title}' 이력서를 대표 이력서로 설정하시겠습니까?");
     });
 </script>
 

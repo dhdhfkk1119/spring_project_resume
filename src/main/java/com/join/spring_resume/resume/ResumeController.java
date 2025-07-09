@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * 📄 이력서 관련 요청을 처리하는 컨트롤러
+ * (목록, 상세, 작성, 수정, 삭제)
+ */
 @RequiredArgsConstructor
 @Controller
 public class ResumeController {
@@ -34,37 +36,36 @@ public class ResumeController {
     private final HttpSession session;
     private final MemberRepository memberRepository;
 
-    //이력서 목록 보기
+    /**
+     * 📚 [GET] /resumes : (개인) 이력서 목록 페이지
+     * - 로그인한 회원의 이력서 목록을 페이징하여 보여줍니다.
+     * - 대표 이력서는 별도로 상단에 표시합니다.
+     */
     @GetMapping("/resumes")
     public String list(Model model,
-                       @PageableDefault(
-                               size = 3,
-                               sort = "resumeIdx",
-                               direction = Sort.Direction.DESC) Pageable pageable) {
+                       @PageableDefault(size = 3, sort = "resumeIdx", direction = Sort.Direction.DESC) Pageable pageable) {
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
-        System.out.println("로그인된 사용자 ID: " + sessionUser.getId());
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
 
-        //pageable 객체 전달
+        // 2. 🔄 서비스 호출 (이력서 목록 조회)
         ResumeResponse.ListDTO listDTO = resumeService.findResumesForList(member.getMemberIdx(), pageable);
 
-        //페이지네이션 데이터 생성
+        // 3. 🔢 페이지네이션 및 카운트 계산
         PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(listDTO.getResumePage());
-
-        //이력서 카운트
         long totalCount = listDTO.getResumePage().getTotalElements();
         if (listDTO.getRepResume() != null) {
-            totalCount++;
+            totalCount++; // 대표 이력서가 있으면 전체 개수에 1을 더함
         }
 
-        //뷰에 데이터 전달
+        // 4. 🖼️ 뷰에 데이터 전달
         model.addAttribute("repResume", listDTO.getRepResume());
         model.addAttribute("resumePage", listDTO.getResumePage());
         model.addAttribute("member", member);
@@ -74,63 +75,76 @@ public class ResumeController {
         return "resume/list";
     }
 
-    // 일반 회원을 위한 이력서 상세보기
+    /**
+     * 📄 [GET] /resume/{id} : (개인) 이력서 상세 페이지
+     * - 본인이 작성한 이력서의 상세 내용을 보여줍니다.
+     */
     @GetMapping("/resume/{id}")
     public String detail(@PathVariable(name = "id") Long resumeIdx, Model model) {
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
         }
 
+        // 2. 🔄 서비스 호출 (이력서 조회)
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
 
+        // 3. 🛡️ 소유권 확인
         if (!resume.isOwner(sessionUser.getId())) {
             throw new Exception403("이력서를 조회할 권한이 없습니다");
         }
 
+        // 4. 🖼️ 뷰에 데이터 전달
         ResumeResponse.CorpDetailDTO responseDTO = new ResumeResponse.CorpDetailDTO(resume);
-
         model.addAttribute("resume", responseDTO);
-        model.addAttribute("isOwner", true);
-        return "resume/detail";
-    }
-
-    //👨‍💻 기업 채용담당관을 위한 이력서 상세보기
-    @GetMapping("/corp/resume/{resumeIdx}")
-    public String corpResumeDetail(@PathVariable Long resumeIdx, Model model, HttpSession session) {
-
-        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
-        if (sessionUser == null) {
-            throw new Exception401("로그인 해주시기 바랍니다");
-        }
-        if (sessionUser.getRole() != "CORP") {
-            throw new Exception403("기업 회원만 작성 가능합니다");
-        }
-
-        ResumeResponse.CorpDetailDTO responseDTO = resumeService.findCorpResumeDetail(resumeIdx);
-        model.addAttribute("resume", responseDTO);
-        model.addAttribute("isOwner", false);
+        model.addAttribute("isOwner", true); // 본인 소유임을 표시
         return "resume/detail";
     }
 
     /**
-     * 이력서 수정 화면 요청
+     * 👨‍💻 [GET] /corp/resume/{resumeIdx} : (기업) 이력서 상세 페이지
+     * - 기업 회원이 개인 회원의 이력서를 조회합니다.
      */
-    @GetMapping("/resume/{id}/update-form")
-    public String updateForm(@PathVariable(name = "id") Long resumeIdx, Model model) {
+    @GetMapping("/corp/resume/{resumeIdx}")
+    public String corpResumeDetail(@PathVariable Long resumeIdx, Model model) {
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
+        if (!"CORP".equals(sessionUser.getRole())) {
+            throw new Exception403("기업 회원만 접근 가능합니다");
+        }
+
+        // 2. 🔄 서비스 호출 및 🖼️ 뷰에 데이터 전달
+        ResumeResponse.CorpDetailDTO responseDTO = resumeService.findCorpResumeDetail(resumeIdx);
+        model.addAttribute("resume", responseDTO);
+        model.addAttribute("isOwner", false); // 타인 소유임을 표시
+        return "resume/detail";
+    }
+
+    /**
+     * 📝 [GET] /resume/{id}/update-form : 이력서 수정 페이지
+     * - 기존 이력서 내용을 채운 수정 폼을 보여줍니다.
+     */
+    @GetMapping("/resume/{id}/update-form")
+    public String updateForm(@PathVariable(name = "id") Long resumeIdx, Model model) {
+        // 1. 👤 인증 및 권한 검사
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) {
+            throw new Exception401("로그인 해주시기 바랍니다");
+        }
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
 
+        // 2. 🔄 서비스 호출 및 🖼️ 뷰에 데이터 전달
         Resume resume = resumeService.findByIdWithCareers(resumeIdx);
         model.addAttribute("resume", resume);
         model.addAttribute("member", member);
@@ -139,141 +153,141 @@ public class ResumeController {
 
 
     /**
-     * 수정 액션
+     * 💾 [POST] /resume/{id}/update : 이력서 수정 처리
+     * - 유효성 검사 후, 이력서 정보를 업데이트합니다.
      */
     @PostMapping("/resume/{id}/update")
     public String update(@PathVariable(name = "id") Long resumeIdx,
                          @Valid ResumeRequest.UpdateDTO updateDTO,
                          BindingResult bindingResult,
                          Model model) {
-
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) {
+            throw new Exception401("로그인 해주시기 바랍니다");
+        }
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
+        }
 
-        //유효성
-        Map<String, String> errorMap = new HashMap<>();//에러 바인딩
+        // 2. ✅ 유효성 검사
         if (bindingResult.hasErrors()) {
-
+            Map<String, String> errorMap = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
             model.addAttribute("errors", errorMap);
             model.addAttribute("dto", updateDTO);
-            return "resume/save-form";
+
+            // 검사 실패 시, 올바른 수정 폼으로
+            Resume resume = resumeService.findByIdWithCareers(resumeIdx);
+            model.addAttribute("resume", resume);
+            return "resume/update-form";
         }
 
-
-        if (sessionUser == null) {
-            throw new Exception401("로그인 해주시기 바랍니다");
-        }
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
-        }
+        // 3. 🔄 서비스 호출 (이력서 수정)
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
-
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
         resumeService.updateById(resumeIdx, updateDTO, member);
+
         return "redirect:/resume/" + resumeIdx;
     }
 
     /**
-     * 이력서 삭제
+     * 🗑️ [POST] /resume/{id}/delete : 이력서 삭제 처리
      */
     @PostMapping("/resume/{id}/delete")
     public String delete(@PathVariable(name = "id") Long resumeIdx) {
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
 
+        // 2. 🔄 서비스 호출 (이력서 삭제)
         resumeService.deleteById(resumeIdx, member);
         return "redirect:/resumes";
     }
 
     /**
-     * 이력서 작성창 요청
+     * ✨ [GET] /resume/save-form : 이력서 작성 페이지
      */
     @GetMapping("/resume/save-form")
     public String saveForm(Model model) {
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
         }
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
-        model.addAttribute("member", member);
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
 
+        // 2. 🖼️ 뷰에 데이터 전달
+        model.addAttribute("member", member);
         return "resume/save-form";
     }
 
     /**
-     * 이력서 저장 액션
-     * 1.인증검사
-     * 2.유효성검사
-     * 3.저장 = 서비스위임
+     * 💾 [POST] /resume/save : 이력서 저장 처리
      */
-
     @PostMapping("/resume/save")
     public String save(@Valid ResumeRequest.SaveDTO saveDTO,
                        BindingResult bindingResult,
                        Model model) {
-
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+        if (sessionUser == null) {
+            throw new Exception401("로그인 해주시기 바랍니다");
+        }
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
+        }
 
-        //유효성
-        Map<String, String> errorMap = new HashMap<>();//에러 바인딩
+        // 2. ✅ 유효성 검사
         if (bindingResult.hasErrors()) {
-
+            Map<String, String> errorMap = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
             model.addAttribute("errors", errorMap);
-            //model.addAttribute("dto", saveDTO);
             return "resume/save-form";
         }
 
-        if (sessionUser == null) {
-            throw new Exception401("로그인 해주시기 바랍니다");
-        }
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
-        }
+        // 3. 🔄 서비스 호출 (이력서 저장)
         Member member = memberRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
-
+                .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
         Resume resume = resumeService.save(saveDTO, member);
 
         return "redirect:/resume/" + resume.getResumeIdx();
     }
 
     /**
-     * 대표 이력서를 변경하시겠습니까?
+     * 👑 [POST] /resume/{id}/set-rep : 대표 이력서 설정
      */
     @PostMapping("/resume/{id}/set-rep")
     public String setRepresentative(@PathVariable(name = "id") Long resumeIdx) {
-
-        // 인증검사
+        // 1. 👤 인증 및 권한 검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
             throw new Exception401("로그인 해주시기 바랍니다");
         }
-        // 권한확인
-        if (sessionUser.getRole() != "MEMBER") {
-            throw new Exception403("일반 회원만 작성 가능합니다");
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("개인 회원만 접근 가능합니다");
         }
 
-        // 2. 서비스에 대표 이력서 변경 로직 위임
+        // 2. 🔄 서비스 호출 (대표 이력서 설정)
         resumeService.setRep(sessionUser.getId(), resumeIdx);
 
-        // 3. 다시 이력서 목록 페이지로 리다이렉트
+        // 3. ➡️ 목록 페이지로 리다이렉트
         return "redirect:/resumes";
     }
 
-}//
+}
