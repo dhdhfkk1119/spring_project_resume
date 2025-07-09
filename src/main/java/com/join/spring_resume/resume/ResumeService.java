@@ -7,6 +7,8 @@ import com.join.spring_resume.carrer.CareerJpaRepository;
 import com.join.spring_resume.carrer.CareerRequest;
 import com.join.spring_resume.member.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,20 @@ public class ResumeService {
         // DTO로 변환해서 반환
         return new ResumeResponse.CorpDetailDTO(resume);
     }
+
+    // 📚 페이징된 이력서 목록 조회
+    public ResumeResponse.ListDTO findResumesForList(Long memberIdx, Pageable pageable) {
+        // 1. 대표 이력서 조회 (없을 수도 있음)
+        Resume repResume = resumeJpaRepository.findRepresentativeResumeByMemberIdx(memberIdx)
+                .orElse(null);
+
+        // 2. 일반이력서 페이징해 조회
+        Page<Resume> resumePage = resumeJpaRepository.findByMemberIdxAndIsRepFalse(memberIdx, pageable);
+
+        // 3. ListDTO에 담아 반환
+        return new ResumeResponse.ListDTO(repResume, resumePage);
+    }
+
 
     //이력서 저장
     @Transactional

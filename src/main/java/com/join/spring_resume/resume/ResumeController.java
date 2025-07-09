@@ -9,6 +9,9 @@ import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,16 +33,17 @@ public class ResumeController {
     private final HttpSession session;
     private final MemberRepository memberRepository;
 
-    /**
-     * 이력서 목록 보기
-     */
+    //이력서 목록 보기
     @GetMapping("/resumes")
-    public String list(Model model) {
+    public String list(Model model,
+                       @PageableDefault(
+                               size = 3,
+                               sort = "resumeIdx",
+                               direction = Sort.Direction.DESC) Pageable pageable) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
-
         System.out.println("로그인된 사용자 ID: " + sessionUser.getId());
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -47,32 +51,69 @@ public class ResumeController {
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
 
-        //모든 이력서 리스트 호출
-        List<Resume> resumeList = resumeService.findMyResumes(member.getMemberIdx());
+        //pageable 객체 전달
+        ResumeResponse.ListDTO listDTO = resumeService.findResumesForList(member.getMemberIdx(), pageable);
 
-        //대표 이력서와 나머지를 분리
-        Resume repResume = resumeList.stream()
-                .filter(r -> Boolean.TRUE.equals(r.getIsRep()))
-                .findFirst()
-                .orElse(null);
-
-        List<Resume> otherResumes = resumeList.stream()
-                .filter(r -> !Boolean.TRUE.equals(r.getIsRep()))
-                .collect(Collectors.toList());
-
-        model.addAttribute("repResume", repResume);
-        model.addAttribute("otherResumes", otherResumes);
+        //뷰에 데이터 전달
+        model.addAttribute("repResume", listDTO.getRepResume());
+        model.addAttribute("resumePage", listDTO.getResumePage());
         model.addAttribute("member", member);
+
+        //❗todo 나중에 PageDTO에 들어갈 내용
+        int currentPage = listDTO.getResumePage().getNumber();
+        int totalPages = listDTO.getResumePage().getTotalPages();
+        int startPage = Math.max(0, currentPage - 2);
+        int endPage = Math.min(totalPages - 1, currentPage + 2);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("prevPage", listDTO.getResumePage().getNumber() - 1);
+        model.addAttribute("nextPage", listDTO.getResumePage().getNumber() + 1);
+        //❗todo 여기까지
 
         return "resume/list";
     }
+
+
+//    @GetMapping("/resumes")
+//    public String list(Model model) {
+//        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+//        if (sessionUser == null) {
+//            throw  new Exception401("로그인 해주시기 바랍니다");
+//        }
+//
+//        System.out.println("로그인된 사용자 ID: " + sessionUser.getId());
+//        if (sessionUser.getRole() != "MEMBER") {
+//            throw new Exception403("일반 회원만 작성 가능합니다");
+//        }
+//        Member member = memberRepository.findById(sessionUser.getId())
+//                .orElseThrow(() -> new Exception404("해당 회원을 찾을수 없습니다"));
+//
+//        //모든 이력서 리스트 호출
+//        List<Resume> resumeList = resumeService.findMyResumes(member.getMemberIdx());
+//
+//        //대표 이력서와 나머지를 분리
+//        Resume repResume = resumeList.stream()
+//                .filter(r -> Boolean.TRUE.equals(r.getIsRep()))
+//                .findFirst()
+//                .orElse(null);
+//
+//        List<Resume> otherResumes = resumeList.stream()
+//                .filter(r -> !Boolean.TRUE.equals(r.getIsRep()))
+//                .collect(Collectors.toList());
+//
+//        model.addAttribute("repResume", repResume);
+//        model.addAttribute("otherResumes", otherResumes);
+//        model.addAttribute("member", member);
+//
+//        return "resume/list";
+//    }
 
     // 일반 회원을 위한 이력서 상세보기
     @GetMapping("/resume/{id}")
     public String detail(@PathVariable(name = "id") Long resumeIdx, Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -97,7 +138,7 @@ public class ResumeController {
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "CORP") {
             throw new Exception403("기업 회원만 작성 가능합니다");
@@ -116,7 +157,7 @@ public class ResumeController {
     public String updateForm(@PathVariable(name = "id") Long resumeIdx, Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -156,7 +197,7 @@ public class ResumeController {
 
 
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -175,7 +216,7 @@ public class ResumeController {
     public String delete(@PathVariable(name = "id") Long resumeIdx) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -194,7 +235,7 @@ public class ResumeController {
     public String saveForm(Model model) {
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -233,7 +274,7 @@ public class ResumeController {
         }
 
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         if (sessionUser.getRole() != "MEMBER") {
             throw new Exception403("일반 회원만 작성 가능합니다");
@@ -255,7 +296,7 @@ public class ResumeController {
         // 인증검사
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) {
-            throw  new Exception401("로그인 해주시기 바랍니다");
+            throw new Exception401("로그인 해주시기 바랍니다");
         }
         // 권한확인
         if (sessionUser.getRole() != "MEMBER") {
