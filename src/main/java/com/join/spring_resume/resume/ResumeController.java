@@ -144,9 +144,11 @@ public class ResumeController {
         Member member = memberRepository.findById(sessionUser.getId())
                 .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
 
-        // 2. 🔄 서비스 호출 및 🖼️ 뷰에 데이터 전달
-        Resume resume = resumeService.findByIdWithCareers(resumeIdx);
-        model.addAttribute("resume", resume);
+        // ✨ [개선] 2. 🔄 서비스 호출 (Entity 대신 DTO를 받음)
+        ResumeResponse.UpdateFormDTO resumeDTO = resumeService.findResumeForUpdateForm(resumeIdx);
+
+        // ✨ [개선] 3. 🖼️ 뷰에 데이터 전달 (Controller는 이제 DTO만 다룸)
+        model.addAttribute("resume", resumeDTO);
         model.addAttribute("member", member);
         return "resume/update-form";
     }
@@ -179,9 +181,9 @@ public class ResumeController {
             model.addAttribute("errors", errorMap);
             model.addAttribute("dto", updateDTO);
 
-            // 검사 실패 시, 올바른 수정 폼으로
-            Resume resume = resumeService.findByIdWithCareers(resumeIdx);
-            model.addAttribute("resume", resume);
+            // ✨ [개선] 검사 실패 시, Entity가 아닌 DTO를 다시 조회하여 화면에 전달
+            ResumeResponse.UpdateFormDTO resumeDTO = resumeService.findResumeForUpdateForm(resumeIdx);
+            model.addAttribute("resume", resumeDTO);
             return "resume/update-form";
         }
 
@@ -258,6 +260,12 @@ public class ResumeController {
                 errorMap.put(error.getField(), error.getDefaultMessage());
             }
             model.addAttribute("errors", errorMap);
+
+            // ✨ [수정] 유효성 검사 실패 시에도 member 정보를 다시 조회하여 모델에 추가해야 합니다.
+            Member member = memberRepository.findById(sessionUser.getId())
+                    .orElseThrow(() -> new Exception404("해당 회원을 찾을 수 없습니다"));
+            model.addAttribute("member", member);
+
             return "resume/save-form";
         }
 

@@ -95,6 +95,21 @@ public class ResumeService {
         return savedResume;
     }
 
+    /**
+     * 📝 이력서 수정 페이지에 필요한 데이터를 DTO로 조회
+     * - Controller 에게 Entity가 아닌 DTO를 전달
+     * @param resumeIdx 이력서 ID
+     * @return UpdateFormDTO
+     */
+    public ResumeResponse.UpdateFormDTO findResumeForUpdateForm(Long resumeIdx) {
+        // 1. Repository를 통해 Entity 조회
+        Resume resume = resumeJpaRepository.findByIdWithCareers(resumeIdx)
+                .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다. id: " + resumeIdx));
+
+        // 2. Entity를 DTO로 변환하여 반환
+        return new ResumeResponse.UpdateFormDTO(resume);
+    }
+
     //이력서 수정
     @Transactional
     public void updateById(Long resumeIdx, ResumeRequest.UpdateDTO updateDTO, Member sessionMember) {
