@@ -90,7 +90,7 @@
                         <hr>
                         <div class="d-flex justify-content-end">
                             <a href="/resume/{{resume.resumeIdx}}" class="btn btn-outline-secondary me-2">취소</a>
-                            <button type="button" id="submit-btn" class="btn btn-outline-primary">수정완료</button>
+                            <button type="submit" id="submit-btn" class="btn btn-outline-primary">수정완료</button>
                         </div>
                     </form>
                 </div>
@@ -106,20 +106,14 @@
         // =================================================================
         // 🚀 1. 초기 설정 및 변수 선언
         // =================================================================
-        // 자주 사용하는 HTML 요소(Element)들을 미리 찾아 `elements` 객체에 보관해요.
-        // 이렇게 하면 코드가 더 깔끔해지고, 필요할 때 바로 꺼내 쓸 수 있어 편리합니다.
         const elements = {
-            updateForm: document.getElementById('update-form'),             // 수정 내용 전체를 감싸는 폼
-            deleteFormIcon: document.getElementById('delete-form-icon'),   // 이력서 전체 삭제 폼
-            careerContainer: document.getElementById('career-container'),  // 경력 목록을 감싸는 영역
-            addCareerBtn: document.getElementById('add-career-btn'),       // '경력 추가' 버튼
-            submitBtn: document.getElementById('submit-btn')               // '수정완료' 버튼
+            updateForm: document.getElementById('update-form'),
+            deleteFormIcon: document.getElementById('delete-form-icon'),
+            careerContainer: document.getElementById('career-container'),
+            addCareerBtn: document.getElementById('add-career-btn'),
         };
 
-        // 서버에서 받아온 기존 경력의 개수를 가져옵니다. (Mustache 템플릿에서 설정)
         const initialSize = elements.careerContainer.getAttribute('data-initial-size');
-        // 새로 추가될 경력 항목의 인덱스(순번)를 관리할 변수입니다.
-        // 기존 경력이 3개라면, 새로 추가될 항목은 4번째(index 3)가 되어야 하므로 initialSize로 시작합니다.
         let careerIndex = initialSize ? parseInt(initialSize, 10) : 0;
 
 
@@ -128,13 +122,9 @@
         // =================================================================
 
         /**
-         * 📄 (함수) 새 경력 입력 폼 HTML 생성
-         * '경력 추가' 버튼을 누를 때마다 호출되어, 새로운 입력 폼의 HTML 코드를 만들어 반환합니다.
-         * @param {number} index - 새로 생성될 경력의 고유 인덱스
-         * @returns {string} - 경력 입력 폼의 HTML 문자열
-         */
+        * 📄 (함수) 새 경력 입력 폼 HTML 생성
+        */
         function createCareerItemHTML(index) {
-            // 💡 Tip: 당신이 설계한 d-flex 레이아웃을 그대로 복원했습니다!
             return `
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1" style="min-width: 0;">
@@ -153,11 +143,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">입사일</label>
-                                <input type="date" name="careers[${index}].startAt" class="form-control">
+                                <input type="date" name="careers[${index}].startAt" class="form-control" value="2022-03-01">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">퇴사일</label>
-                                <input type="date" name="careers[${index}].endAt" class="form-control">
+                                <input type="date" name="careers[${index}].endAt" class="form-control" value="2024-02-28">
                             </div>
                         </div>
                     </div>
@@ -170,16 +160,8 @@
             `;
         }
 
-        /**
-         * 📅 (함수) 날짜 선택기(flatpickr) 초기화
-         * 날짜 입력창(input[type="date"])을 예쁜 달력 UI로 바꿔주는 라이브러리를 적용합니다.
-         * @param {HTMLElement} element - 날짜 입력창 요소
-         */
         function initializeFlatpickr(element) {
-            flatpickr(element, {
-                dateFormat: "Y-m-d", // 날짜 형식은 "년-월-일"
-                locale: "ko"         // 언어는 한국어로 설정
-            });
+            flatpickr(element, { dateFormat: "Y-m-d", locale: "ko" });
         }
 
 
@@ -187,106 +169,55 @@
         // 👂 3. 사용자 행동 감지 (이벤트 리스너)
         // =================================================================
 
-        // 🗑️ (이벤트) 이력서 전체 삭제
-        // 휴지통 아이콘을 감싸는 폼이 'submit'(제출)될 때 실행됩니다.
+        // (이벤트 리스너들은 기존 코드와 동일하게 유지합니다)
         elements.deleteFormIcon.addEventListener('submit', function (e) {
-            // 정말 삭제할 건지 사용자에게 한 번 더 확인을 받습니다.
             if (!confirm('정말 이 이력서를 삭제하시겠습니까? 되돌릴 수 없어요!')) {
-                e.preventDefault(); // 사용자가 '취소'를 누르면, 폼 제출(삭제 요청)을 막습니다.
+                e.preventDefault();
             }
         });
 
-        // ➕ (이벤트) '경력 추가' 버튼 클릭
         elements.addCareerBtn.addEventListener('click', function () {
-            // 1. 새로운 <div> 요소를 만들고, 부트스트랩 카드 스타일을 적용합니다.
             const careerDiv = document.createElement('div');
-            // 💥 중요: 새로 추가되는 경력 카드에도 d-flex 레이아웃이 적용되도록,
-            // careerDiv 자체에는 card 클래스만 추가하고, 내부 HTML은 createCareerItemHTML 함수가 모두 책임지도록 합니다.
             careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light', 'career-item', 'new-career-item');
-
-            // 2. 위에서 만든 `createCareerItemHTML` 함수를 호출해서 HTML 내용을 채워 넣습니다.
             careerDiv.innerHTML = createCareerItemHTML(careerIndex);
-
-            // 3. 완성된 경력 폼을 화면에 보여주기 위해 `<div id="career-container">` 안에 추가합니다.
             elements.careerContainer.appendChild(careerDiv);
-
-            // 4. 새로 생긴 날짜 입력창에도 달력 UI를 적용해 줍니다.
             const newDateInputs = careerDiv.querySelectorAll('input[type="date"]');
             newDateInputs.forEach(initializeFlatpickr);
-
-            // 5. ✨ 사용자 경험(UX) 개선! ✨
-            //    새로 추가된 입력 폼으로 화면을 부드럽게 스크롤하고,
             careerDiv.scrollIntoView({behavior: 'smooth', block: 'center'});
-            //    첫 번째 입력창에 바로 글을 쓸 수 있도록 커서를 위치(포커스)시킵니다.
             const firstInput = careerDiv.querySelector('input[type="text"]');
-            if (firstInput) {
-                firstInput.focus();
-            }
-
-            // 6. 다음 경력 항목을 위해 인덱스를 1 증가시킵니다. (예: 3 -> 4)
+            if (firstInput) firstInput.focus();
             careerIndex++;
         });
 
-        // 💥 (이벤트) 개별 경력 항목 삭제 (이벤트 위임 방식)
-        // `career-container` 전체에 이벤트 리스너를 하나만 달아두고,
-        // 클릭된 대상이 '삭제 버튼'일 때만 동작하게 만들어 코드를 효율적으로 관리합니다.
         elements.careerContainer.addEventListener('click', function (e) {
-            // 클릭된 요소(e.target) 또는 그 부모 중에 '.remove-career-btn' 클래스를 가진 버튼을 찾습니다.
             const removeBtn = e.target.closest('.remove-career-btn');
-            if (!removeBtn) return; // 삭제 버튼이 아니면, 여기서 함수를 종료합니다.
-
-            // 삭제 버튼이 속한 경력 카드 전체(.career-item)를 찾습니다.
+            if (!removeBtn) return;
             const careerItem = removeBtn.closest('.career-item');
             if (!careerItem) return;
-
-            // 사용자에게 정말 삭제할 것인지 다시 한번 확인합니다.
-            if (!confirm('이 경력 항목을 삭제하시겠습니까?')) {
-                return; // '취소'를 누르면 아무 일도 일어나지 않습니다.
-            }
-
-            // 삭제하려는 경력이 서버에 저장된 기존 경력인지 확인합니다. (data-career-id 속성 유무로 판단)
+            if (!confirm('이 경력 항목을 삭제하시겠습니까?')) return;
             const careerId = removeBtn.getAttribute('data-career-id');
-
             if (careerId) {
-                // [기존 경력 삭제]
-                // 1. 서버에 어떤 경력을 지워야 할지 알려주기 위해, ID를 담을 숨겨진 <input>을 만듭니다.
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
-                hiddenInput.name = 'deletedCareerIds'; // 서버에서 이 이름으로 값을 받습니다.
+                hiddenInput.name = 'deletedCareerIds';
                 hiddenInput.value = careerId;
-                // 2. 숨겨진 input을 폼에 추가합니다.
                 elements.updateForm.appendChild(hiddenInput);
-                // 3. 화면에서 해당 경력 카드를 제거합니다.
                 careerItem.remove();
             } else {
-                // [새로 추가된 경력 삭제]
-                // 아직 서버에 저장되지 않은 항목이므로, 그냥 화면에서만 제거합니다.
                 careerItem.remove();
             }
         });
 
-        // 💾 (이벤트) '수정완료' 버튼 클릭
-        elements.submitBtn.addEventListener('click', function () {
-            // 1. [정리 작업] 폼을 제출하기 전에, 사용자가 '경력 추가'만 누르고 아무 내용도 입력하지 않은
-            //    빈 경력 폼이 있다면 자동으로 제거해 줍니다.
+        // 폼의 'submit' 이벤트를 감지
+        elements.updateForm.addEventListener('submit', function(e) {
+            // 1. 빈 경력 폼 자동 제거
             const newCareerItems = document.querySelectorAll('.new-career-item');
             newCareerItems.forEach(item => {
                 const corpNameInput = item.querySelector('input[name*="corpName"]');
-                // 회사명 입력창이 비어있으면 해당 경력 카드 전체를 삭제합니다.
                 if (corpNameInput && corpNameInput.value.trim() === '') {
                     item.remove();
                 }
             });
-
-            // 2. [유효성 검사] HTML5의 기본 유효성 검사 기능을 사용합니다.
-            //    (`required` 속성이 있는 입력창이 비어있는지 등을 확인)
-            if (elements.updateForm.checkValidity()) {
-                // 모든 필드가 유효하면, 폼을 서버로 제출합니다.
-                elements.updateForm.submit();
-            } else {
-                // 유효하지 않은 필드가 있다면, 브라우저가 사용자에게 알려주는 말풍선을 띄웁니다.
-                elements.updateForm.reportValidity();
-            }
         });
     });
 </script>
