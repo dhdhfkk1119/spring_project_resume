@@ -17,6 +17,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
 
     // 좋아요 토글 기능
+    @Transactional
     public boolean toggleLike(Member member, Board board) {
         Optional<Like> existing = likeRepository.findByMemberAndBoard(member, board);
         if (existing.isPresent()) {
