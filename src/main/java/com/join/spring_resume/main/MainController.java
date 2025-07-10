@@ -1,7 +1,9 @@
 package com.join.spring_resume.main;
 
+import com.join.spring_resume._core.common.PageResponseDTO;
 import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume._core.errors.exception.Exception403;
+import com.join.spring_resume.apply.Apply;
 import com.join.spring_resume.apply.ApplyService;
 import com.join.spring_resume.board.BoardRepository;
 import com.join.spring_resume.board.BoardService;
@@ -45,7 +47,8 @@ public class MainController {
 
         Pageable pageable = PageRequest.of(0, 8);
         Page<Recruit> recruitList = recruitService.findAllList(pageable);
-        RecruitResponse.RecruitPageDTO recruitPageDTO = RecruitResponse.RecruitPageDTO.fromPage(recruitList);
+        PageResponseDTO<RecruitResponse.RecruitListDTO> recruitPageDTO =
+                PageResponseDTO.from(recruitList,RecruitResponse.RecruitListDTO::fromEntity);
 
         model.addAttribute("recruitList", recruitPageDTO);
 
@@ -55,13 +58,13 @@ public class MainController {
     // ajax 실시간으로 데이터 베이스 데이터 뿌리기 (공고 목록)
     @GetMapping("/api/recruits")
     @ResponseBody
-    public RecruitResponse.RecruitPageDTO getRecruits(
+    public PageResponseDTO<RecruitResponse.RecruitListDTO> getRecruits(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "3") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Recruit> recruits = recruitService.findAllList(pageable);
-        return RecruitResponse.RecruitPageDTO.fromPage(recruits);
+        return PageResponseDTO.from(recruits,RecruitResponse.RecruitListDTO::fromEntity);
     }
 
 
@@ -86,7 +89,7 @@ public class MainController {
         }
 
         int resumeCount = resumeService.findMyResumes(sessionUser.getId()).size(); // 이력서 등록 갯수
-        int recruitCount = applyService.MyApplyList(sessionUser.getId()).size(); // 공고 등록 갯수 가져오기
+        Long recruitCount = applyService.getRecruitCount(sessionUser.getId()); // 공고에 지원한 갯수
         int boardCount = boardService.findByMemberIdx(sessionUser.getId()).size();// 게시물 작성 갯수 가져오기
         Member member = memberService.findById(sessionUser.getId());
 

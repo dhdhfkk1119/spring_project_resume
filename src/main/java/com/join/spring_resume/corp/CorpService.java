@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CorpService {
 
     private final CorpRepository corpRepository;
@@ -80,7 +80,6 @@ public class CorpService {
             }
         }
 
-        corpRepository.save(corp);
     }
 
 }

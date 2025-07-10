@@ -1,5 +1,6 @@
 package com.join.spring_resume.apply;
 
+import com.join.spring_resume._core.common.PageResponseDTO;
 import com.join.spring_resume._core.errors.exception.Exception401;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume.corp.Corp;
@@ -12,12 +13,12 @@ import com.join.spring_resume.resume.ResumeService;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ApplyController {
     private final ResumeService resumeService;
     private final MemberService memberService;
 
-    // 이력서 지원하기
+    // 이력서 지원하기 -> 누르면 Body로 값이 넘어온다
     @PostMapping("/{recruitIdx}/apply")
     @ResponseBody
     public String apply(@PathVariable(name = "recruitIdx") Long idx,
@@ -57,9 +58,10 @@ public class ApplyController {
 
 
     }
-
+    
+    // 지원한 이력서 목록을 보여준다
     @GetMapping("/apply/status")
-    public String applyList(Model model,HttpSession httpSession){
+    public String applyList(Model model, HttpSession httpSession){
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
 
         if (sessionUser == null) {
@@ -71,12 +73,37 @@ public class ApplyController {
             throw new Exception403("일반 회원만 접근 가능합니다");
         }
 
-        List<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId());
+        Pageable pageable = PageRequest.of(0,5);
+        Page<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId(),pageable);
 
         model.addAttribute("recruitList",applyRecruitList);
         return "apply/apply-list";
     }
 
+    // 지원한 이력서 목록을 보여준다 ajax 데이터 뿌리기
+    @GetMapping("/api/apply/status")
+    @ResponseBody
+    public PageResponseDTO<ApplyResponse.ApplyDTO> getApplyList(Model model,
+                                                                HttpSession httpSession,
+                                                                @RequestParam(name = "page",defaultValue = "0")int page,
+                                                                @RequestParam(name = "size", defaultValue = "5")int size){
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
+
+        if (sessionUser == null) {
+            // 로그인 안 된 경우
+            throw new Exception401("로그인해주시기 바랍니다");
+        }
+
+        if (!"MEMBER".equals(sessionUser.getRole())) {
+            throw new Exception403("일반 회원만 접근 가능합니다");
+        }
+
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId(),pageable);
+
+        model.addAttribute("recruitList",applyRecruitList);
+        return PageResponseDTO.from(applyRecruitList,ApplyResponse.ApplyDTO::fromEntity);
+    }
 
 
 }

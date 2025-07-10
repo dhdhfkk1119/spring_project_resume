@@ -2,6 +2,7 @@ package com.join.spring_resume.recruit_like;
 
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.recruit.Recruit;
+import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +34,8 @@ public class RecruitLike {
 
     @CreationTimestamp
     private Timestamp createdAt;
+
+    public String getFormattedAppliedAt() {
+        return DateUtil.timestampFormat(this.createdAt);
+    }
 }

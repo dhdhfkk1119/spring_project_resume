@@ -1,6 +1,5 @@
 package com.join.spring_resume.corp;
 
-import com.join.spring_resume.member.Member;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
