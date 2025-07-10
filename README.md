@@ -4,7 +4,7 @@
 # ㅁㄴㅇㄹ
 ## ㅁㄴㅇㄹ
 ### ㅁㄴㅇㄹ
-####ㅁㄴㄹ
+#### ㅁㄴㅇㄹ
 ---
 # 📝 이력서(Resume) 및 경력(Career) 기능 명세
 
@@ -37,11 +37,13 @@
 | **이력서 수정 처리**      | `POST`      | `/resume/{resumeIdx}/update`      | `resumeUpdate()`          | O                 |
 | **이력서 삭제 처리**      | `POST`      | `/resume/{resumeIdx}/delete`      | `resumeDelete()`          | O                 |
 
-## 4. 데이터베이스 설계 (ERD)
+![list](https://github.com/user-attachments/assets/983ff860-5186-4fce-bc11-328cf71a91c1)
+![detail](https://github.com/user-attachments/assets/c01a650a-e2e0-409a-bf12-ed578e37ac15)
+![corp](https://github.com/user-attachments/assets/68937970-70df-4c99-8803-964576096c0a)
+![save](https://github.com/user-attachments/assets/08ea6f46-b2c7-4833-87fc-2a2eac31adc8)
+![update](https://github.com/user-attachments/assets/8fcf770a-18c6-45f8-9184-9e06ecde267f)
 
-`MEMBER`, `RESUME`, `CAREER` 테이블 간의 관계는 다음과 같습니다.
-
-## 5. 핵심 로직 및 설계 결정
+## 4. 핵심 로직 및 설계 결정
 
 ### 가. 이력서 소유권 검증: `Resume.isOwner()`
 
