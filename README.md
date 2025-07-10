@@ -37,13 +37,19 @@
 | **이력서 수정 처리**      | `POST`      | `/resume/{resumeIdx}/update`      | `resumeUpdate()`          | O                 |
 | **이력서 삭제 처리**      | `POST`      | `/resume/{resumeIdx}/delete`      | `resumeDelete()`          | O                 |
 
+## 4. 실제 화면
+### 가. 이력서 목록
 ![list](https://github.com/user-attachments/assets/983ff860-5186-4fce-bc11-328cf71a91c1)
+### 나. 이력서 상세보기
 ![detail](https://github.com/user-attachments/assets/c01a650a-e2e0-409a-bf12-ed578e37ac15)
+### 다. 이력서 상세보기 (기업회원)
 ![corp](https://github.com/user-attachments/assets/68937970-70df-4c99-8803-964576096c0a)
+### 라. 이력서 저장
 ![save](https://github.com/user-attachments/assets/08ea6f46-b2c7-4833-87fc-2a2eac31adc8)
+### 마. 이력서 수정
 ![update](https://github.com/user-attachments/assets/8fcf770a-18c6-45f8-9184-9e06ecde267f)
 
-## 4. 핵심 로직 및 설계 결정
+## 5. 핵심 로직 및 설계 결정
 
 ### 가. 이력서 소유권 검증: `Resume.isOwner()`
 
