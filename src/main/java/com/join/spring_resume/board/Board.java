@@ -26,7 +26,10 @@ public class Board {
     private Long boardIdx;
 
     private String boardTitle;
-
+    /**
+     * string 이나 byte[]  대용량 데이터로 저장하도록 지정 --> Lob
+     * LONGTEXT 4GB 까지 저장 가능한 텍스트 타입
+     */
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String boardContent;
@@ -69,10 +72,20 @@ public class Board {
         return DateUtil.format(updatedAt);
     }
 
+    /**
+     * tags가 null 이면 빈 문자열 "" 반환
+     * 값이 있으면 그대로 반환
+     */
     public String getTags() {
         return tags == null ? "" : tags;
     }
 
+    /**
+     *  외부에서 setter를 통해 설정하는 경우도 있음 그에 대비해서 열어놓은것
+     *  createdAt 을 포맷팅해서 보여주기 위한 필드
+     *  템플릿에서 {{formattedCreatedAt}} 사용 시 필수
+     * @param formattedCreatedAt
+     */
     @SuppressWarnings("unused")
     public void setFormattedCreatedAt(String formattedCreatedAt) {
         this.formattedCreatedAt = formattedCreatedAt;

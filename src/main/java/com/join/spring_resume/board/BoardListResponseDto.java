@@ -59,6 +59,7 @@ public class BoardListResponseDto {
 
 
     public void setFormattedCreatedAt(String formattedDate) {
-        // Not used, but defined for template compatibility
+        // mustache 오류 방지를 위해 남겨둠
+        // {{formattedCreatedAt}} <-- 사용 하고 있어서
     }
 }

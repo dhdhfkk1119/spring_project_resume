@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * 예외 처리기
+ * 로그인 정보가 없으면 Exception401 예외 발생
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
