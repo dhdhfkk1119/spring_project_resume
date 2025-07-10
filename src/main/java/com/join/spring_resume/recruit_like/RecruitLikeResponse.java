@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 public class RecruitLikeResponse {
-
+    
+    // 해당 공고에 대한 좋아요를 like db에서 찾아서 공고에 대한 정보를 DTO -> 엔티티로 바꾸기
     @Data
     @AllArgsConstructor
     public static class LikeDTO {

@@ -25,7 +25,8 @@ public interface RecruitLikeRepository extends JpaRepository<RecruitLike,Long> {
     // 내가 좋아요 누른 게시물에 대한 정보
     @Query("select r from RecruitLike r where r.member.id = :memberIdx")
     Page<RecruitLike> findByMemberIdx(Long memberIdx, Pageable pageable);
-
+    
+    // 해당 공고가 삭제되면 해당 공고를 좋아요 누른 DB에서도 삭제된다
     @Query("delete from RecruitLike r where r.recruit.id = :recruitIdx")
     @Modifying
     void deleteByRecruitIdx(@Param("recruitIdx")Long recruitIdx);
