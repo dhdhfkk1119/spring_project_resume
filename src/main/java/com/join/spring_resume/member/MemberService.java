@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
 
     private final MemberRepository memberRepository;

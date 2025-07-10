@@ -1,14 +1,10 @@
 package com.join.spring_resume.corp;
 
 
-import com.join.spring_resume.member.MemberRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 public class CorpRequest {

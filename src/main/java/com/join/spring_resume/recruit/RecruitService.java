@@ -1,24 +1,24 @@
 package com.join.spring_resume.recruit;
 
-import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume._core.errors.exception.Exception404;
+import com.join.spring_resume.apply.ApplyRepository;
 import com.join.spring_resume.corp.Corp;
-import com.join.spring_resume.session.SessionUser;
+import com.join.spring_resume.recruit_like.RecruitLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RecruitService {
 
     private final RecruitRepository recruitRepository;
+    private final RecruitLikeRepository recruitLikeRepository;
+    private final ApplyRepository applyRepository;
 
     public Recruit findById(Long idx){
         return recruitRepository.findById(idx).orElseThrow(() -> new Exception404("해당 공고를찾을 수 없습니다"));
@@ -74,14 +74,18 @@ public class RecruitService {
         return recruitRepository.countByCorpIdx(corpIdx);
     }
 
-    // 현재 로그인 기업의 모든 공고 보기
+    // 현재 로그인 한기업의 모든 공고 보기
     public Page<Recruit> findByAllList(Long idx,Pageable pageable){
         return recruitRepository.findByCorp_CorpIdx(idx,pageable);
     }
 
 
-    public void deleteById(Long id){
-        recruitRepository.deleteById(id);
+    // 공고 삭제 하기
+    @Transactional
+    public void deleteById(Long recruitIdx){
+        applyRepository.deleteByRecruitIdx(recruitIdx); // apply 에서 해당 공고 삭제
+        recruitLikeRepository.deleteByRecruitIdx(recruitIdx); // 좋아요 삭제
+        recruitRepository.deleteById(recruitIdx); // 해당 공고 상제
     }
 
 }

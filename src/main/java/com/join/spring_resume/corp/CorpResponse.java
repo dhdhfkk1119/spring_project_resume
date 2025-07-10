@@ -16,7 +16,6 @@ public class CorpResponse {
                     corp.getCorpIdx(),
                     corp.getCorpName(),
                     corp.getCorpImage()
-
             );
         }
     }
