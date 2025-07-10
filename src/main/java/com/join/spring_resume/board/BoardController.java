@@ -94,7 +94,8 @@ public class BoardController {
     }
 
     @PostMapping
-    public String createBoard(@ModelAttribute BoardCreateDto dto, HttpSession session) {
+    public String createBoard(BoardCreateDto dto,
+                              HttpSession session) {
         Member member = getLoggedInMember(session);
         boardService.create(dto, member);
         return "redirect:/board/list";
@@ -184,11 +185,13 @@ public class BoardController {
     public String writeComment(@PathVariable Long boardId,
                                @RequestParam String content,
                                @RequestParam(required = false) Long parentId,
+                               @RequestParam(required = false, defaultValue = "false") boolean isSecret,
                                HttpSession session) {
         Member member = getLoggedInMember(session);
-        commentService.writeComment(boardId, content, member.getMemberIdx(), parentId);
+        commentService.writeComment(boardId, content, member.getMemberIdx(), parentId, isSecret);
         return "redirect:/board/" + boardId;
     }
+
 
     @PostMapping("/{boardId}/like")
     public String toggleLike(@PathVariable Long boardId, HttpSession session) {

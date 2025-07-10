@@ -17,6 +17,8 @@ public class CommentResponseDto {
     private String username;
     private Long userId;
     private boolean isOwner;
+    private boolean isSecret;
+    private boolean canView;
 
     private List<CommentResponseDto> replies = new ArrayList<>();
 
@@ -28,6 +30,14 @@ public class CommentResponseDto {
         this.username = comment.getUser().getUsername();
         this.userId = comment.getUser().getMemberIdx();
         this.isOwner = (loginUserId != null && loginUserId.equals(this.userId));
+        this.isSecret = comment.isSecret();
+        // 비밀 댓글 여부에 따른 표시 권한
+        this.canView = !isSecret || isOwner;
+        if (canView) {
+            this.comment = comment.getComment();
+        } else {
+            this.comment = "🔒 비밀 댓글입니다.";
+        }
     }
 
     public void addReply(CommentResponseDto reply) {

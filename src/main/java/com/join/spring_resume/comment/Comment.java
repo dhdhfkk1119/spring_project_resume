@@ -49,4 +49,7 @@ public class Comment {
         this.comment = comment;
     }
 
+    @Column(nullable = false)
+    private boolean isSecret = false;
+
 }

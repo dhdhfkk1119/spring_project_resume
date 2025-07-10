@@ -8,6 +8,7 @@ import com.join.spring_resume.member.MemberRepository;
 import com.join.spring_resume.session.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,11 +50,29 @@ public class CommentController {
         Member member = getLoggedInMember(session);
         Comment comment = commentService.findById(id);
 
+
         if (!comment.getUser().getMemberIdx().equals(member.getMemberIdx())) {
             throw new Exception403("댓글 수정 권한이 없습니다.");
         }
+        // HTML 태그 제거
+        String plainText = Jsoup.parse(content).text();
 
         commentService.updateContent(id, content);
         return "redirect:/board/" + comment.getBoard().getBoardIdx();
     }
+
+    @PostMapping("/{boardId}/comment")
+    public String writeComment(@PathVariable Long boardId,
+                               @RequestParam String content,
+                               @RequestParam(required = false) Long parentId,
+                               @RequestParam(defaultValue = "false") boolean isSecret,
+                               HttpSession session) {
+        Member member = getLoggedInMember(session);
+        // HTML 태그 제거
+        String plainText = Jsoup.parse(content).text();
+        commentService.writeComment(boardId, content, member.getMemberIdx(), parentId, isSecret);
+        return "redirect:/board/" + boardId;
+    }
+
+
 }

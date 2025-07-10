@@ -27,7 +27,8 @@ public class Board {
 
     private String boardTitle;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String boardContent;
 
     private String tags;
