@@ -15,16 +15,30 @@ public class BoardListResponseDto {
     private String boardContent;
     private Integer boardHits;
     private LocalDateTime createdAt;
+
+
     private Long commentCount;
+
+
     private Long likeCount;
+
     private Long memberIdx;
     private String username;
+
+
     private boolean author;
 
 
-    public BoardListResponseDto(Long boardIdx, String boardTitle, String boardContent, Integer boardHits,
-                                LocalDateTime createdAt, Long commentCount, Long likeCount,
-                                Long memberIdx, String username, boolean author) {
+    public BoardListResponseDto(Long boardIdx,
+                                String boardTitle,
+                                String boardContent,
+                                Integer boardHits,
+                                LocalDateTime createdAt,
+                                Long commentCount,
+                                Long likeCount,
+                                Long memberIdx,
+                                String username,
+                                boolean author) {
         this.boardIdx = boardIdx;
         this.boardTitle = boardTitle;
         this.boardContent = boardContent;
@@ -43,7 +57,8 @@ public class BoardListResponseDto {
         return createdAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
-    public void setFormattedCreatedAt(String formattedDate) {
 
+    public void setFormattedCreatedAt(String formattedDate) {
+        // Not used, but defined for template compatibility
     }
 }

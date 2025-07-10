@@ -15,9 +15,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     // 2. 게시글 좋아요 개수
     long countByBoard(Board board);
 
-    // 3. 좋아요 취소
-    void deleteByMemberAndBoard(Member member, Board board);
-
-    // 4. 회원이 좋아요한 게시글 목록 가져오기
+    // 3. 회원이 좋아요한 게시글 목록 가져오기
     List<Like> findByMember(Member member);
 }
