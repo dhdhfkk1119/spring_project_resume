@@ -93,6 +93,9 @@ public class MainController {
         int boardCount = boardService.findByMemberIdx(sessionUser.getId()).size();// 게시물 작성 갯수 가져오기
         Member member = memberService.findById(sessionUser.getId());
 
+        boolean isBasic = "basic.png".equals(member.getMemberImage());
+        model.addAttribute("isBasic", isBasic);
+
         model.addAttribute("resumeCount",resumeCount);
         model.addAttribute("recruitCount",recruitCount);
         model.addAttribute("boardCount",boardCount);
@@ -117,6 +120,9 @@ public class MainController {
 
         Corp corp = corpService.findById(sessionUser.getId());
         Long recruitCount = recruitService.countByRecruit(sessionUser.getId());
+
+        boolean isBasic = "basic.png".equals(corp.getCorpImage());
+        model.addAttribute("isBasic", isBasic);
         model.addAttribute("recruitCount",recruitCount);
         model.addAttribute("corp",corp);
 

@@ -114,8 +114,14 @@ public class MemberController {
     // 회원 업데이트
     @PostMapping("/member/{id}/update")
     public String update(@PathVariable(name = "id")Long sessionIdx,
-                         @ModelAttribute MemberRequest.UpdateDTO updateDTO){
+                         @ModelAttribute MemberRequest.UpdateDTO updateDTO,
+                         HttpSession httpSession){
         memberService.updateMember(sessionIdx,updateDTO);
+        Member updatedMember = memberService.findById(sessionIdx);
+        //세션 동기화
+        SessionUser updatedSessionUser = SessionUser.fromMember(updatedMember);
+        session.setAttribute("session", updatedSessionUser);
+
         return "redirect:/";
 
     }

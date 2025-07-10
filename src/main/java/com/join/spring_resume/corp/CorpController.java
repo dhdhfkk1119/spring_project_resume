@@ -109,6 +109,11 @@ public class CorpController {
     public String update(@PathVariable(name = "id")Long sessionIdx,
                          @ModelAttribute CorpRequest.UpdateDTO updateDTO){
         corpService.update(sessionIdx,updateDTO);
+        Corp updatedCorp = corpService.findById(sessionIdx);
+        // 세션 동기화
+        SessionUser updatedSessionUser = SessionUser.fromCorp(updatedCorp);
+        session.setAttribute("session", updatedSessionUser);
+
         return "redirect:/";
     }
 

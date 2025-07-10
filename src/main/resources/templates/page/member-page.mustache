@@ -12,7 +12,12 @@
             <!-- 프로필 영역 -->
             <div class="d-flex align-items-center my-4 gap-3 text-secondary">
                 <div>
-                    <img src="/member-images/{{sessionUser.Images}}" alt="프로필 이미지" width="150px" height="150px" style="border-radius: 50%;">
+                    {{#isBasic}}
+                        <img src="/profile-images/basic.png" alt="기본 이미지" width="150px" height="150px" style="border-radius: 50%;">
+                    {{/isBasic}}
+                    {{^isBasic}}
+                        <img src="/member-images/{{sessionUser.images}}" alt="프로필 이미지" width="150px" height="150px" style="border-radius: 50%;">
+                    {{/isBasic}}
                 </div>
 
                 <div class="w-100">
@@ -108,7 +113,13 @@
                                 <div class="d-flex align-items-start gap-4">
                                     <!-- 이미지 미리보기 -->
                                     <div>
-                                        <img id="companyImagePreview" src="/member-images/{{sessionUser.Images}}" alt="회원 이미지" width="150px" height="150px" style="border-radius: 10px; object-fit: cover;">
+                                        {{#isBasic}}
+                                            <img id="companyImagePreview"  src="/profile-images/basic.png" alt="기본 이미지" width="150px" height="150px" style="border-radius: 10px; object-fit: cover;">
+                                        {{/isBasic}}
+                                        {{^isBasic}}
+                                            <img id="companyImagePreview" src="/member-images/{{sessionUser.images}}" alt="회원 이미지" width="150px" height="150px" style="border-radius: 10px; object-fit: cover;">
+                                        {{/isBasic}}
+
                                     </div>
 
                                     <!-- 오른쪽 폼 -->
