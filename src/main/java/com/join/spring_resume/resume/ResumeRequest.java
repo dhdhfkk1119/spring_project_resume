@@ -1,6 +1,6 @@
 package com.join.spring_resume.resume;
 
-import com.join.spring_resume.carrer.CareerRequest;
+import com.join.spring_resume.career.CareerRequest;
 import com.join.spring_resume.member.Member;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

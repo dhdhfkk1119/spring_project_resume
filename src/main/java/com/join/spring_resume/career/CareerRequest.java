@@ -1,11 +1,10 @@
-package com.join.spring_resume.carrer;
+package com.join.spring_resume.career;
 
 import com.join.spring_resume.resume.Resume;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 
 public class CareerRequest {

@@ -1,4 +1,4 @@
-package com.join.spring_resume.carrer;
+package com.join.spring_resume.career;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

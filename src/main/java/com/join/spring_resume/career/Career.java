@@ -1,4 +1,4 @@
-package com.join.spring_resume.carrer;
+package com.join.spring_resume.career;
 
 import com.join.spring_resume.resume.Resume;
 import jakarta.persistence.*;

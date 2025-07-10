@@ -2,9 +2,9 @@ package com.join.spring_resume.resume;
 
 import com.join.spring_resume._core.errors.exception.Exception403;
 import com.join.spring_resume._core.errors.exception.Exception404;
-import com.join.spring_resume.carrer.Career;
-import com.join.spring_resume.carrer.CareerJpaRepository;
-import com.join.spring_resume.carrer.CareerRequest;
+import com.join.spring_resume.career.Career;
+import com.join.spring_resume.career.CareerJpaRepository;
+import com.join.spring_resume.career.CareerRequest;
 import com.join.spring_resume.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

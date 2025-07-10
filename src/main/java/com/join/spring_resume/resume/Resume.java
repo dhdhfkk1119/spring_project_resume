@@ -1,6 +1,6 @@
 package com.join.spring_resume.resume;
 
-import com.join.spring_resume.carrer.Career;
+import com.join.spring_resume.career.Career;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.util.DateUtil;
 import jakarta.persistence.*;
