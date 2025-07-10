@@ -29,4 +29,5 @@ public class Like {
 
     @Column(nullable = false)
     private boolean likeYn = true;
+
 }

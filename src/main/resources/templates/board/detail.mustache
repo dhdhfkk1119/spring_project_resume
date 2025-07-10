@@ -1,159 +1,182 @@
 {{> layout/header}}
 
-<body class="bg-light">
-<div class="container py-5" style="max-width: 900px;">
+<body style="background:#fdfdfd; font-family: 'SUIT', sans-serif;">
+<div class="wrapper">
+    <div class="content">
+        <div class="container py-5" style="max-width: 950px;">
 
-    <!-- 제목 -->
-    <div class="mb-3">
-        <h2 class="fw-bold text-primary">{{board.boardTitle}}</h2>
-        <div class="text-muted small">
-            ✍️ <strong>{{board.member.username}}</strong>
-            &nbsp;|&nbsp; 📅 {{formattedCreatedAt}}
-            &nbsp;|&nbsp; 👁️ {{board.boardHits}}회 조회
-        </div>
-    </div>
-
-    <!-- 좋아요 -->
-    <div class="mb-4">
-        {{#sessionUser}}
-            <form method="post" action="/board/{{board.boardIdx}}/like" style="display:inline;">
-                <button type="submit"
-                        class="btn btn-sm {{#isLiked}}btn-danger{{/isLiked}}{{^isLiked}}btn-outline-danger{{/isLiked}}">
-                    ❤️ 좋아요 <span class="badge bg-light text-dark">{{likeCount}}</span>
-                </button>
-            </form>
-        {{/sessionUser}}
-        {{^sessionUser}}
-            <span class="text-muted">❤️ 좋아요 <span class="badge bg-light text-dark">{{likeCount}}</span></span>
-            <small class="ms-2"><a href="/login-form">로그인</a> 후 이용 가능합니다.</small>
-        {{/sessionUser}}
-    </div>
-
-    <!-- 본문 -->
-    <div class="p-4 bg-white border rounded shadow-sm mb-4">
-        <p class="mb-3">{{board.boardContent}}</p>
-        {{#board.tags}}
-            <span class="badge bg-secondary me-1">#{{.}}</span>
-        {{/board.tags}}
-    </div>
-
-    <!-- 수정/삭제 -->
-    {{#isAuthor}}
-        <div class="mb-4 d-flex gap-2">
-            <a href="/board/{{board.boardIdx}}/edit" class="btn btn-outline-primary">수정</a>
-            <form method="post" action="/board/{{board.boardIdx}}/delete"
-                  onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                <button type="submit" class="btn btn-outline-danger">삭제</button>
-            </form>
-        </div>
-    {{/isAuthor}}
-
-    <!-- 댓글 헤더 -->
-    <hr>
-    <h5 class="mt-4 mb-3">💬 댓글</h5>
-
-    <!-- 댓글 목록 -->
-    {{#comments}}
-        <div class="bg-white border rounded shadow-sm p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>{{username}}</strong>
-                    <span class="text-muted small">· {{createdAt}}</span>
+            <!-- 제목 -->
+            <div class="text-start mb-4">
+                <h4 class="fw-bold text-dark mb-2">
+                    <i class="bi bi-journal-text me-2 text-primary"></i>{{board.boardTitle}}
+                </h4>
+                <div class="text-muted small">
+                    <i class="bi bi-calendar3 me-1 text-primary"></i> {{formattedCreatedAt}}
                 </div>
-                {{#isOwner}}
-                    <div class="d-flex gap-1">
-                        <button onclick="toggleEditForm({{id}})" class="btn btn-sm btn-outline-warning">수정</button>
-                        <form method="post" action="/comments/{{id}}/delete"
-                              onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
-                        </form>
-                    </div>
-                {{/isOwner}}
             </div>
 
-            <!-- 댓글 본문 -->
-            <p id="comment-text-{{id}}" class="mt-2">{{comment}}</p>
+            <!-- 좋아요/댓글 수 -->
+            <div class="d-flex gap-2 mb-4 align-items-center">
 
-            <!-- 수정 폼 -->
-            <form id="edit-form-{{id}}" method="post" action="/comments/{{id}}/edit"
-                  style="display:none;" class="mt-2">
-                <textarea name="content" class="form-control mb-2" rows="3">{{comment}}</textarea>
-                <button type="submit" class="btn btn-sm btn-success me-2">수정 완료</button>
-                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm({{id}})">취소</button>
-            </form>
-
-            <!-- 답글 -->
-            <button class="btn btn-sm btn-link text-primary mt-2" onclick="toggleReplyForm({{id}})">↪ 답글 달기</button>
-
-            <!-- 답글 입력 -->
-            <div id="reply-form-{{id}}" style="display:none;" class="mt-2">
-                <form method="post" action="/board/{{board.boardIdx}}/comment">
-                    <input type="hidden" name="parentId" value="{{id}}">
-                    <textarea name="content" class="form-control mb-2" rows="2" placeholder="답글을 입력하세요..."></textarea>
-                    <button type="submit" class="btn btn-sm btn-primary">답글 작성</button>
+                <form method="post" action="/board/{{board.boardIdx}}/like" style="display:inline;">
+                    <button type="submit"
+                            class="btn d-flex align-items-center px-3 py-2 rounded-pill"
+                            style="background-color: {{#isLiked}}#ffcdd2{{/isLiked}}{{^isLiked}}#e3f2fd{{/isLiked}};
+                   color: {{#isLiked}}#d32f2f{{/isLiked}}{{^isLiked}}#1976d2{{/isLiked}};
+                   border: none; font-weight: 600; border-radius: 9999px; cursor: pointer;">
+                        <i class="bi bi-heart{{#isLiked}}-fill{{/isLiked}} me-2"></i>{{likeCount}}개
+                    </button>
                 </form>
+
+                <span class="badge d-flex align-items-center px-3 py-2 rounded-pill"
+                      style="background-color: #e0f7fa; color: #00796b;">
+        <i class="bi bi-chat-dots me-2"></i>{{commentCount}}개
+    </span>
             </div>
 
-            <!-- 대댓글 목록 -->
-            {{#replies}}
-                <div class="mt-3 ps-4 border-start">
+
+            <!-- 수정/삭제 (작성자만) -->
+            {{#isAuthor}}
+                <div class="d-flex gap-2 mb-5">
+                    <a href="/board/{{board.boardIdx}}/edit" class="btn btn-sm rounded-pill fw-semibold"
+                       style="border: 2px solid #2d67ff; color: #2d67ff;">
+                        <i class="bi bi-pencil-square me-1"></i> 수정
+                    </a>
+                    <form method="post" action="/board/{{board.boardIdx}}/delete"
+                          onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                        <button type="submit" class="btn btn-sm rounded-pill fw-semibold"
+                                style="border: 2px solid black; color: black;">
+                            <i class="bi bi-trash3 me-1"></i> 삭제
+                        </button>
+                    </form>
+                </div>
+            {{/isAuthor}}
+
+            <!-- 본문 -->
+            <div class="bg-white p-4 rounded-4 shadow-sm mb-5">
+                <p class="fs-5">{{board.boardContent}}</p>
+                {{#board.tags}}
+                    <span class="badge bg-secondary me-1">#{{.}}</span>
+                {{/board.tags}}
+            </div>
+
+            <!-- 댓글 영역 제목 -->
+            <h5 class="fw-bold mb-4">💬 댓글</h5>
+
+            <!-- 댓글 리스트 -->
+            {{#comments}}
+                <div class="bg-white p-4 mb-4 rounded-4 shadow-sm">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{username}}</strong>
-                            <span class="text-muted small">· {{createdAt}}</span>
+                        <div class="fw-semibold">
+                            {{username}} <small class="text-muted">· {{createdAt}}</small>
                         </div>
                         {{#isOwner}}
-                            <form method="post" action="/comments/{{id}}/delete"
-                                  onsubmit="return confirm('답글을 삭제하시겠습니까?');">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">삭제</button>
-                            </form>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm rounded-pill fw-semibold"
+                                        style="border: 2px solid #2d67ff; color: #2d67ff;"
+                                        onclick="toggleEditForm({{id}})">
+                                    <i class="bi bi-pencil"></i> 수정
+                                </button>
+                                <form method="post" action="/comments/{{id}}/delete"
+                                      onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn btn-sm rounded-pill fw-semibold"
+                                            style="border: 2px solid black; color: black;">
+                                        <i class="bi bi-trash3"></i> 삭제
+                                    </button>
+                                </form>
+                            </div>
                         {{/isOwner}}
                     </div>
-                    <p class="mt-1 mb-0">{{comment}}</p>
+
+                    <!-- 댓글 내용 -->
+                    <p id="comment-text-{{id}}" class="mt-3 mb-2">{{comment}}</p>
+
+                    <!-- 댓글 수정 폼 -->
+                    <form id="edit-form-{{id}}" method="post" action="/comments/{{id}}/edit" style="display:none;">
+                        <textarea name="content" class="form-control mb-2" rows="3">{{comment}}</textarea>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-success rounded-pill">수정 완료</button>
+                            <button type="button" class="btn btn-sm btn-secondary rounded-pill" onclick="toggleEditForm({{id}})">취소</button>
+                        </div>
+                    </form>
+
+                    <!-- 답글 달기 버튼 -->
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-sm rounded-pill fw-semibold"
+                                style="border: 2px solid #2d67ff; color: #2d67ff;"
+                                onclick="toggleReplyForm({{id}})">
+                            <i class="bi bi-reply"></i> 답글 달기
+                        </button>
+
+                        <!-- 답글 작성 폼 -->
+                        <div id="reply-form-{{id}}" style="display:none;" class="mt-3">
+                            <form method="post" action="/board/{{board.boardIdx}}/comment">
+                                <input type="hidden" name="parentId" value="{{id}}">
+                                <textarea name="content" class="form-control mb-2" rows="2" placeholder="답글을 입력하세요"></textarea>
+                                <button type="submit" class="btn btn-sm btn-primary rounded-pill">답글 작성</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 대댓글 리스트 -->
+                    {{#replies}}
+                        <div class="border-start ps-3 mt-4 ms-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="small fw-semibold">{{username}} · {{createdAt}}</div>
+                                {{#isOwner}}
+                                    <form method="post" action="/comments/{{id}}/delete"
+                                          onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
+                                        <button type="submit" class="btn btn-sm rounded-pill fw-semibold"
+                                                style="border: 2px solid black; color: black;">
+                                            <i class="bi bi-trash3"></i> 삭제
+                                        </button>
+                                    </form>
+                                {{/isOwner}}
+                            </div>
+                            <p class="mt-2 mb-0">{{comment}}</p>
+                        </div>
+                    {{/replies}}
                 </div>
-            {{/replies}}
+            {{/comments}}
 
-        </div>
-    {{/comments}}
+            <!-- 댓글 없을 때 -->
+            {{^comments}}
+                <p class="text-muted">💬 아직 댓글이 없습니다.</p>
+            {{/comments}}
 
-    {{^comments}}
-        <div class="text-muted mb-4">아직 댓글이 없습니다.</div>
-    {{/comments}}
+            <hr class="my-5">
 
-    <!-- 댓글 작성 -->
-    <hr>
-    {{#sessionUser}}
-        <form method="post" action="/board/{{board.boardIdx}}/comment" class="mt-3">
-            <div class="mb-3">
-                <textarea name="content" class="form-control" rows="3" placeholder="댓글을 입력하세요..." required></textarea>
+            <!-- 댓글 작성 폼 (로그인 시) -->
+            {{#sessionUser}}
+                <form method="post" action="/board/{{board.boardIdx}}/comment">
+                    <textarea name="content" class="form-control mb-3" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill">댓글 작성</button>
+                </form>
+            {{/sessionUser}}
+
+            <!-- 로그인 안 했을 때 -->
+            {{^sessionUser}}
+                <p class="text-muted">✋ 댓글을 작성하려면 <a href="/login-form">로그인</a>해주세요.</p>
+            {{/sessionUser}}
+
+            <div class="text-end mt-5">
+                <a href="/board/list" class="btn btn-secondary rounded-pill">← 목록으로</a>
             </div>
-            <button type="submit" class="btn btn-primary">댓글 작성</button>
-        </form>
-    {{/sessionUser}}
 
-    {{^sessionUser}}
-        <div class="text-muted mt-3">
-            ✍️ 댓글을 작성하려면 <a href="/login-form">로그인</a>이 필요합니다.
         </div>
-    {{/sessionUser}}
-
-    <!-- 목록으로 -->
-    <div class="mt-5">
-        <a href="/board/list" class="btn btn-secondary">← 목록으로</a>
     </div>
-
 </div>
 
-<!-- 토글 스크립트 -->
+<!-- 스크립트 -->
 <script>
-    function toggleReplyForm(id) {
-        const form = document.getElementById(`reply-form-${id}`);
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById(`reply-form-${commentId}`);
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
 
-    function toggleEditForm(id) {
-        const text = document.getElementById(`comment-text-${id}`);
-        const form = document.getElementById(`edit-form-${id}`);
+    function toggleEditForm(commentId) {
+        const text = document.getElementById(`comment-text-${commentId}`);
+        const form = document.getElementById(`edit-form-${commentId}`);
         if (form.style.display === 'none') {
             form.style.display = 'block';
             text.style.display = 'none';
@@ -164,7 +187,11 @@
     }
 </script>
 
+<!-- 리소스 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/suit-font@1.0.0/build/web/suit.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+</body>
 {{> layout/footer}}

@@ -1,4 +1,3 @@
-
 package com.join.spring_resume.board;
 
 import com.join.spring_resume.Like.LikeService;
@@ -50,7 +49,9 @@ public class BoardController {
                              Model model,
                              HttpSession session) {
 
-        keyword = (keyword == null) ? "" : keyword;
+        if (keyword == null) {
+            keyword = "";
+        }
         model.addAttribute("keyword", keyword);
 
         Sort sorting = direction.equalsIgnoreCase("asc") ?
@@ -69,11 +70,7 @@ public class BoardController {
         PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(boardPage);
 
         model.addAttribute("boardList", boardPage);
-        model.addAttribute("pageNumbers", navigation.getPageNumbers());
-        model.addAttribute("hasPrev", navigation.isHasPrev());
-        model.addAttribute("hasNext", navigation.isHasNext());
-        model.addAttribute("prevPage", navigation.getPrevPage());
-        model.addAttribute("nextPage", navigation.getNextPage());
+        model.addAttribute("navigation", navigation);
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
@@ -81,10 +78,10 @@ public class BoardController {
         model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
         model.addAttribute("isDesc", direction.equals("desc"));
         model.addAttribute("isAsc", direction.equals("asc"));
+        model.addAttribute("keyword", keyword);
 
         return "board/list";
     }
-
 
     @GetMapping("/new")
     public String newBoardForm(HttpSession session, Model model) {
@@ -147,6 +144,7 @@ public class BoardController {
             model.addAttribute("isAuthor", true);
         }
 
+
         List<Comment> commentEntities = commentService.findCommentsByBoard(id);
         List<CommentResponseDto> commentDtos = commentEntities.stream()
                 .map(parent -> {
@@ -155,12 +153,19 @@ public class BoardController {
                     return dto;
                 }).toList();
 
+
+        int commentCount = commentDtos.stream()
+                .mapToInt(dto -> 1 + dto.getReplies().size())
+                .sum();
+
         model.addAttribute("board", board);
         model.addAttribute("formattedCreatedAt", board.getFormattedCreatedAt());
         model.addAttribute("formattedUpdatedAt", board.getFormattedUpdatedAt());
         model.addAttribute("comments", commentDtos);
+        model.addAttribute("commentCount", commentCount);
         model.addAttribute("sessionUser", sessionUser);
         model.addAttribute("loginUserId", loginUserId);
+
 
         boolean isLiked = false;
         long likeCount = likeService.countLikes(board);
@@ -171,6 +176,7 @@ public class BoardController {
 
         model.addAttribute("isLiked", isLiked);
         model.addAttribute("likeCount", likeCount);
+
         return "board/detail";
     }
 
@@ -204,7 +210,10 @@ public class BoardController {
         if (sessionUser == null) throw new Exception401("로그인이 필요합니다.");
 
         Long memberIdx = sessionUser.getId();
-        keyword = (keyword == null) ? "" : keyword;
+        if (keyword == null) {
+            keyword = "";
+        }
+        model.addAttribute("keyword", keyword);
 
         Sort sorting = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
         Pageable pageable = PageRequest.of(page, size, sorting);
@@ -220,13 +229,8 @@ public class BoardController {
         PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(boardPage);
 
         model.addAttribute("boardList", boardPage);
+        model.addAttribute("navigation", navigation);
         model.addAttribute("sessionUser", sessionUser);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("pageNumbers", navigation.getPageNumbers());
-        model.addAttribute("hasPrev", navigation.isHasPrev());
-        model.addAttribute("hasNext", navigation.isHasNext());
-        model.addAttribute("prevPage", navigation.getPrevPage());
-        model.addAttribute("nextPage", navigation.getNextPage());
         model.addAttribute("sort", sort);
         model.addAttribute("direction", direction);
         model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
@@ -236,7 +240,6 @@ public class BoardController {
 
         return "board/my-list";
     }
-
 
     @GetMapping("/likes")
     public String likedBoard(HttpSession session, Model model) {
@@ -272,13 +275,12 @@ public class BoardController {
         return "board/my-comment-list";
     }
 
-
     @GetMapping("/my-boards")
-    public String myBoards(HttpSession session, Model model,
-                           @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "10") int size,
-                           @RequestParam(defaultValue = "createdAt") String sort,
-                           @RequestParam(defaultValue = "desc") String direction) {
+    public String myBoardsPaging(HttpSession session, Model model,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "10") int size,
+                                 @RequestParam(defaultValue = "createdAt") String sort,
+                                 @RequestParam(defaultValue = "desc") String direction) {
 
         SessionUser sessionUser = (SessionUser) session.getAttribute("session");
         if (sessionUser == null) throw new Exception401("로그인이 필요합니다.");
@@ -289,13 +291,19 @@ public class BoardController {
 
         Page<BoardListResponseDto> boardPage = boardService.getMyBoards(memberIdx, pageable);
 
-        model.addAttribute("boardList", boardPage.getContent());
+        PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(boardPage);
+
+        model.addAttribute("boardList", boardPage);
+        model.addAttribute("navigation", navigation);
+        model.addAttribute("sessionUser", sessionUser);
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
         model.addAttribute("isSortCreatedAt", sort.equals("createdAt"));
         model.addAttribute("isSortBoardHits", sort.equals("boardHits"));
-        model.addAttribute("isAsc", direction.equals("asc"));
         model.addAttribute("isDesc", direction.equals("desc"));
+        model.addAttribute("isAsc", direction.equals("asc"));
 
-        return "board/my_list";
+        return "board/my-boards";
     }
 
     @GetMapping("/boards")
@@ -304,26 +312,35 @@ public class BoardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction,
-            Model model
+            Model model,
+            HttpSession session
     ) {
+        if (keyword == null) {
+            keyword = "";
+        }
+        model.addAttribute("keyword", keyword);
+
         Sort sort = direction.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, 10, sort);
 
         Page<BoardListResponseDto> boardPage = boardService.getBoardList(keyword, pageable);
 
-        model.addAttribute("boardList", boardPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", boardPage.getTotalPages());
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("sortBy", sortBy);
+        PageNumberDto.PageNavigation navigation = PageNumberDto.createNavigation(boardPage);
+
+        SessionUser sessionUser = (SessionUser) session.getAttribute("session");
+
+        model.addAttribute("boardList", boardPage);
+        model.addAttribute("navigation", navigation);
+        model.addAttribute("sort", sortBy);  // sortBy -> sort 통일
         model.addAttribute("direction", direction);
+        model.addAttribute("isSortCreatedAt", sortBy.equals("createdAt"));
+        model.addAttribute("isSortBoardHits", sortBy.equals("boardHits"));
+        model.addAttribute("isDesc", direction.equals("desc"));
+        model.addAttribute("isAsc", direction.equals("asc"));
+        model.addAttribute("sessionUser", sessionUser);
 
         return "board/list";
     }
-
-
 }
-
-
 
