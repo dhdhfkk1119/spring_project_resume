@@ -4,12 +4,14 @@ import com.join.spring_resume.board.Board;
 import com.join.spring_resume.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LikeService {
 
     private final LikeRepository likeRepository;

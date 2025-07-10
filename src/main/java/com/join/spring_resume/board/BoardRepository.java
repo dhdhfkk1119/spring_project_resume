@@ -11,7 +11,7 @@ import java.util.List;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
 
-    // 2. 내가 쓴 게시글 목록 조회
+    // 1. 내가 쓴 게시글 목록 조회
     @Query("""
                 SELECT new com.join.spring_resume.board.BoardListResponseDto(
                     b.boardIdx,
@@ -36,7 +36,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<BoardListResponseDto> findBoardListByMemberIdx(@Param("memberIdx") Long memberIdx, Pageable pageable);
 
 
-    // 3. 좋아요 누른 게시글 목록
+    // 2. 좋아요 누른 게시글 목록
     @Query("""
                 SELECT new com.join.spring_resume.board.BoardListResponseDto(
                     b.boardIdx,
@@ -64,7 +64,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     List<BoardListResponseDto> findBoardsLikedByMember(@Param("memberIdx") Long memberIdx);
 
 
-    // 4. 내가 댓글 단 게시글 목록
+    // 3. 내가 댓글 단 게시글 목록
     @Query("""
                 SELECT DISTINCT new com.join.spring_resume.board.BoardListResponseDto(
                     b.boardIdx,
@@ -90,7 +90,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     List<BoardListResponseDto> findBoardsCommentedByMember(@Param("memberIdx") Long memberIdx);
 
 
-    // 5. 내가 쓴 게시글 목록 + 키워드 검색
+    // 4. 내가 쓴 게시글 목록 + 키워드 검색
     @Query("""
        SELECT new com.join.spring_resume.board.BoardListResponseDto(
            b.boardIdx,
@@ -120,7 +120,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
 
 
-    // 6. 기본 엔티티 반환용 (옵션)
+    // 5. 기본 엔티티 반환용 (옵션)
     Page<Board> findByMember_MemberIdx(Long memberIdx, Pageable pageable);
 
     @Query("""
@@ -132,7 +132,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     List<Board> findByMember_MemberIdx(Long memberIdx);
 
-    // 7. 전체 게시글 목록 DTO (댓글/좋아요 수 제외)
+    // 6. 전체 게시글 목록 DTO (댓글/좋아요 수 제외)
     @Query("""
                 SELECT new com.join.spring_resume.board.BoardListResponseDto(
                     b.boardIdx,
@@ -151,7 +151,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             """)
     Page<BoardListResponseDto> findAllBoards(Pageable pageable);
 
-    // 8. 전체 게시글 목록 + 키워드 검색 DTO (댓글/좋아요 수 제외)
+    // 7. 전체 게시글 목록 + 키워드 검색 DTO (댓글/좋아요 수 제외)
     @Query("""
                 SELECT new com.join.spring_resume.board.BoardListResponseDto(
                     b.boardIdx,
@@ -174,7 +174,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             """)
     Page<BoardListResponseDto> findBoardListWithCounts(@Param("keyword") String keyword, Pageable pageable);
 
-
+    // 8. 게시글 목록 을 제목 또는 내용으로 검색
     @Query("""
                 SELECT new com.join.spring_resume.board.BoardListResponseDto(
                     b.boardIdx,

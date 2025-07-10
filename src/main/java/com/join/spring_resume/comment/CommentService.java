@@ -5,7 +5,8 @@ import com.join.spring_resume.board.BoardHtmlSanitizer;
 import com.join.spring_resume.board.BoardRepository;
 import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommentService {
 
     private final CommentRepository commentRepository;
