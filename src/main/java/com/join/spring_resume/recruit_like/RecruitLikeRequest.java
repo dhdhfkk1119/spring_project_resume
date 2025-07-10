@@ -9,6 +9,7 @@ import lombok.Data;
 
 public class RecruitLikeRequest {
 
+    // 저장해주는 용도 ( 좋아요 )
     @Data
     public static class SaveDTO{
         public RecruitLike toEntity(Member member, Recruit recruit){

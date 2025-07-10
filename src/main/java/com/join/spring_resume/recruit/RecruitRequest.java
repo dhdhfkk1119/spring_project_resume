@@ -46,9 +46,6 @@ public class RecruitRequest {
         @NotBlank(message = "공고의 마감일을 입력해주시기 바랍니다")
         private String endAt;   // 마감일
 
-
-        private String logoImages;
-
         public Recruit toEntity(Corp corp) {
             return Recruit.builder()
                     .corp(corp)
@@ -61,7 +58,6 @@ public class RecruitRequest {
                     .workType(workType)
                     .startAt(toStartOfDay(startAt))  // 00:00:00으로 변환 변환안하면 오류남
                     .endAt(toEndOfDay(endAt))        // 23:59:59.999999999로 변환
-                    .logoImages(logoImages)
                     .build();
         }
 
