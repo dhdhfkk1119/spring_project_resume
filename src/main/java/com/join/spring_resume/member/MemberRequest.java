@@ -61,6 +61,8 @@ public class MemberRequest {
         @NotBlank(message = "전화번호 뒷 4자리를 입력해주세요")
         private String phone3;
 
+        private String memberImage = "basic.png";
+
         public Member toEntity(){
             String phoneNumber = phone1 + phone2 + phone3; // --> 따로 받아서 넘겨주기
             
@@ -75,6 +77,7 @@ public class MemberRequest {
                     .addressDefault(addressDefault)
                     .addressDetail(addressDetail)
                     .phoneNumber(phoneNumber)
+                    .memberImage(memberImage)
                     .build();
         }
 
