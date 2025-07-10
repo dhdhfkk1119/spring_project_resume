@@ -4,6 +4,8 @@ import com.join.spring_resume.member.Member;
 import com.join.spring_resume.member.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,13 @@ public class BoardService {
 
     @Transactional
     public Board create(BoardCreateDto dto, Member member) {
-        if (dto.getBoardTitle() == null || dto.getBoardContent() == null) {
-            throw new IllegalArgumentException("제목과 내용을 입력해주세요");
-        }
-        return boardRepository.save(dto.toEntity(member));
+        String safeContent = Jsoup.clean(dto.getBoardContent(),
+                Safelist.none().addTags("img").addAttributes("img", "src", "alt", "width", "height"));
+        Board board = dto.toEntity(member);
+        board.setBoardContent(safeContent);
+        return boardRepository.save(board);
     }
+
 
     public Page<Board> findAll(Pageable pageable) {
         return boardRepository.findAll(pageable);
@@ -40,8 +44,15 @@ public class BoardService {
         if (dto.getBoardTitle() == null || dto.getBoardContent() == null) {
             throw new IllegalArgumentException("제목과 내용을 입력해주세요.");
         }
-        dto.applyTo(board);
+
+        // 이미지 태그만 허용하고 나머지 HTML 은 제거
+        String safeContent = Jsoup.clean(dto.getBoardContent(),
+        Safelist.none().addTags("img").addAttributes("img","src","alt","width","height"));
+        board.setBoardTitle(dto.getBoardTitle());
+        board.setBoardContent(safeContent);
+        board.setTags(dto.getTags());
     }
+
 
     public void delete(Long boardIdx) {
         Board board = findById(boardIdx);

@@ -24,15 +24,22 @@
                         <div class="col">
                             <label for="sort" class="form-label fw-semibold text-dark">📌 정렬</label>
                             <select name="sort" id="sort" class="form-select shadow-sm">
-                                <option value="createdAt" {{#isSortCreatedAt}}selected{{/isSortCreatedAt}}>최신순</option>
-                                <option value="boardHits" {{#isSortBoardHits}}selected{{/isSortBoardHits}}>조회순</option>
+                                <option value="createdAt" {{#isSortCreatedAt}}selected{{/isSortCreatedAt}}>작성일</option>
+                                <option value="boardHits" {{#isSortBoardHits}}selected{{/isSortBoardHits}}>조회수</option>
                             </select>
                         </div>
                         <div class="col">
                             <label for="direction" class="form-label fw-semibold text-dark">⬇⬆ 방향</label>
                             <select name="direction" id="direction" class="form-select shadow-sm">
-                                <option value="desc" {{#isDesc}}selected{{/isDesc}}>내림차순</option>
-                                <option value="asc" {{#isAsc}}selected{{/isAsc}}>오름차순</option>
+                                {{#isSortCreatedAt}}
+                                    <option value="desc" {{#isDesc}}selected{{/isDesc}}>최신순</option>
+                                    <option value="asc" {{#isAsc}}selected{{/isAsc}}>오래된순</option>
+                                {{/isSortCreatedAt}}
+
+                                {{#isSortBoardHits}}
+                                    <option value="desc" {{#isDesc}}selected{{/isDesc}}>조회수 많은 순</option>
+                                    <option value="asc" {{#isAsc}}selected{{/isAsc}}>조회수 적은 순</option>
+                                {{/isSortBoardHits}}
                             </select>
                         </div>
                         <div class="col">
@@ -174,7 +181,6 @@
       border-color: #000 !important;
     }
 
-    /* 페이징 버튼 통일 스타일 */
     .pagination .page-item .page-link {
       width: 40px;
       height: 40px;

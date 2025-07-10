@@ -5,7 +5,7 @@
     <div class="content">
         <div class="container py-5" style="max-width: 950px;">
 
-            <!-- 제목 -->
+            <!-- 게시글 제목 및 정보 -->
             <div class="text-start mb-4">
                 <h4 class="fw-bold text-dark mb-2">
                     <i class="bi bi-journal-text me-2 text-primary"></i>{{board.boardTitle}}
@@ -15,27 +15,24 @@
                 </div>
             </div>
 
-            <!-- 좋아요/댓글 수 -->
+            <!-- 좋아요/댓글 -->
             <div class="d-flex gap-2 mb-4 align-items-center">
-
                 <form method="post" action="/board/{{board.boardIdx}}/like" style="display:inline;">
                     <button type="submit"
                             class="btn d-flex align-items-center px-3 py-2 rounded-pill"
                             style="background-color: {{#isLiked}}#ffcdd2{{/isLiked}}{{^isLiked}}#e3f2fd{{/isLiked}};
-                   color: {{#isLiked}}#d32f2f{{/isLiked}}{{^isLiked}}#1976d2{{/isLiked}};
-                   border: none; font-weight: 600; border-radius: 9999px; cursor: pointer;">
+                                   color: {{#isLiked}}#d32f2f{{/isLiked}}{{^isLiked}}#1976d2{{/isLiked}};
+                                   border: none;">
                         <i class="bi bi-heart{{#isLiked}}-fill{{/isLiked}} me-2"></i>{{likeCount}}개
                     </button>
                 </form>
-
                 <span class="badge d-flex align-items-center px-3 py-2 rounded-pill"
                       style="background-color: #e0f7fa; color: #00796b;">
-        <i class="bi bi-chat-dots me-2"></i>{{commentCount}}개
-    </span>
+                    <i class="bi bi-chat-dots me-2"></i>{{commentCount}}개
+                </span>
             </div>
 
-
-            <!-- 수정/삭제 (작성자만) -->
+            <!-- 수정/삭제 버튼 -->
             {{#isAuthor}}
                 <div class="d-flex gap-2 mb-5">
                     <a href="/board/{{board.boardIdx}}/edit" class="btn btn-sm rounded-pill fw-semibold"
@@ -52,7 +49,7 @@
                 </div>
             {{/isAuthor}}
 
-            <!-- 본문 -->
+            <!-- 게시글 본문 -->
             <div class="bg-white p-4 rounded-4 shadow-sm mb-5">
                 <p class="fs-5">{{board.boardContent}}</p>
                 {{#board.tags}}
@@ -60,15 +57,14 @@
                 {{/board.tags}}
             </div>
 
-            <!-- 댓글 영역 제목 -->
+            <!-- 댓글 섹션 -->
             <h5 class="fw-bold mb-4">💬 댓글</h5>
 
-            <!-- 댓글 리스트 -->
             {{#comments}}
                 <div class="bg-white p-4 mb-4 rounded-4 shadow-sm">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="fw-semibold">
-                            {{username}} <small class="text-muted">· {{createdAt}}</small>
+                            {{username}} <small class="text-muted">· {{formattedCreatedAt}}</small>
                         </div>
                         {{#isOwner}}
                             <div class="d-flex gap-2">
@@ -90,8 +86,9 @@
 
                     <!-- 댓글 내용 -->
                     <p id="comment-text-{{id}}" class="mt-3 mb-2">{{comment}}</p>
+                    {{#isSecret}}<span class="badge bg-dark-subtle text-dark">🔒 비밀댓글</span>{{/isSecret}}
 
-                    <!-- 댓글 수정 폼 -->
+                    <!-- 수정 폼 -->
                     <form id="edit-form-{{id}}" method="post" action="/comments/{{id}}/edit" style="display:none;">
                         <textarea name="content" class="form-control mb-2" rows="3">{{comment}}</textarea>
                         <div class="d-flex gap-2">
@@ -100,7 +97,7 @@
                         </div>
                     </form>
 
-                    <!-- 답글 달기 버튼 -->
+                    <!-- 답글 작성 -->
                     <div class="mt-3">
                         <button type="button" class="btn btn-sm rounded-pill fw-semibold"
                                 style="border: 2px solid #2d67ff; color: #2d67ff;"
@@ -108,11 +105,14 @@
                             <i class="bi bi-reply"></i> 답글 달기
                         </button>
 
-                        <!-- 답글 작성 폼 -->
                         <div id="reply-form-{{id}}" style="display:none;" class="mt-3">
                             <form method="post" action="/board/{{board.boardIdx}}/comment">
                                 <input type="hidden" name="parentId" value="{{id}}">
                                 <textarea name="content" class="form-control mb-2" rows="2" placeholder="답글을 입력하세요"></textarea>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="isSecret" value="true" id="reply-secret-{{id}}">
+                                    <label class="form-check-label" for="reply-secret-{{id}}">🔒 비밀 댓글</label>
+                                </div>
                                 <button type="submit" class="btn btn-sm btn-primary rounded-pill">답글 작성</button>
                             </form>
                         </div>
@@ -122,7 +122,7 @@
                     {{#replies}}
                         <div class="border-start ps-3 mt-4 ms-2">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="small fw-semibold">{{username}} · {{createdAt}}</div>
+                                <div class="small fw-semibold">{{username}} · {{formattedCreatedAt}}</div>
                                 {{#isOwner}}
                                     <form method="post" action="/comments/{{id}}/delete"
                                           onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
@@ -134,27 +134,30 @@
                                 {{/isOwner}}
                             </div>
                             <p class="mt-2 mb-0">{{comment}}</p>
+                            {{#isSecret}}<span class="badge bg-dark-subtle text-dark">🔒 비밀댓글</span>{{/isSecret}}
                         </div>
                     {{/replies}}
                 </div>
             {{/comments}}
 
-            <!-- 댓글 없을 때 -->
             {{^comments}}
                 <p class="text-muted">💬 아직 댓글이 없습니다.</p>
             {{/comments}}
 
             <hr class="my-5">
 
-            <!-- 댓글 작성 폼 (로그인 시) -->
+            <!-- 댓글 작성 -->
             {{#sessionUser}}
                 <form method="post" action="/board/{{board.boardIdx}}/comment">
-                    <textarea name="content" class="form-control mb-3" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    <textarea name="content" class="form-control mb-2" rows="3" placeholder="댓글을 입력하세요"></textarea>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="isSecret" id="secretComment" value="true">
+                        <label class="form-check-label" for="secretComment">🔒 비밀 댓글로 작성</label>
+                    </div>
                     <button type="submit" class="btn btn-primary px-4 rounded-pill">댓글 작성</button>
                 </form>
             {{/sessionUser}}
 
-            <!-- 로그인 안 했을 때 -->
             {{^sessionUser}}
                 <p class="text-muted">✋ 댓글을 작성하려면 <a href="/login-form">로그인</a>해주세요.</p>
             {{/sessionUser}}
@@ -162,32 +165,46 @@
             <div class="text-end mt-5">
                 <a href="/board/list" class="btn btn-secondary rounded-pill">← 목록으로</a>
             </div>
-
         </div>
     </div>
 </div>
 
-<!-- 스크립트 -->
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+
 <script>
-    function toggleReplyForm(commentId) {
-        const form = document.getElementById(`reply-form-${commentId}`);
+    $(document).ready(function() {
+        $('textarea[name="content"]').summernote({
+            height: 120,
+            placeholder: '댓글을 입력하세요',
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['link']],
+                ['view', ['codeview']]
+            ]
+        });
+    });
+
+    function toggleReplyForm(id) {
+        const form = document.getElementById(`reply-form-${id}`);
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
 
-    function toggleEditForm(commentId) {
-        const text = document.getElementById(`comment-text-${commentId}`);
-        const form = document.getElementById(`edit-form-${commentId}`);
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            text.style.display = 'none';
-        } else {
-            form.style.display = 'none';
-            text.style.display = 'block';
-        }
+    function toggleEditForm(id) {
+        const form = document.getElementById(`edit-form-${id}`);
+        const text = document.getElementById(`comment-text-${id}`);
+        const isHidden = form.style.display === 'none';
+        form.style.display = isHidden ? 'block' : 'none';
+        text.style.display = isHidden ? 'none' : 'block';
     }
 </script>
 
-<!-- 리소스 -->
+<!-- Summernote CSS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet" />
+
+<!-- 기존 리소스 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/suit-font@1.0.0/build/web/suit.css" rel="stylesheet" />
