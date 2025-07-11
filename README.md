@@ -15,7 +15,7 @@
 
 # 기업 공고 등록 및 지원하기 
 
-# 게시물 등록 및 기능 명세
+
 
 
 
@@ -145,3 +145,80 @@ sequenceDiagram
 ```
 
 ---
+# 게시물 등록 및 기능 명세
+담당자 : 유류진    participant AuthInterceptor as 인증 인터셉터
+    participant ResumeController as 컨트롤러
+
+    Client->>DispatcherServlet: GET /resume/1 (요청)
+    DispatcherServlet->>AuthInterceptor: preHandle() 호출
+    activate AuthInterceptor
+    AuthInterceptor->>AuthInterceptor: @Auth 어노테이션 확인
+    AuthInterceptor->>AuthInterceptor: 세션에서 sessionUser 조회
+    alt 세션 정보 없음
+        AuthInterceptor-->>DispatcherServlet: Exception403 발생
+    else 세션 정보 있음
+        AuthInterceptor-->>DispatcherServlet: true 반환
+    end
+    deactivate AuthInterceptor
+    
+    DispatcherServlet->>ResumeController: resumeDetail() 호출
+    ResumeController-->>DispatcherServlet: View 반환
+    DispatcherServlet-->>Client: HTML 페이지 렌더링
+```
+### 다. 이력서 및 경력 동시 저장: 트랜잭션 관리
+
+-   **목적**: 데이터 정합성 보장. Resume, Career 저장/실패 시 원자적 처리(All or Nothing)
+-   **동작**: @Transactional 적용. Resume 저장 후 얻은 ID를 Career에 설정. saveAll로 DB I/O 최적화
+```mermaid
+sequenceDiagram
+    participant Controller as 컨트롤러
+    participant Service as ResumeService
+    participant ResumeRepo as ResumeRepository
+    participant CareerRepo as CareerRepository
+
+    Controller->>Service: save(saveDTO, sessionMember)
+    activate Service
+    alt 대표 이력서로 지정된 경우
+        Service->>ResumeRepo: resetAllIsRepByMemberIdx()
+    end
+    Service->>ResumeRepo: save(resume)
+    ResumeRepo-->>Service: savedResume (ID 포함)
+    
+    Service->>Service: careerDTOs를 Career 엔티티로 변환
+    Note right of Service: 이때 savedResume의 ID를 사용해<br/>연관관계를 설정함.
+    Service->>CareerRepo: saveAll(careers)
+    
+    Service-->>Controller: savedResume 반환
+    deactivate Service
+```
+### 라. 복합 이력서 수정: 더티 체킹, 명시적 관리
+
+-   **목적**: 정보 수정, 경력 추가/삭제 동시 처리
+-   **동작**: 소유권 검증. 기본 정보는 더티 체킹. 신규 경력은 save. 삭제 경력은 deletedCareerIds로 deleteAllById 호출
+```mermaid
+sequenceDiagram
+    participant Controller as 컨트롤러
+    participant Service as ResumeService
+    participant ResumeRepo as ResumeRepository
+    participant CareerRepo as CareerRepository
+
+    Controller->>Service: updateById(resumeIdx, updateDTO, sessionMember)
+    activate Service
+    Service->>ResumeRepo: findById(resumeIdx)
+    ResumeRepo-->>Service: resume 엔티티
+    
+    Service->>Service: resume.isOwner() 권한 검사
+    
+    Note right of Service: Dirty Checking으로<br/>Title, Content 등 수정
+    
+    Service->>CareerRepo: save(newCareer) (새 경력 추가)
+    Service->>CareerRepo: deleteAllById(deletedCareerIds) (기존 경력 삭제)
+    
+    Service-->>Controller: void
+    deactivate Service
+```
+
+---
+# 📋 게시물 등록 및 기능 명세
+담당자 : 유류진
+
