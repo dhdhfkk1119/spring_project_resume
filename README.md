@@ -305,6 +305,26 @@ sequenceDiagram
 ---
 
 
+### 로그인을 해야만 글쓰기 가능
+![로그인 인증 알림](https://github.com/user-attachments/assets/98568c58-6e14-44b7-b3f4-cff2716bb8c5)
+
+### 글쓰기 기능
+![글쓰기](https://github.com/user-attachments/assets/4f9b26ec-09c8-4911-9c85-3b8afccb94f8)
+
+### 글 삭제 기능
+![글 삭제 기능](https://github.com/user-attachments/assets/fbf463d6-343f-4624-918f-2d4abc0827fa)
+
+### 댓글 달기,수정,삭제,답글 기능
+![댓글 수정,삭제,답글](https://github.com/user-attachments/assets/b9d4564c-ab59-476e-98a2-038d429bdf01)
+
+### 좋아요, 비밀 댓글 기능
+![좋아요,비밀댓글](https://github.com/user-attachments/assets/1f2f45ab-38a0-4e59-8fa6-73a4d08ac490)
+
+### 페이징 정렬,조회,검색 기능
+![페이징 정렬,조회,검색](https://github.com/user-attachments/assets/93c13e22-08c6-4a0f-be9f-02218f5fa245)
+
+### 내가 댓글단 게시물,찜한,내 게시물 조회
+![회원정보에서 경로 설정](https://github.com/user-attachments/assets/52e2383a-9bb3-4ad6-804f-0849a72959a5)
 
 
 
