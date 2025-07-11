@@ -304,58 +304,6 @@ sequenceDiagram
 
 ---
 
-## 5. 📂 프로젝트 구조 (일부)
-spring_project_resume/
-├── board/                            # 📘 게시글 기능 관련            
-│   ├── BoardController.java
-│   ├── BoardCreateDto.java
-│   ├── BoardHtmlSanitizer.java
-│   ├── BoardListResponseDto.java
-│   ├── BoardRepository.java
-│   ├── BoardService.java
-│   ├── BoardUpdateDto.java
-|   ├── GlobalExceptionHandler.java
-│   └── SessionUserAdvice.java
-│
-
-------------------------------------------------------------
-
-├── comment/                          # 💬 댓글 기능 관련
-│   ├── CommentController.java
-│   ├── CommentRepository.java
-│   ├── CommentResponseDto.java
-│   └── CommentService.java
-│
-
-------------------------------------------------------------
-
-
-├── like/                             # ❤️ 좋아요 기능 관련
-|   ├── Like.java
-│   ├── LikeRepository.java
-│   └── LikeService.java
-│
-
-
-├── common/                           # 🧩 공통 유틸/DTO
-│   └── PageNumberDto.java            # 페이징 네비게이션 DTO
-│
-│
-│
-
-------------------------------------------------------------
-
-├── templates/                        # 🖼 Mustache 템플릿 뷰
-│   └── board/
-│       ├── detail.mustache
-│       ├── form.mustache
-│       ├── liked-list.mustache
-│       ├── list.mustache
-│       ├── my-comment-list.mustache
-│       └── my-list.mustache
-│
-└──
-------------------------------------------------------------
 
 
 
