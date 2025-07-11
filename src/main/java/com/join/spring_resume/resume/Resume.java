@@ -61,7 +61,7 @@ public class Resume {
             fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE)
     List<Career> careerList = new ArrayList<>();
-    //선언과 동시에 초기화 (💀❗오류가 잘 일어난다)
+    //선언과 동시에 초기화
 
     //Resume 소유권 확인 메서드
     public boolean isOwner(Long memberIdx) {
