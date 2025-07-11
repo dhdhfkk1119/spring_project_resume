@@ -145,8 +145,7 @@ sequenceDiagram
 ```
 
 ---
-# 게시물 등록 및 기능 명세
-담당자 : 유류진    participant AuthInterceptor as 인증 인터셉터
+   participant AuthInterceptor as 인증 인터셉터
     participant ResumeController as 컨트롤러
 
     Client->>DispatcherServlet: GET /resume/1 (요청)
@@ -219,6 +218,7 @@ sequenceDiagram
 ```
 
 ---
+
 
 # 📋 게시판 커뮤니티 기능
 
