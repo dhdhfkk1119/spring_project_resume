@@ -10,13 +10,19 @@ public class CorpResponse {
         private Long corpIdx;
         private String corpName;
         private String corpImage;
+        private boolean isBasicImage;
 
         public static CorpDTO fromEntity(Corp corp) {
+            String corpImage = corp.getCorpImage();
+            boolean isBasic = "basic.png".equals(corpImage); // null-safe
+
             return new CorpDTO(
                     corp.getCorpIdx(),
                     corp.getCorpName(),
-                    corp.getCorpImage()
+                    corpImage,
+                    isBasic
             );
         }
     }
+
 }
