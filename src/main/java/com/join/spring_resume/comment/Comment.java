@@ -49,7 +49,7 @@ public class Comment {
         this.comment = comment;
     }
 
-    @Column(nullable = false)
+    @Column(name = "is_secret", nullable = false)
     private boolean isSecret = false;
 
 }
