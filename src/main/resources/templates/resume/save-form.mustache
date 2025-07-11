@@ -82,36 +82,40 @@
          * @returns {string} - 경력 입력 폼의 HTML 문자열
          */
         function createCareerItemHTML(index) {
+            // 여기서는 플레이스홀더가 적용된 버전으로 복구했습니다.
+            // 만약 테스트 값이 있던 원래 버전이 필요하시면 바로 말씀해주세요.
             return `
-                <div class="d-flex align-items-start">
-                    <div class="flex-grow-1" style="min-width: 0;">
-                        <div class="mb-2">
-                            <label class="form-label">회사명</label>
-                            <input type="text" name="careers[${index}].corpName" class="form-control" placeholder="예: (주)네이버" maxlength="50" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">직책</label>
-                            <input type="text" name="careers[${index}].position" class="form-control" placeholder="예: 백엔드 개발팀 / 사원" maxlength="50">
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">담당 업무</label>
-                            <textarea name="careers[${index}].careerContent" class="form-control" rows="3" maxlength="500" placeholder="담당했던 주요 업무와 성과를 구체적으로 작성해주세요." required></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">입사일</label>
-                                <input type="date" name="careers[${index}].startAt" class="form-control">
+                <div class="card my-3 p-3 bg-light career-item">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-grow-1" style="min-width: 0;">
+                            <div class="mb-2">
+                                <label class="form-label">회사명</label>
+                                <input type="text" name="careers[${index}].corpName" class="form-control" placeholder="예: (주)네이버" maxlength="50" required>
                             </div>
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">퇴사일</label>
-                                <input type="date" name="careers[${index}].endAt" class="form-control">
+                            <div class="mb-2">
+                                <label class="form-label">직책</label>
+                                <input type="text" name="careers[${index}].position" class="form-control" placeholder="예: 백엔드 개발팀 / 사원" maxlength="50">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">담당 업무</label>
+                                <textarea name="careers[${index}].careerContent" class="form-control" rows="3" maxlength="500" placeholder="담당했던 주요 업무와 성과를 구체적으로 작성해주세요." required></textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">입사일</label>
+                                    <input type="date" name="careers[${index}].startAt" class="form-control">
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">퇴사일</label>
+                                    <input type="date" name="careers[${index}].endAt" class="form-control">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex-shrink-0 ms-3 mt-4 pt-2">
-                        <button type="button" class="btn btn-link p-0 remove-career-btn" title="삭제하기" style="color: Tomato;">
-                            <i class="fa-solid fa-trash fs-5"></i>
-                        </button>
+                        <div class="flex-shrink-0 ms-3 mt-4 pt-2">
+                            <button type="button" class="btn btn-link p-0 remove-career-btn" title="삭제하기" style="color: Tomato;">
+                                <i class="fa-solid fa-trash fs-5"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -137,17 +141,19 @@
         // '경력 추가' 버튼 클릭 이벤트
         addCareerBtn.addEventListener('click', function () {
             const careerDiv = document.createElement('div');
-            careerDiv.classList.add('card', 'my-3', 'p-3', 'bg-light', 'career-item');
+            // 템플릿에 이미 card 스타일이 있어서 여기서는 제거합니다.
             careerDiv.innerHTML = createCareerItemHTML(careerIndex);
-            careerContainer.appendChild(careerDiv);
+            // createCareerItemHTML에서 생성된 첫 번째 자식 요소를 추가합니다.
+            careerContainer.appendChild(careerDiv.firstElementChild);
 
             // 중요: 새로 추가된 날짜 입력 필드에 달력(flatpickr) 적용
-            const newDateInputs = careerDiv.querySelectorAll('input[type="date"]');
+            const newDateInputs = careerContainer.lastElementChild.querySelectorAll('input[type="date"]');
             newDateInputs.forEach(initializeFlatpickr);
 
             // UX 개선: 새로 추가된 폼으로 스크롤하고 첫 입력 필드에 포커스
-            careerDiv.scrollIntoView({behavior: 'smooth', block: 'center'});
-            const firstInput = careerDiv.querySelector('input[type="text"]');
+            const newCareerItem = careerContainer.lastElementChild;
+            newCareerItem.scrollIntoView({behavior: 'smooth', block: 'center'});
+            const firstInput = newCareerItem.querySelector('input[type="text"]');
             if (firstInput) {
                 firstInput.focus();
             }
@@ -156,11 +162,9 @@
         });
 
         // '경력 삭제' 버튼 클릭 이벤트 (이벤트 위임)
-        // careerContainer에 이벤트를 한 번만 등록하여, 동적으로 추가되는 자식 요소(.remove-career-btn)의 이벤트를 처리
         careerContainer.addEventListener('click', function (e) {
             const removeBtn = e.target.closest('.remove-career-btn');
             if (removeBtn) {
-                // 가장 가까운 '.career-item' 부모 요소를 찾아 삭제
                 removeBtn.closest('.career-item').remove();
             }
         });
@@ -171,7 +175,6 @@
             const newCareerItems = document.querySelectorAll('.career-item');
             newCareerItems.forEach(item => {
                 const corpNameInput = item.querySelector('input[name*="corpName"]');
-                // 회사명이 비어있으면 해당 경력 블록을 삭제
                 if (corpNameInput && corpNameInput.value.trim() === '') {
                     item.remove();
                 }
