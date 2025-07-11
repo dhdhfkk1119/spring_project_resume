@@ -36,7 +36,7 @@ public interface ResumeJpaRepository extends JpaRepository<Resume,Long> {
     @Query("SELECT r FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = true")
     Optional<Resume> findRepresentativeResumeByMemberIdx(@Param("memberIdx") Long memberIdx);
 
-    // 📚 페이징 메서드 ( 일반 이력서 조회 / 조회된 이력서 카운트)
+    //페이징 메서드 ( 일반 이력서 조회 / 조회된 이력서 카운트)
     @Query(value = "SELECT r FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = false ORDER BY r.resumeIdx DESC",
             countQuery = "SELECT count(r) FROM Resume r WHERE r.member.memberIdx = :memberIdx AND r.isRep = false")
     Page<Resume> findByMemberIdxAndIsRepFalse(@Param("memberIdx") Long memberIdx, Pageable pageable);

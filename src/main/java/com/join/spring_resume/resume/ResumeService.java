@@ -40,7 +40,7 @@ public class ResumeService {
                 .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다. id: " + resumeIdx));
     }
 
-    // 👨‍💻 기업 채용담당관용 이력서 상세보기
+    // 기업 채용담당관용 이력서 상세보기
     public ResumeResponse.CorpDetailDTO findCorpResumeDetail(Long resumeIdx) {
         Resume resume = resumeJpaRepository.findByIdWithCareers(resumeIdx)
                 .orElseThrow(() -> new Exception404("해당 이력서를 찾을 수 없습니다: " + resumeIdx));
@@ -49,7 +49,7 @@ public class ResumeService {
         return new ResumeResponse.CorpDetailDTO(resume);
     }
 
-    // 📚 페이징된 이력서 목록 조회
+    // 페이징된 이력서 목록 조회
     public ResumeResponse.ListDTO findResumesForList(Long memberIdx, Pageable pageable) {
         // 1. 대표 이력서 조회 (없을 수도 있음)
         Resume repResume = resumeJpaRepository.findRepresentativeResumeByMemberIdx(memberIdx)
@@ -95,12 +95,7 @@ public class ResumeService {
         return savedResume;
     }
 
-    /**
-     * 📝 이력서 수정 페이지에 필요한 데이터를 DTO로 조회
-     * - Controller 에게 Entity가 아닌 DTO를 전달
-     * @param resumeIdx 이력서 ID
-     * @return UpdateFormDTO
-     */
+    //이력서 수정 페이지에 필요한 데이터를 DTO로 조회
     public ResumeResponse.UpdateFormDTO findResumeForUpdateForm(Long resumeIdx) {
         // 1. Repository를 통해 Entity 조회
         Resume resume = resumeJpaRepository.findByIdWithCareers(resumeIdx)
