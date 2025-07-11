@@ -317,6 +317,8 @@ spring_project_resume/
 |   ├── GlobalExceptionHandler.java
 │   └── SessionUserAdvice.java
 │
+
+
 ├── comment/                          # 💬 댓글 기능 관련
 │   ├── CommentController.java
 │   ├── CommentRepository.java
@@ -328,11 +330,15 @@ spring_project_resume/
 │   ├── LikeRepository.java
 │   └── LikeService.java
 │
+
+
 ├── common/                           # 🧩 공통 유틸/DTO
 │   └── PageNumberDto.java            # 페이징 네비게이션 DTO
 │
 │
 │
+
+
 ├── templates/                        # 🖼 Mustache 템플릿 뷰
 │   └── board/
 │       ├── detail.mustache
