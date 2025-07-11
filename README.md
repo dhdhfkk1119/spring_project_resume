@@ -306,7 +306,7 @@ sequenceDiagram
 
 ## 5. 📂 프로젝트 구조 (일부)
 spring_project_resume/
-├── board/                            # 📘 게시글 기능 관련
+├── board/                            # 📘 게시글 기능 관련            
 │   ├── BoardController.java
 │   ├── BoardCreateDto.java
 │   ├── BoardHtmlSanitizer.java
@@ -318,6 +318,7 @@ spring_project_resume/
 │   └── SessionUserAdvice.java
 │
 
+------------------------------------------------------------
 
 ├── comment/                          # 💬 댓글 기능 관련
 │   ├── CommentController.java
@@ -325,6 +326,10 @@ spring_project_resume/
 │   ├── CommentResponseDto.java
 │   └── CommentService.java
 │
+
+------------------------------------------------------------
+
+
 ├── like/                             # ❤️ 좋아요 기능 관련
 |   ├── Like.java
 │   ├── LikeRepository.java
@@ -338,6 +343,7 @@ spring_project_resume/
 │
 │
 
+------------------------------------------------------------
 
 ├── templates/                        # 🖼 Mustache 템플릿 뷰
 │   └── board/
@@ -348,7 +354,8 @@ spring_project_resume/
 │       ├── my-comment-list.mustache
 │       └── my-list.mustache
 │
-└── ...
+└──
+------------------------------------------------------------
 
 
 
