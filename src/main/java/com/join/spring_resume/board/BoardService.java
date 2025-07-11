@@ -54,7 +54,7 @@ public class BoardService {
         board.setTags(dto.getTags());
     }
 
-
+    @Transactional
     public void delete(Long boardIdx) {
         Board board = findById(boardIdx);
         boardRepository.delete(board);
