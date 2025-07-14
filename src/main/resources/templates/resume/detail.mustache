@@ -64,7 +64,15 @@
                                 {{#position}}
                                     <h6 class="card-subtitle mb-2 text-muted">{{position}}</h6>
                                 {{/position}}
-                                <p class="card-text"><small class="text-muted">{{startAt}} ~ {{endAt}}</small></p>
+                                <!-- 모든 날짜 경우의 수를 처리 -->
+                                {{#startAt}}
+                                    <p class="card-text"><small class="text-muted">{{startAt}} ~ {{#endAt}}{{endAt}}{{/endAt}}</small></p>
+                                {{/startAt}}
+                                {{^startAt}}
+                                    {{#endAt}}
+                                        <p class="card-text"><small class="text-muted">~ {{endAt}}</small></p>
+                                    {{/endAt}}
+                                {{/startAt}}
                                 <p class="card-text" style="white-space: pre-wrap;">{{careerContent}}</p>
                             </div>
                         </div>
