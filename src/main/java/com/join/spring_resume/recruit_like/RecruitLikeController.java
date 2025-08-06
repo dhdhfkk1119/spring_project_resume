@@ -29,7 +29,9 @@ public class RecruitLikeController {
     private final RecruitService recruitService;
     private final MemberService memberService;
     private final RecruitLikeService recruitLikeService;
-
+    
+    
+    // 공고에 대한 좋아요 누르는 API 기능 
     @PostMapping("/api/likes/{recruitIdx}")
     public ResponseEntity<Map<String, String>> toggleLike(
             @PathVariable(name = "recruitIdx") Long recruitIdx,
@@ -52,7 +54,7 @@ public class RecruitLikeController {
         return ResponseEntity.ok(response);
     }
     
-    // 내가 좋아요 누른 공고 보기
+    // 내가 공고에 대해 좋아요 누른 리스트 목록
     @GetMapping("/recruit-list")
     public String recruitLikeList(HttpSession httpSession,
                                   Model model){
@@ -67,11 +69,13 @@ public class RecruitLikeController {
 
         Pageable pageable = PageRequest.of(0,5);
         Page<RecruitLike> recruitLikes = recruitLikeService.recruitLikeList(sessionUser.getId(),pageable);
-        model.addAttribute("recruitList",recruitLikes);
+        PageResponseDTO<RecruitLikeResponse.LikeDTO> pageResponseDTO =
+                PageResponseDTO.from(recruitLikes,RecruitLikeResponse.LikeDTO::fromEntity);
+        model.addAttribute("recruitList",pageResponseDTO);
         return "recruit/recruit-like";
     }
 
-    // 내가 좋아요 누른 공고 보기 늘리기
+    // 내가 좋아요 누른 공고 보기 Ajax 로 비동기 방식으로 보여주기
     @GetMapping("/api/my-recruit")
     @ResponseBody
     public PageResponseDTO<RecruitLikeResponse.LikeDTO> getLikeRecruit(HttpSession httpSession,

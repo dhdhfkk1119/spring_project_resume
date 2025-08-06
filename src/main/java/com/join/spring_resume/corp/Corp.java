@@ -30,6 +30,7 @@ public class Corp {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    @Builder.Default
     private String corpImage = "basic.png";
 
     public void isUseridCheck(String inputId) {

@@ -60,4 +60,13 @@ public class Recruit {
         return DateUtil.formatDate(this.endAt);
     }
 
+    public void updateFromDTO(RecruitRequest.RecruitUpdateDTO dto) {
+        this.recruitTitle = dto.getRecruitTitle();
+        this.area = dto.getArea();
+        this.recruitNumber = dto.getRecruitNumber();
+        this.recruitContent = dto.getRecruitContent();
+        this.startAt = dto.getStartAt().atStartOfDay();
+        this.endAt = dto.getEndAt().atStartOfDay();
+    }
+
 }

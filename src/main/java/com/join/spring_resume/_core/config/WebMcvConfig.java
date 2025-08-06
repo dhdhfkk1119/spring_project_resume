@@ -3,7 +3,9 @@ package com.join.spring_resume._core.config;
 import com.join.spring_resume._core.interceptor.AuthInterceptor;
 import com.join.spring_resume._core.interceptor.LoginInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,6 +16,10 @@ public class WebMcvConfig implements WebMvcConfigurer {
 
     private final LoginInterceptor loginInterceptor;
     private final AuthInterceptor authInterceptor; // 추가사항
+
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -41,7 +47,12 @@ public class WebMcvConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/corp-images/**","/member-images/**")
-                .addResourceLocations("file:///C:/join-uploads/corp-images/","file:///C:/join-uploads/member-images/");
+        // 실제 로컬 저장 폴더: ./uploads/member/
+        // 요청 URL: http://localhost:8080/member-images/abcd.jpg
+        registry.addResourceHandler("/member-images/**")
+                .addResourceLocations("file:./uploads/member-images/");
+
+        registry.addResourceHandler("/corp-images/**")
+                .addResourceLocations("file:./uploads/corp-images/");
     }
 }

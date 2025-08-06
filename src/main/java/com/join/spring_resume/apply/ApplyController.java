@@ -56,7 +56,6 @@ public class ApplyController {
         // 지원 완료 alert 후 메인 페이지 이동
         return "<script>alert('지원이 완료되었습니다.'); window.location.href='/';</script>";
 
-
     }
     
     // 지원한 이력서 목록을 보여준다
@@ -75,8 +74,9 @@ public class ApplyController {
 
         Pageable pageable = PageRequest.of(0,5);
         Page<Apply> applyRecruitList = applyService.MyApplyList(sessionUser.getId(),pageable);
-
-        model.addAttribute("recruitList",applyRecruitList);
+        PageResponseDTO<ApplyResponse.ApplyDTO> pageResponseDTO =
+                PageResponseDTO.from(applyRecruitList,ApplyResponse.ApplyDTO::fromEntity);
+        model.addAttribute("recruitList",pageResponseDTO);
         return "apply/apply-list";
     }
 

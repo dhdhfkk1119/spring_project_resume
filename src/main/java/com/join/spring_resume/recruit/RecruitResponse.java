@@ -41,4 +41,36 @@ public class RecruitResponse {
         }
     }
 
+    @Data
+    @AllArgsConstructor
+    public static class RecruitDetailDTO {
+        private Long recruitIdx;
+        private String recruitTitle;
+        private String area;
+        private String career;
+        private String education;
+        private String workType;
+        private String recruitContent;
+        private int recruitNumber;
+        private String startAtFormatted;
+        private String endAtFormatted;
+        private CorpResponse.CorpDTO corp;
+
+        public static RecruitDetailDTO fromEntity(Recruit recruit) {
+            return new RecruitDetailDTO(
+                    recruit.getRecruitIdx(),
+                    recruit.getRecruitTitle(),
+                    recruit.getArea(),
+                    recruit.getCareer(),
+                    recruit.getEducation(),
+                    recruit.getWorkType(),
+                    recruit.getRecruitContent(),
+                    recruit.getRecruitNumber(),
+                    recruit.getStartAtFormatted(),
+                    recruit.getEndAtFormatted(),
+                    CorpResponse.CorpDTO.fromEntity(recruit.getCorp())
+            );
+        }
+    }
+
 }

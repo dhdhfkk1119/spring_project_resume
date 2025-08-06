@@ -27,8 +27,6 @@ public class MemberController {
         if(sessionUser != null){
             return "redirect:/";
         }
-
-
         return "member/login-form";
     }
 

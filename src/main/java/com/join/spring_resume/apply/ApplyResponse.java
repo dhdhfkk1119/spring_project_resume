@@ -1,5 +1,6 @@
 package com.join.spring_resume.apply;
 
+import com.join.spring_resume.recruit.Recruit;
 import com.join.spring_resume.recruit.RecruitResponse;
 import com.join.spring_resume.resume.ResumeResponse;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,19 @@ public class ApplyResponse {
                     apply.getFormattedAppliedAt()
             );
         }
+    }
+
+    // 일반 유저의 지원한 공고 확인하기
+    @Data
+    public static class RecruitWithApplyCountDTO {
+        private Recruit recruit;
+        private long applyCount; // 몇개 지원했는지 확인 하기 위함
+
+        public RecruitWithApplyCountDTO(Recruit recruit, long applyCount) {
+            this.recruit = recruit;
+            this.applyCount = applyCount;
+        }
+
     }
 
 }

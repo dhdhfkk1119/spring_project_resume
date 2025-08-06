@@ -30,7 +30,8 @@ public class CorpController {
         }
         return "corp/sign-form";
     }
-
+    
+    // 로그인 화면
     @GetMapping("/login-form")
     public String loginForm(HttpSession httpSession){
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
@@ -40,7 +41,7 @@ public class CorpController {
         return "corp/login-form";
     }
 
-    // 로그인 화면
+    // 로그인 화면 API
     @PostMapping("/login")
     public String login(@Valid CorpRequest.LoginDTO loginDTO,
                         BindingResult bindingResult,
@@ -67,7 +68,7 @@ public class CorpController {
 
 
 
-
+    // 기업 회원 가입
     @PostMapping("/corp-sign")
     public String save(@Valid CorpRequest.saveDTO saveDTO,
                        BindingResult bindingResult,
@@ -104,7 +105,9 @@ public class CorpController {
 
         return "redirect:/";
     }
-
+    
+    
+    // 기업 회원 수정
     @PostMapping("/{id}/update")
     public String update(@PathVariable(name = "id")Long sessionIdx,
                          @ModelAttribute CorpRequest.UpdateDTO updateDTO){

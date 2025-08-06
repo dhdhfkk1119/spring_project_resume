@@ -1,13 +1,17 @@
 package com.join.spring_resume.corp;
 
+import com.join.spring_resume._core.config.UploadProperties;
 import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume._core.errors.exception.Exception500;
+import com.join.spring_resume.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
@@ -16,11 +20,16 @@ import java.util.UUID;
 public class CorpService {
 
     private final CorpRepository corpRepository;
+    private final FileUploadUtil fileUploadUtil;
+    private final UploadProperties uploadProperties;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public Corp save(CorpRequest.saveDTO saveDTO){
-
-        return corpRepository.save(saveDTO.toEntity());
+        String encoderPassword = bCryptPasswordEncoder.encode(saveDTO.getPassword());
+        Corp corp = saveDTO.toEntity();
+        corp.setPassword(encoderPassword);
+        return corpRepository.save(corp);
     }
 
 
@@ -28,7 +37,7 @@ public class CorpService {
         Corp corp = corpRepository.findByCorpId(loginDTO.getCorpId())
                 .orElseThrow(() -> new Exception400("아이디 또는 비밀번호가 틀립니다"));
 
-        if (!corp.getPassword().equals(loginDTO.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(loginDTO.getPassword(),corp.getPassword())) {
             throw new Exception400("아이디 또는 비밀번호가 틀립니다");
         }
 
@@ -53,31 +62,20 @@ public class CorpService {
         corp.setCorpName(updateDTO.getCorpName());
 
         // 이미지 저장
-        MultipartFile imageFile = updateDTO.getCorpImage();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
-                // 1. 저장 경로 설정
-                String uploadDir = "C:/join-uploads/corp-images/";
-                File dir = new File(uploadDir);
-                if (!dir.exists()) dir.mkdirs();
+         String oldImagePath = corp.getCorpImage();
+        try {
+            // 새 이미지로 서버 컴퓨터에 생성 완료
+            String savedFileName = fileUploadUtil.uploadProfileImage(updateDTO.getCorpImage(),uploadProperties.getCorpDir());
 
-                String originalFilename = imageFile.getOriginalFilename();
-                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-
-                // 2. UUID 파일명 생성
-                String uuidFilename = UUID.randomUUID().toString() + extension;
-
-                // 3. 파일 객체로 저장
-                File saveFile = new File(uploadDir + uuidFilename);
-                imageFile.transferTo(saveFile);
-
-                // 4. DB에 저장할 파일명 (또는 상대 경로)
-                corp.setCorpImage(uuidFilename); // 또는 "/corp-images/" + uuidFilename
-
-            } catch (Exception e) {
-                e.printStackTrace(); // 상세 스택 로그 출력
-                throw new Exception500("이미지 저장 실패");
+            // 기존에 파일이 있으면 삭제
+            if(oldImagePath != null){
+                fileUploadUtil.deleteProfileImage(oldImagePath,uploadProperties.getCorpDir());
             }
+            
+            // DB에 저장 하기
+            corp.setCorpImage(savedFileName);
+        } catch (IOException e) {
+            throw new Exception400("프로필 이미지 업로드에 실패했습니다");
         }
 
     }

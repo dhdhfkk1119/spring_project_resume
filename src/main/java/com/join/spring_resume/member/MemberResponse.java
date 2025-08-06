@@ -41,30 +41,4 @@ public class MemberResponse {
             );
         }
     }
-
-    @Data
-    @AllArgsConstructor
-    public static class MemberPageDTO {
-        private List<MemberDTO> content;
-        private int page;
-        private int size;
-        private long totalElements;
-        private int totalPages;
-        private boolean last;
-
-        public static MemberPageDTO fromPage(Page<Member> memberPage) {
-            List<MemberDTO> dtoList = memberPage.getContent().stream()
-                    .map(MemberDTO::fromEntity)
-                    .collect(Collectors.toList());
-
-            return new MemberPageDTO(
-                    dtoList,
-                    memberPage.getNumber(),
-                    memberPage.getSize(),
-                    memberPage.getTotalElements(),
-                    memberPage.getTotalPages(),
-                    memberPage.isLast()
-            );
-        }
-    }
 }

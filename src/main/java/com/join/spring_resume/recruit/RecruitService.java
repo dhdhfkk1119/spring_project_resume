@@ -31,17 +31,20 @@ public class RecruitService {
         recruitRepository.save(recruit);
     }
 
-    // 공고 삭제
+    // 공고 삭제 하기
     @Transactional
-    public void recruitDelete(Long idx){
-        Recruit recruit = recruitRepository.findByRecruitIdx(idx)
+    public void deleteById(Long recruitIdx){
+
+        Recruit recruit = recruitRepository.findByRecruitIdx(recruitIdx)
                 .orElseThrow(() -> new Exception404("해당 유저를 찾을수 없습니다"));
 
-        if(recruit.isOwner(idx)){
+        if(recruit.isOwner(recruitIdx)){
             throw new Exception403("삭제권한이없습니다");
         }
 
-        recruitRepository.delete(recruit);
+        applyRepository.deleteByRecruitIdx(recruitIdx); // apply 에서 해당 공고 삭제
+        recruitLikeRepository.deleteByRecruitIdx(recruitIdx); // 좋아요 삭제
+        recruitRepository.deleteById(recruitIdx); // 해당 공고 상제
     }
 
     // 공고 수정
@@ -55,12 +58,7 @@ public class RecruitService {
             throw new Exception403("수정권한이없습니다");
         }
 
-        recruit.setRecruitTitle(recruitDTO.getRecruitTitle());
-        recruit.setArea(recruitDTO.getArea());
-        recruit.setRecruitNumber(recruitDTO.getRecruitNumber());
-        recruit.setRecruitContent(recruitDTO.getRecruitContent());
-        recruit.setStartAt(recruitDTO.getStartAt().atStartOfDay());
-        recruit.setEndAt(recruitDTO.getEndAt().atStartOfDay());
+        recruit.updateFromDTO(recruitDTO);
 
     }
 
@@ -77,15 +75,6 @@ public class RecruitService {
     // 현재 로그인 한기업의 모든 공고 보기
     public Page<Recruit> findByAllList(Long idx,Pageable pageable){
         return recruitRepository.findByCorp_CorpIdx(idx,pageable);
-    }
-
-
-    // 공고 삭제 하기
-    @Transactional
-    public void deleteById(Long recruitIdx){
-        applyRepository.deleteByRecruitIdx(recruitIdx); // apply 에서 해당 공고 삭제
-        recruitLikeRepository.deleteByRecruitIdx(recruitIdx); // 좋아요 삭제
-        recruitRepository.deleteById(recruitIdx); // 해당 공고 상제
     }
 
 }

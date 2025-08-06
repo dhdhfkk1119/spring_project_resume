@@ -187,7 +187,8 @@ public class RecruitController {
     @GetMapping("/{recruitIdx}")
     public String detail(@PathVariable(name = "recruitIdx") Long idx, Model model, HttpSession httpSession) {
         Recruit recruit = recruitService.findById(idx);
-        model.addAttribute("recruit", recruit);
+        RecruitResponse.RecruitDetailDTO recruitDetailDTO = RecruitResponse.RecruitDetailDTO.fromEntity(recruit);
+        model.addAttribute("recruit", recruitDetailDTO);
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("session");
 
@@ -217,16 +218,17 @@ public class RecruitController {
         }
 
         Recruit recruit = recruitService.findById(recruitIdx);
-
+        RecruitResponse.RecruitDetailDTO recruitDetailDTO = RecruitResponse.RecruitDetailDTO.fromEntity(recruit);
         if (!recruit.isOwner(sessionUser.getId())) {
             throw new Exception403("기업이 등록한 공고에 대해서만 조회 가능합니다");
         }
 
         Pageable pageable = PageRequest.of(0, 3);
         Page<Apply> appMemberList = applyService.getApplicantsForRecruit(recruit.getRecruitIdx(), pageable);
+        PageResponseDTO pageResponseDTO = PageResponseDTO.from(appMemberList,ApplyResponse.ApplicantDTO::fromEntity);
 
-        model.addAttribute("recruit", recruit);
-        model.addAttribute("recruitList", appMemberList);
+        model.addAttribute("recruit", recruitDetailDTO);
+        model.addAttribute("recruitList", pageResponseDTO);
         model.addAttribute("appliedCount", appMemberList.getTotalElements());
 
         return "recruit/recruit-applied";
@@ -272,9 +274,9 @@ public class RecruitController {
         Pageable pageable = PageRequest.of(0, 5);
         Page<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx(), pageable);
 
-        Page<ApplyRequest.RecruitWithApplyCountDTO> recruitListWithCounts = recruits.map(recruit -> {
+        Page<ApplyResponse.RecruitWithApplyCountDTO> recruitListWithCounts = recruits.map(recruit -> {
                     long applyCount = applyRepository.countByRecruitId(recruit.getRecruitIdx());
-                    return new ApplyRequest.RecruitWithApplyCountDTO(recruit, applyCount);
+                    return new ApplyResponse.RecruitWithApplyCountDTO(recruit, applyCount);
                 });
 
         model.addAttribute("recruitList", recruitListWithCounts);
@@ -284,7 +286,7 @@ public class RecruitController {
     // 공고 + 지원자 수 목록을 JSON으로 반환 (Ajax 전용)
     @GetMapping("/api/applied/status")
     @ResponseBody
-    public PageResponseDTO<ApplyRequest.RecruitWithApplyCountDTO> getAppliedStatus(
+    public PageResponseDTO<ApplyResponse.RecruitWithApplyCountDTO> getAppliedStatus(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             HttpSession httpSession) {
@@ -300,9 +302,9 @@ public class RecruitController {
         Page<Recruit> recruits = recruitService.findByAllList(corp.getCorpIdx(), pageable);
 
         // DTO 변환
-        Page<ApplyRequest.RecruitWithApplyCountDTO> result = recruits.map(recruit -> {
+        Page<ApplyResponse.RecruitWithApplyCountDTO> result = recruits.map(recruit -> {
             long applyCount = applyRepository.countByRecruitId(recruit.getRecruitIdx());
-            return new ApplyRequest.RecruitWithApplyCountDTO(recruit, applyCount);
+            return new ApplyResponse.RecruitWithApplyCountDTO(recruit, applyCount);
         });
 
         return PageResponseDTO.from(result, dto -> dto);

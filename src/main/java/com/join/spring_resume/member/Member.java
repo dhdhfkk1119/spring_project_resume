@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -50,5 +52,11 @@ public class Member {
         return DateUtil.timestampFormat(this.createdAt);
     }
 
+    @Builder.Default
     private String memberImage = "basic.png";
+
+    public void update(String username, String multipartFile){
+        this.username = username;
+        this.memberImage = multipartFile;
+    }
 }

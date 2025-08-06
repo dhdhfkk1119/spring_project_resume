@@ -1,14 +1,18 @@
 package com.join.spring_resume.member;
 
+import com.join.spring_resume._core.config.UploadProperties;
 import com.join.spring_resume._core.errors.exception.Exception400;
 import com.join.spring_resume._core.errors.exception.Exception404;
 import com.join.spring_resume._core.errors.exception.Exception500;
+import com.join.spring_resume.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
@@ -17,13 +21,16 @@ import java.util.UUID;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final FileUploadUtil fileUploadUtil;
+    private final UploadProperties uploadProperties;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public Member login(MemberRequest.LoginDTO loginDTO){
 
         Member member = memberRepository.findByMemberId(loginDTO.getMemberId())
                 .orElseThrow(() -> new Exception400("아이디 또는 비밀번호가 틀렸습니다"));
 
-        if (!member.getPassword().equals(loginDTO.getPassword())) {
+        if(!bCryptPasswordEncoder.matches(loginDTO.getPassword(),member.getPassword())){
             throw new Exception400("아이디 또는 비밀번호가 틀립니다");
         }
 
@@ -34,8 +41,10 @@ public class MemberService {
 
     @Transactional
     public Member saveMember(MemberRequest.SaveDTO saveDTO){
-
-        return memberRepository.save(saveDTO.toEntity());
+        String encoderPassword = bCryptPasswordEncoder.encode(saveDTO.getPassword());
+        Member member = saveDTO.toEntity();
+        member.setPassword(encoderPassword);
+        return memberRepository.save(member);
     }
 
     public Member findById(Long Idx){
@@ -53,36 +62,22 @@ public class MemberService {
     @Transactional
     public void updateMember(Long idx,MemberRequest.UpdateDTO updateDTO){
         Member member = findById(idx);
-
-        // 회원 이름 수정
-        member.setUsername(updateDTO.getUsername());
         
         // 이미지 저장
-        MultipartFile imageFile = updateDTO.getMemberImage();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
-                // 1. 저장 경로 설정
-                String uploadDir = "C:/join-uploads/member-images/";
-                File dir = new File(uploadDir);
-                if (!dir.exists()) dir.mkdirs();
-
-                String originalFilename = imageFile.getOriginalFilename();
-                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-
-                // 2. UUID 파일명 생성
-                String uuidFilename = UUID.randomUUID().toString() + extension;
-
-                // 3. 파일 객체로 저장
-                File saveFile = new File(uploadDir + uuidFilename);
-                imageFile.transferTo(saveFile);
-
-                // 4. DB에 저장할 파일명 (또는 상대 경로)
-                member.setMemberImage(uuidFilename); // 또는 "/corp-images/" + uuidFilename
-
-            } catch (Exception e) {
-                e.printStackTrace(); // 상세 스택 로그 출력
-                throw new Exception500("이미지 저장 실패");
+        String oldImagePath = member.getMemberImage();
+        try {
+            // 새 이미지로 서버 컴퓨터에 생성 완료
+            String savedFileName = fileUploadUtil.uploadProfileImage(updateDTO.getMemberImage(),uploadProperties.getMemberDir());
+            
+            // 기존에 파일이 있으면 삭제
+            if(oldImagePath != null){
+                fileUploadUtil.deleteProfileImage(oldImagePath,uploadProperties.getMemberDir());
             }
+            
+            // 이름 및 파일 저장
+            member.update(updateDTO.getUsername(),savedFileName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
