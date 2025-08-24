@@ -3,7 +3,7 @@
 ---
 ## 개발프로그램 및 세부사항 
 #### 개발 프로그램 : IntellJ Community
-#### 개발 언어 및 프레임 워크 : JAVA(SpringBoot) - Mustahce 엔진 사용
+#### 개발 언어 및 프레임 워크 : JAVA(SpringBoot) - Mustache 엔진 사용
 #### 개발 DB : MySQL(8.0)
 #### 개발 인원 : 4명 
 #### 개발 기간 : 6/24 ~ 7/7 일 (18일)
